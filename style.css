@@ -259,11 +259,12 @@ nav a::after {
 }
 
 .hero h1::before {
-  content: "$ whoami\n> ";
+  content: "$ whoami\A> ";
   display: block;
   font-size: 1rem;
   color: var(--ctp-green);
   margin-bottom: var(--space-sm);
+  white-space: pre;
 }
 
 .hero .subtitle {
@@ -274,11 +275,12 @@ nav a::after {
 }
 
 .hero .subtitle::before {
-  content: "$ cat role.txt\n> ";
+  content: "$ cat role.txt\A> ";
   display: block;
   font-size: 0.875rem;
   color: var(--ctp-green);
   margin-bottom: var(--space-xs);
+  white-space: pre;
 }
 
 .hero-cta {
@@ -633,6 +635,54 @@ figcaption::before {
 }
 
 /* ============================================
+   Blog - ls style listing
+   ============================================ */
+
+.blog-ls {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
+
+.blog-ls-header {
+  color: var(--ctp-green);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: var(--border-width) var(--border-style) var(--border-color);
+}
+
+.blog-ls-item {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-xs) 0;
+  align-items: baseline;
+}
+
+.blog-ls-item:hover {
+  background: var(--bg-surface);
+}
+
+.blog-ls-perms {
+  color: var(--ctp-yellow);
+  min-width: 80px;
+  font-size: 0.875rem;
+}
+
+.blog-ls-date {
+  color: var(--ctp-blue);
+  min-width: 100px;
+  font-size: 0.875rem;
+}
+
+.blog-ls-link {
+  color: var(--ctp-mauve);
+  flex: 1;
+}
+
+.blog-ls-link:hover {
+  color: var(--ctp-pink);
+}
+
+/* ============================================
    Contact Page
    ============================================ */
 
@@ -724,4 +774,339 @@ summary:hover {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--ctp-surface1);
+}
+
+/* ============================================
+   Visuals Page - CSS Art
+   ============================================ */
+
+.visual-container {
+  margin-bottom: var(--space-2xl);
+}
+
+.visual-box {
+  width: 100%;
+  max-width: 600px;
+  height: 400px;
+  margin: 2rem auto;
+  border: var(--border-width) var(--border-style) var(--border-accent);
+  background: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Visual 1: Impossible Cube */
+.impossible-cube {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: rotateCube 20s infinite linear;
+}
+
+@keyframes rotateCube {
+  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+  100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+}
+
+.cube-face {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border: 2px solid var(--ctp-blue);
+  opacity: 0.8;
+}
+
+.cube-front {
+  background: linear-gradient(135deg, var(--ctp-blue), var(--ctp-mauve));
+  transform: translateZ(100px);
+}
+
+.cube-back {
+  background: linear-gradient(135deg, var(--ctp-mauve), var(--ctp-pink));
+  transform: translateZ(-100px) rotateY(180deg);
+}
+
+.cube-right {
+  background: linear-gradient(135deg, var(--ctp-pink), var(--ctp-red));
+  transform: rotateY(90deg) translateZ(100px);
+}
+
+.cube-left {
+  background: linear-gradient(135deg, var(--ctp-red), var(--ctp-peach));
+  transform: rotateY(-90deg) translateZ(100px);
+}
+
+.cube-top {
+  background: linear-gradient(135deg, var(--ctp-peach), var(--ctp-yellow));
+  transform: rotateX(90deg) translateZ(100px);
+}
+
+.cube-bottom {
+  background: linear-gradient(135deg, var(--ctp-yellow), var(--ctp-green));
+  transform: rotateX(-90deg) translateZ(100px);
+}
+
+/* Visual 2: Psychedelic Spiral */
+.psychedelic-spiral {
+  width: 400px;
+  height: 400px;
+  position: relative;
+}
+
+.spiral-layer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+.spiral-1 {
+  background: conic-gradient(
+    from 0deg,
+    var(--ctp-red),
+    var(--ctp-pink),
+    var(--ctp-mauve),
+    var(--ctp-blue),
+    var(--ctp-teal),
+    var(--ctp-green),
+    var(--ctp-yellow),
+    var(--ctp-red)
+  );
+  animation: spiralRotate 8s infinite linear;
+}
+
+.spiral-2 {
+  background: conic-gradient(
+    from 90deg,
+    var(--ctp-blue),
+    var(--ctp-teal),
+    var(--ctp-green),
+    var(--ctp-yellow),
+    var(--ctp-red),
+    var(--ctp-pink),
+    var(--ctp-mauve),
+    var(--ctp-blue)
+  );
+  animation: spiralRotate 6s infinite linear reverse;
+  transform: scale(0.8);
+}
+
+.spiral-3 {
+  background: conic-gradient(
+    from 180deg,
+    var(--ctp-green),
+    var(--ctp-yellow),
+    var(--ctp-red),
+    var(--ctp-pink),
+    var(--ctp-mauve),
+    var(--ctp-blue),
+    var(--ctp-teal),
+    var(--ctp-green)
+  );
+  animation: spiralRotate 10s infinite linear;
+  transform: scale(0.6);
+}
+
+.spiral-4 {
+  background: conic-gradient(
+    from 270deg,
+    var(--ctp-yellow),
+    var(--ctp-red),
+    var(--ctp-pink),
+    var(--ctp-mauve),
+    var(--ctp-blue),
+    var(--ctp-teal),
+    var(--ctp-green),
+    var(--ctp-yellow)
+  );
+  animation: spiralRotate 4s infinite linear reverse;
+  transform: scale(0.4);
+}
+
+@keyframes spiralRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Visual 3: 3D Corridor */
+.corridor-3d {
+  width: 500px;
+  height: 350px;
+  position: relative;
+  perspective: 500px;
+}
+
+.corridor-segment {
+  position: absolute;
+  border: 3px solid var(--ctp-blue);
+  animation: corridorPulse 3s infinite ease-in-out;
+}
+
+.corridor-1 {
+  width: 400px;
+  height: 300px;
+  top: 25px;
+  left: 50px;
+  background: linear-gradient(135deg, transparent, rgba(137, 180, 250, 0.1));
+}
+
+.corridor-2 {
+  width: 320px;
+  height: 240px;
+  top: 55px;
+  left: 90px;
+  background: linear-gradient(135deg, transparent, rgba(137, 180, 250, 0.15));
+  animation-delay: 0.3s;
+}
+
+.corridor-3 {
+  width: 240px;
+  height: 180px;
+  top: 85px;
+  left: 130px;
+  background: linear-gradient(135deg, transparent, rgba(137, 180, 250, 0.2));
+  animation-delay: 0.6s;
+}
+
+.corridor-4 {
+  width: 160px;
+  height: 120px;
+  top: 115px;
+  left: 170px;
+  background: linear-gradient(135deg, transparent, rgba(137, 180, 250, 0.25));
+  animation-delay: 0.9s;
+}
+
+.corridor-5 {
+  width: 80px;
+  height: 60px;
+  top: 145px;
+  left: 210px;
+  background: linear-gradient(135deg, transparent, rgba(137, 180, 250, 0.3));
+  animation-delay: 1.2s;
+}
+
+.corridor-vanish {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 165px;
+  left: 240px;
+  background: radial-gradient(circle, var(--ctp-blue), transparent);
+  animation: vanishPulse 2s infinite ease-in-out;
+}
+
+@keyframes corridorPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+
+@keyframes vanishPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* Visual 4: Tessellation Grid */
+.tessellation-grid {
+  width: 500px;
+  height: 400px;
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      var(--ctp-blue) 0px,
+      var(--ctp-blue) 20px,
+      var(--ctp-mauve) 20px,
+      var(--ctp-mauve) 40px,
+      var(--ctp-pink) 40px,
+      var(--ctp-pink) 60px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      var(--ctp-teal) 0px,
+      var(--ctp-teal) 20px,
+      var(--ctp-green) 20px,
+      var(--ctp-green) 40px,
+      var(--ctp-yellow) 40px,
+      var(--ctp-yellow) 60px
+    );
+  background-blend-mode: multiply;
+  animation: tessellationShift 15s infinite linear;
+  opacity: 0.8;
+}
+
+@keyframes tessellationShift {
+  0% { background-position: 0 0, 0 0; }
+  100% { background-position: 200px 200px, -200px -200px; }
+}
+
+/* Visual 5: Magic Eye Pattern */
+.magic-eye-pattern {
+  width: 500px;
+  height: 400px;
+  background:
+    radial-gradient(circle at 20% 50%, var(--ctp-blue) 5px, transparent 5px),
+    radial-gradient(circle at 40% 30%, var(--ctp-mauve) 5px, transparent 5px),
+    radial-gradient(circle at 60% 70%, var(--ctp-pink) 5px, transparent 5px),
+    radial-gradient(circle at 80% 50%, var(--ctp-teal) 5px, transparent 5px),
+    radial-gradient(circle at 100% 30%, var(--ctp-green) 5px, transparent 5px);
+  background-size: 60px 80px;
+  background-position: 0 0, 15px 20px, 30px 40px, 45px 60px, 60px 80px;
+  animation: magicEyeMove 20s infinite linear;
+}
+
+@keyframes magicEyeMove {
+  0% { background-position: 0 0, 15px 20px, 30px 40px, 45px 60px, 60px 80px; }
+  100% { background-position: 60px 80px, 75px 100px, 90px 120px, 105px 140px, 120px 160px; }
+}
+
+/* Responsive adjustments for visuals */
+@media (max-width: 768px) {
+  .visual-box {
+    height: 300px;
+  }
+
+  .impossible-cube {
+    width: 150px;
+    height: 150px;
+  }
+
+  .cube-face {
+    width: 150px;
+    height: 150px;
+  }
+
+  .cube-front { transform: translateZ(75px); }
+  .cube-back { transform: translateZ(-75px) rotateY(180deg); }
+  .cube-right { transform: rotateY(90deg) translateZ(75px); }
+  .cube-left { transform: rotateY(-90deg) translateZ(75px); }
+  .cube-top { transform: rotateX(90deg) translateZ(75px); }
+  .cube-bottom { transform: rotateX(-90deg) translateZ(75px); }
+
+  .psychedelic-spiral {
+    width: 280px;
+    height: 280px;
+  }
+
+  .corridor-3d {
+    width: 350px;
+    height: 250px;
+  }
+
+  .corridor-1 { width: 280px; height: 210px; top: 20px; left: 35px; }
+  .corridor-2 { width: 224px; height: 168px; top: 41px; left: 63px; }
+  .corridor-3 { width: 168px; height: 126px; top: 62px; left: 91px; }
+  .corridor-4 { width: 112px; height: 84px; top: 83px; left: 119px; }
+  .corridor-5 { width: 56px; height: 42px; top: 104px; left: 147px; }
+  .corridor-vanish { width: 15px; height: 15px; top: 117px; left: 167px; }
+
+  .tessellation-grid,
+  .magic-eye-pattern {
+    width: 350px;
+    height: 280px;
+  }
 }
