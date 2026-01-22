@@ -259,11 +259,12 @@ nav a::after {
 }
 
 .hero h1::before {
-  content: "$ whoami\n> ";
+  content: "$ whoami\A> ";
   display: block;
   font-size: 1rem;
   color: var(--ctp-green);
   margin-bottom: var(--space-sm);
+  white-space: pre;
 }
 
 .hero .subtitle {
@@ -274,11 +275,12 @@ nav a::after {
 }
 
 .hero .subtitle::before {
-  content: "$ cat role.txt\n> ";
+  content: "$ cat role.txt\A> ";
   display: block;
   font-size: 0.875rem;
   color: var(--ctp-green);
   margin-bottom: var(--space-xs);
+  white-space: pre;
 }
 
 .hero-cta {
