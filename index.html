@@ -1,126 +1,285 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Michael Vivirito's Webpage</title>
-<link rel='stylesheet' type='text/css' href='style.css'>
-<meta charset="utf-8"/>
-<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Michael Vivirito - Systems Administrator & Cloud Engineer</title>
+  <meta name="description" content="Michael Vivirito is a passionate Systems Administrator specializing in AWS cloud infrastructure, serverless architecture, and DevOps. AWS certified with expertise in Linux, FreeBSD, and modern cloud technologies.">
+  <meta name="keywords" content="Michael Vivirito, Systems Administrator, AWS, Cloud Engineer, DevOps, FreeBSD, Linux, Serverless, mvivirito">
+  <meta name="author" content="Michael Vivirito">
+
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://michaelvivirito.com">
+  <meta property="og:title" content="Michael Vivirito - Systems Administrator & Cloud Engineer">
+  <meta property="og:description" content="Passionate Systems Administrator with expertise in AWS cloud and on-prem datacenters. Self-taught since age 3, AWS & CompTIA certified.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Michael Vivirito - Systems Administrator & Cloud Engineer">
+  <meta name="twitter:description" content="AWS certified Systems Administrator specializing in cloud infrastructure and DevOps.">
+  <meta name="twitter:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Michael Vivirito",
+    "url": "https://michaelvivirito.com",
+    "image": "https://michaelvivirito.com/pix/portrait.jpg",
+    "jobTitle": "Systems Administrator",
+    "worksFor": {
+      "@type": "Organization",
+      "name": "Self-Employed"
+    },
+    "alumniOf": "Computer Science, Mathematics, Physics",
+    "sameAs": [
+      "https://www.linkedin.com/in/mvivirito",
+      "https://github.com/mvivirito",
+      "https://www.youtube.com/c/michaelvivirito"
+    ]
+  }
+  </script>
 </head>
-
 <body>
-<h1>Michael Vivirito's Webpage</h1>
 
-        <img class=resright src="pix/portrait.jpg" alt="Mike" title="Mike">
+  <!-- Navigation -->
+  <nav>
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#articles">Articles</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
 
-<style>
-@-webkit-keyframes pulse
-{
-  0% {color: red;}
- 25% {color: tomato;}
- 50% {color: orange;}
- 75% {color: yellow;}
- 100% {color: moccasin;}
-}
-#pulse
-{
- color: red;
- -webkit-animation: pulse 0.5s infinite alternate;
-}
-</style>
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <h1>Michael Vivirito</h1>
+      <p class="subtitle">Systems Administrator | Cloud Engineer | DevOps Enthusiast</p>
+      <p class="text-muted">Building scalable infrastructure on AWS • FreeBSD advocate • Vim golfer</p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary">View Projects</a>
+        <a href="contact.html" class="btn btn-secondary">Get in Touch</a>
+      </div>
+    </div>
+  </section>
 
-        <p>I am a passionate Systems Administrator with experience in the AWS cloud and on-prem datacenters. I have been using computers since I was 3 years old and have matured alongside the technology. I am mostly self-taught but began my foray into a formal education in 2017. Since than I have achieved an Associate degree in CS, Math and soon Physics. I have also attained the AWS Developers and Solutions Architect Associate Certifications as well as CompTIA Security+. My favorite OS is FreeBSD, and I am an avid Vim Golfer. In my spare time I am working on several personal projects on AWS. They are fully Serverless and implementing technologies such as S3, CloudFront, Route53, Cognito, API Gateway, Lambda and DynamoDB and I use Github, CodeDeploy with CodePipeline for continuous integration and deployment..
-        </p>
+  <!-- About Section -->
+  <section id="about">
+    <h2>About Me</h2>
+    <div class="about-content">
+      <div>
+        <p>I am a passionate Systems Administrator with experience in the AWS cloud and on-prem datacenters. I have been using computers since I was 3 years old and have matured alongside the technology.</p>
 
-        <h2>Topics</h2>
+        <p>I am mostly self-taught but began my foray into a formal education in 2017. Since then I have achieved an Associate degree in CS, Math and soon Physics.</p>
 
-        <div class=lol>
-        <h3>🖥️ Computers &amp;  Linux</h3>
+        <p>My favorite OS is <strong>FreeBSD</strong>, and I am an avid Vim Golfer. In my spare time I am working on several personal projects on AWS. They are fully <strong>Serverless</strong> and implementing technologies such as S3, CloudFront, Route53, Cognito, API Gateway, Lambda and DynamoDB. I use Github, CodeDeploy with CodePipeline for continuous integration and deployment.</p>
 
-        <ul>
-            <li><a href="articles/programs.html"><strong>Software I Use and Recommend</strong></a></li>
-        </ul>
+        <div class="certifications">
+          <span class="badge">AWS Solutions Architect Associate</span>
+          <span class="badge">AWS Developer Associate</span>
+          <span class="badge">CompTIA Security+</span>
+          <span class="badge">Associate CS</span>
+          <span class="badge">Associate Math</span>
         </div>
+      </div>
+      <div>
+        <img src="pix/portrait.jpg" alt="Michael Vivirito" class="profile-image">
+      </div>
+    </div>
+  </section>
 
-        <div class=lol>
+  <!-- Projects Section -->
+  <section id="projects">
+    <h2>Featured Projects</h2>
+    <div class="grid grid-3">
+
+      <!-- nix-config -->
+      <div class="card project-card">
+        <h3>nix-config</h3>
+        <p>Personal Nix configuration for reproducible system setups and development environments.</p>
+        <div class="project-meta">
+          <span class="project-language">
+            <span class="language-dot" style="background: #7e7eff;"></span>
+            Nix
+          </span>
+          <a href="https://github.com/mvivirito/nix-config" target="_blank" rel="noopener noreferrer" class="project-link">View on GitHub →</a>
+        </div>
+      </div>
+
+      <!-- media_server -->
+      <div class="card project-card">
+        <h3>media_server</h3>
+        <p>Portainer stack for my media server - containerized media management and streaming infrastructure.</p>
+        <div class="project-meta">
+          <span class="project-language">
+            <span class="language-dot" style="background: #89e051;"></span>
+            Docker
+          </span>
+          <a href="https://github.com/mvivirito/media_server" target="_blank" rel="noopener noreferrer" class="project-link">View on GitHub →</a>
+        </div>
+      </div>
+
+      <!-- url_runner -->
+      <div class="card project-card">
+        <h3>url_runner</h3>
+        <p>A URL runner game based on the browser URL snake game! Creative use of the browser address bar for gameplay.</p>
+        <div class="project-meta">
+          <span class="project-language">
+            <span class="language-dot" style="background: #f1e05a;"></span>
+            JavaScript
+          </span>
+          <a href="https://github.com/mvivirito/url_runner" target="_blank" rel="noopener noreferrer" class="project-link">View on GitHub →</a>
+        </div>
+      </div>
+
+      <!-- AdventOfCode2024 -->
+      <div class="card project-card">
+        <h3>AdventOfCode2024</h3>
+        <p>Solutions to Advent of Code 2024 programming challenges - algorithmic problem solving in Python.</p>
+        <div class="project-meta">
+          <span class="project-language">
+            <span class="language-dot" style="background: #3572A5;"></span>
+            Python
+          </span>
+          <a href="https://github.com/mvivirito/AdventOfCode2024" target="_blank" rel="noopener noreferrer" class="project-link">View on GitHub →</a>
+        </div>
+      </div>
+
+      <!-- advantage360 -->
+      <div class="card project-card">
+        <h3>advantage360</h3>
+        <p>Custom configuration for the Advantage360 Professional keyboard using ZMK firmware.</p>
+        <div class="project-meta">
+          <span class="project-language">
+            <span class="language-dot" style="background: #89e051;"></span>
+            Shell
+          </span>
+          <a href="https://github.com/mvivirito/advantage360" target="_blank" rel="noopener noreferrer" class="project-link">View on GitHub →</a>
+        </div>
+      </div>
+
+      <!-- glove80-config -->
+      <div class="card project-card">
+        <h3>glove80-config</h3>
+        <p>Configuration for my MoErgo Glove80 keyboard - ergonomic keyboard layout optimization.</p>
+        <div class="project-meta">
+          <span class="project-language">
+            <span class="language-dot" style="background: #7e7eff;"></span>
+            Nix
+          </span>
+          <a href="https://github.com/mvivirito/glove80-config" target="_blank" rel="noopener noreferrer" class="project-link">View on GitHub →</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Articles Section -->
+  <section id="articles">
+    <h2>Articles & Tutorials</h2>
+    <div class="grid">
+
+      <div class="card">
+        <h3>🖥️ Computers & Linux</h3>
+        <ul class="list-unstyled">
+          <li><a href="articles/programs.html">Software I Use and Recommend</a></li>
+        </ul>
+      </div>
+
+      <div class="card">
         <h3>📜 Tutorials and Guides</h3>
-        <ul>
-            <li><a href="#">Coming Soon</a></li>
+        <ul class="list-unstyled">
+          <li><a href="#">Coming Soon</a></li>
         </ul>
-        </div>
+      </div>
 
-        <div class=lol>
+      <div class="card">
         <h3>💬 Language</h3>
-        <ul>
-            <li><a href="#">Coming Soon</a></li>
+        <ul class="list-unstyled">
+          <li><a href="#">Coming Soon</a></li>
         </ul>
-        </div>
+      </div>
 
-        <div class=lol>
-            <h3>🌃 Science</h3>
-            <ul>
-            <li><a href="#">Coming Soon</a></li>
-                <!-- <li><a href="articles/utilitarianism.html">Absurdities of Utilitarianism</a></li> -->
-            </ul>
-        </div>
-
-
-        <div class=lol>
-            <h3>🍹 Lifestyle</h3>
-            <ul>
-		    <!--        <li><a href="https://www.miketheinventor.com">MikeTheInventor.com</a></li> -->
-            <li><a href="#">Coming Soon</a></li>
-            </ul>
-        </div>
-
-        <div class=lol>
-            <h3>💻 Software</h3>
-            <ul>
-                <li><a href="https://github.com/mvivirito/dotfiles">dotfiles</a></li>
-            </ul>
-        </div>
-
-        <div class=lol>
-        <h3>😎 Myself</h3>
-        <ul>
-            <!-- <li><a href="about.html">About Me</a></li> -->
-            <!-- <li><a href="articles/academic.html">Academic</a></li> -->
-            <li><a href="contact.html">Contact me</a></li>
-            <li><a href="https://www.linkedin.com/in/mvivirito">Linkedin</a></li>
-            <!-- <li><a href="donate.html"><strong>Donate to me</strong></a></li> -->
+      <div class="card">
+        <h3>🌃 Science</h3>
+        <ul class="list-unstyled">
+          <li><a href="#">Coming Soon</a></li>
         </ul>
-        </div>
+      </div>
 
-        <div class=lol>
-        <h3>🌎 Other Places on the Wev...</h3>
-        <ul>
-            <li><a href="https://www.youtube.com/c/michaelvivirito">Personal Youtube Channel</a></li>
-            <li><a href="https://www.youtube.com/channel/UCEW0IUL5YRpi8XtxopBkhYw">Music Youtube Chanel</a></li>
+      <div class="card">
+        <h3>🍹 Lifestyle</h3>
+        <ul class="list-unstyled">
+          <li><a href="#">Coming Soon</a></li>
         </ul>
-        </div>
+      </div>
 
+      <div class="card">
+        <h3>💻 Software & Dotfiles</h3>
+        <ul class="list-unstyled">
+          <li><a href="https://github.com/mvivirito/dotfiles" target="_blank" rel="noopener noreferrer">My Dotfiles</a></li>
+        </ul>
+      </div>
 
+    </div>
+  </section>
 
+  <!-- Connect Section -->
+  <section id="connect">
+    <h2>Let's Connect</h2>
+    <div class="card" style="max-width: 600px; margin: 0 auto; text-align: center;">
+      <p>Interested in collaborating or just want to chat about tech? Feel free to reach out!</p>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem;">
+        <a href="contact.html" class="btn btn-primary">Contact Me</a>
+        <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">LinkedIn</a>
+        <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">GitHub</a>
+      </div>
 
+      <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+        <h4 style="margin-bottom: 1rem;">Support My Work</h4>
+        <p style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
+          <img src="pix/btc.svg" alt="Bitcoin" style="width: 1.5em; height: 1.5em; display: inline;">
+          Bitcoin (<a href="pix/btc.png">QR Code</a>)
+        </p>
+        <code id="cryptoaddr">3PnS6iR9tFgictRnzntSkPY4cWZJ9R3t3e</code>
+      </div>
+    </div>
+  </section>
 
-<ul>
-    <li><img src="pix/btc.svg"> Bitcoin (<a href="pix/btc.png">BTC QR</a>): <code class=cryptoaddr style="font-size:small;overflow-wrap:break-word">3PnS6iR9tFgictRnzntSkPY4cWZJ9R3t3e</code></li>
-    </li>
-</ul>
+  <!-- Footer -->
+  <footer>
+    <p>
+      <a href="https://www.youtube.com/c/michaelvivirito" target="_blank" rel="noopener noreferrer">YouTube</a> •
+      <a href="https://www.youtube.com/channel/UCEW0IUL5YRpi8XtxopBkhYw" target="_blank" rel="noopener noreferrer">Music Channel</a> •
+      <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2024 Michael Vivirito. Built with HTML, CSS, and passion.
+    </p>
+  </footer>
 
-
-<!-- <dl> -->
-<!--     <dt>General</dt> -->
-<!--     <dd><code>https://lukesmith.xyz/rss.xml</code></dd> -->
-<!--     <dt><em>Not Related!</em> Podcast</dt> -->
-<!--     <dd><code>https://notrelated.xyz/rss</code></dd> -->
-<!--     <dt>Videos</dt> -->
-<!--     <dd><code>https://videos.lukesmith.xyz/feeds/videos.xml?accountId=3</code></dd> -->
-<!--     <dt>YouTube</dt> -->
-<!--     <dd><code>https://www.youtube.com/feeds/videos.xml?channel_id=UC2eYFnH61tmytImy1mTYvhA</code></dd> -->
-<!-- </dl> -->
-
-
+  <!-- Smooth scroll script -->
+  <script>
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>
-
