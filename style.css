@@ -183,28 +183,25 @@ a:focus {
    ============================================ */
 
 nav {
-  border: var(--border-width) var(--border-style) var(--border-color);
   background: var(--bg-tertiary);
   padding: var(--space-md);
+  padding-top: calc(var(--space-md) + 0.5rem);
   margin-bottom: var(--space-xl);
   position: sticky;
   top: var(--space-lg);
   z-index: 1000;
+  border: var(--border-width) var(--border-style) var(--border-color);
+  position: relative;
 }
 
 nav::before {
-  content: "┌─ Navigation ─────────────────────────────────────────────────┐";
-  display: block;
+  content: " Navigation ";
+  position: absolute;
+  top: -0.6em;
+  left: var(--space-md);
+  background: var(--bg-tertiary);
+  padding: 0 var(--space-xs);
   color: var(--border-color);
-  margin-bottom: var(--space-sm);
-  font-size: 0.875rem;
-}
-
-nav::after {
-  content: "└──────────────────────────────────────────────────────────────┘";
-  display: block;
-  color: var(--border-color);
-  margin-top: var(--space-sm);
   font-size: 0.875rem;
 }
 
@@ -730,9 +727,8 @@ summary:hover {
     font-size: 1.75rem;
   }
 
-  nav::before,
-  nav::after {
-    font-size: 0.65rem;
+  nav::before {
+    font-size: 0.75rem;
   }
 
   nav ul {
