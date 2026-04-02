@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Michael Vivirito — Blog</title>
+    <link>https://michaelvivirito.com</link>
+    <description>SRE, infrastructure, and AI agent engineering. Real-world DevOps from the trenches.</description>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 02 Apr 2026 14:00:00 GMT</lastBuildDate>
+    <atom:link href="https://michaelvivirito.com/feed.xml" rel="self" type="application/rss+xml"/>
+
+    <item>
+      <title>Kubernetes on Bare Metal: A Practical Guide</title>
+      <link>https://michaelvivirito.com/articles/kubernetes-bare-metal.html</link>
+      <guid isPermaLink="true">https://michaelvivirito.com/articles/kubernetes-bare-metal.html</guid>
+      <pubDate>Wed, 02 Apr 2026 07:00:00 GMT</pubDate>
+      <description>Skip the cloud. Own your stack. A real-world guide to running k8s on bare metal with Proxmox — kubeadm, Cilium, NFS storage, MetalLB, and backups.</description>
+    </item>
+
+    <item>
+      <title>AWS Cost Optimization: An SRE's Playbook</title>
+      <link>https://michaelvivirito.com/articles/aws-cost-optimization.html</link>
+      <guid isPermaLink="true">https://michaelvivirito.com/articles/aws-cost-optimization.html</guid>
+      <pubDate>Wed, 02 Apr 2026 06:30:00 GMT</pubDate>
+      <description>Real strategies, real numbers. From $2800/month to $1800/month without sacrificing reliability. Reserved instances, right-sizing, Spot fleets, and storage lifecycle.</description>
+    </item>
+
+    <item>
+      <title>How I Built an AI Agent That Manages My Infrastructure</title>
+      <link>https://michaelvivirito.com/articles/building-ai-agent-infrastructure.html</link>
+      <guid isPermaLink="true">https://michaelvivirito.com/articles/building-ai-agent-infrastructure.html</guid>
+      <pubDate>Wed, 02 Apr 2026 06:00:00 GMT</pubDate>
+      <description>Not a chatbot. A real autonomous agent that manages NixOS servers, Kubernetes clusters, task tracking, and proactive infrastructure monitoring — built with OpenClaw.</description>
+    </item>
+
+    <item>
+      <title>Set Up Prometheus and Grafana Monitoring in 10 Minutes</title>
+      <link>https://michaelvivirito.com/articles/prometheus-grafana-monitoring.html</link>
+      <guid isPermaLink="true">https://michaelvivirito.com/articles/prometheus-grafana-monitoring.html</guid>
+      <pubDate>Wed, 02 Apr 2026 05:30:00 GMT</pubDate>
+      <description>Deploy Prometheus and Grafana with Docker Compose. Includes pre-configured alert rules, dashboards, and a downloadable monitoring toolkit.</description>
+    </item>
+
+    <item>
+      <title>Why I Run NixOS on My Servers</title>
+      <link>https://michaelvivirito.com/articles/why-i-run-nixos.html</link>
+      <guid isPermaLink="true">https://michaelvivirito.com/articles/why-i-run-nixos.html</guid>
+      <pubDate>Wed, 02 Apr 2026 05:00:00 GMT</pubDate>
+      <description>Declarative configuration, atomic rollbacks, and reproducible builds — lessons from 3 years of NixOS in production on Proxmox and bare metal.</description>
+    </item>
+
+    <item>
+      <title>Top 10 TUI Apps for Terminal Enthusiasts</title>
+      <link>https://michaelvivirito.com/articles/top-10-tui-apps.html</link>
+      <guid isPermaLink="true">https://michaelvivirito.com/articles/top-10-tui-apps.html</guid>
+      <pubDate>Mon, 22 Jan 2024 00:00:00 GMT</pubDate>
+      <description>The best terminal user interface apps for productivity and style — from file managers to system monitors to music players.</description>
+    </item>
+
+  </channel>
+</rss>
