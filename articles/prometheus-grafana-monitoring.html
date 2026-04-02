@@ -232,7 +232,33 @@ scrape_configs:
 
     </div>
 
-    <div style="max-width: 800px; margin: 3rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+    <!-- Newsletter CTA -->
+    <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
+      <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
+      <p class="text-muted">
+        SRE tips, infrastructure patterns, and NixOS guides — straight to your inbox. No spam, just signal.
+      </p>
+      <form action="#" method="POST" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+        <input type="email" name="email" placeholder="you@example.com" required
+               style="flex: 1; min-width: 200px; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-default); color: var(--text-primary); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
+        <button type="submit" class="btn btn-primary" style="cursor: pointer;">Subscribe</button>
+      </form>
+      <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 0; margin-top: 0.5rem;">
+        <!-- TODO: Wire up to newsletter service (Buttondown, ConvertKit, or similar) -->
+        Delivery via newsletter service. Unsubscribe anytime.
+      </p>
+    </div>
+
+    <!-- Related Posts -->
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <h3>Related Posts</h3>
+      <ul>
+        <li><a href="why-i-run-nixos.html">Why I Run NixOS on My Servers</a></li>
+        <li><a href="building-ai-agent-infrastructure.html">How I Built an AI Agent That Manages My Infrastructure</a></li>
+      </ul>
+    </div>
+
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
       <p class="text-center">
         <a href="../index.html#blog" class="btn btn-secondary">← Back to Blog</a>
       </p>

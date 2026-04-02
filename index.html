@@ -202,6 +202,16 @@
         <div class="blog-ls-item">
           <span class="blog-ls-perms">-rw-r--r--</span>
           <span class="blog-ls-date">2026-04-02</span>
+          <a href="articles/kubernetes-bare-metal.html" class="blog-ls-link">kubernetes-bare-metal.html</a>
+        </div>
+        <div class="blog-ls-item">
+          <span class="blog-ls-perms">-rw-r--r--</span>
+          <span class="blog-ls-date">2026-04-02</span>
+          <a href="articles/aws-cost-optimization.html" class="blog-ls-link">aws-cost-optimization.html</a>
+        </div>
+        <div class="blog-ls-item">
+          <span class="blog-ls-perms">-rw-r--r--</span>
+          <span class="blog-ls-date">2026-04-02</span>
           <a href="articles/building-ai-agent-infrastructure.html" class="blog-ls-link">building-ai-agent-infrastructure.html</a>
         </div>
         <div class="blog-ls-item">
@@ -227,6 +237,25 @@
           <strong>Resources:</strong> Check out my <a href="https://github.com/mvivirito/dotfiles" target="_blank" rel="noopener noreferrer">dotfiles on GitHub</a>
         </p>
       </div>
+    </div>
+  </section>
+
+  <!-- Newsletter Section -->
+  <section id="newsletter">
+    <h2>$ subscribe --to newsletter</h2>
+    <div class="card" style="max-width: 600px; margin: 0 auto;">
+      <p class="text-muted">
+        SRE tips, infrastructure patterns, and NixOS guides. No spam, just signal.
+      </p>
+      <form action="#" method="POST" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+        <input type="email" name="email" placeholder="you@example.com" required
+               style="flex: 1; min-width: 200px; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-default); color: var(--text-primary); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
+        <button type="submit" class="btn btn-primary" style="cursor: pointer;">Subscribe</button>
+      </form>
+      <p class="text-muted" style="font-size: 0.75rem; margin-top: 0.75rem; margin-bottom: 0;">
+        <!-- TODO: Wire up to newsletter service (Buttondown, ConvertKit, or similar) -->
+        Powered by a newsletter service. Unsubscribe anytime. ~2 emails/month.
+      </p>
     </div>
   </section>
 

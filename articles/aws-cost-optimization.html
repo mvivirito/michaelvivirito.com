@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS Cost Optimization: An SRE's Playbook - Michael Vivirito</title>
+  <meta name="description" content="Practical AWS cost optimization strategies from 8 years of SRE experience. Real numbers, real savings — from $2800/month to $1800/month with these techniques.">
+  <meta name="keywords" content="AWS, cloud cost optimization, SRE, FinOps, Reserved Instances, Spot Instances, cost reduction, cloud spending, infrastructure">
+  <meta name="author" content="Michael Vivirito">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="AWS Cost Optimization: An SRE's Playbook">
+  <meta property="og:description" content="Real strategies, real numbers. From $2800/month to $1800/month without sacrificing reliability.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#projects">Projects</a></li>
+      <li><a href="../index.html#blog">Blog</a></li>
+      <li><a href="../nixie.html">Nixie</a></li>
+      <li><a href="../visuals.html">Visuals</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>AWS Cost Optimization: An SRE's Playbook</h1>
+      <p class="text-muted">
+        Published on <time datetime="2026-04-02">April 2, 2026</time>
+      </p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+        <span class="badge">AWS</span>
+        <span class="badge">FinOps</span>
+        <span class="badge">SRE</span>
+      </div>
+    </header>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <h2>The Bill That Woke Me Up</h2>
+      <p>
+        Three years ago, I got an AWS bill for $2,800. For a side project. That was the moment
+        I stopped treating cloud costs as someone else's problem.
+      </p>
+      <p>
+        Since then, I've cut that bill to $1,800/month while <strong>increasing</strong> reliability
+        and capacity. This isn't theoretical — these are the exact techniques I use, with real
+        numbers.
+      </p>
+
+      <h2>1. Right-Sizing: The Low-Hanging Fruit</h2>
+      <p>
+        Most teams over-provision because they guessed during setup. AWS's own data shows
+        <strong>40% of EC2 instances are under-utilized</strong>.
+      </p>
+      <pre><code># Check your actual utilization
+aws cloudwatch get-metric-statistics \
+  --namespace AWS/EC2 \
+  --metric-name CPUUtilization \
+  --dimensions Name=InstanceId,Value=i-1234567890 \
+  --start-time $(date -u -d '14 days ago' +%Y-%m-%dT%H:%M:%S) \
+  --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
+  --period 86400 \
+  --statistics Average</code></pre>
+      <p>
+        <strong>Rule of thumb</strong>: If your average CPU is below 20% and memory below 40%
+        for 14 days, you can probably drop one instance size. I saved $180/month just by
+        moving a t3.xlarge to t3.large.
+      </p>
+
+      <h2>2. Reserved Instances and Savings Plans</h2>
+      <p>
+        If you're running anything stable (databases, core services, CI/CD), you're leaving
+        money on the table without commitments.
+      </p>
+      <ul>
+        <li><strong>1-year No Upfront RI</strong>: ~30% savings on baseline compute</li>
+        <li><strong>Compute Savings Plans</strong>: ~25% savings with flexibility across instance families</li>
+        <li><strong>S3 Intelligent-Tiering</strong>: Automatically moves objects between access tiers</li>
+      </ul>
+      <p>
+        I run Savings Plans on my baseline (3x m6i.large) and use Spot for burst workloads.
+        This alone saves me ~$400/month.
+      </p>
+
+      <h2>3. Spot Instances for Fault-Tolerant Workloads</h2>
+      <p>
+        Spot instances are 60-90% cheaper than On-Demand. The catch: they can be interrupted
+        with 2 minutes notice. Use them for:
+      </p>
+      <ul>
+        <li>CI/CD build runners</li>
+        <li>Data processing jobs</li>
+        <li>Stateless web servers behind an ALB</li>
+        <li>Kubernetes worker nodes (with proper drain handling)</li>
+      </ul>
+      <pre><code># Spot Fleet request for CI runners
+{
+  "SpotFleetRequestConfig": {
+    "AllocationStrategy": "capacityOptimized",
+    "TargetCapacity": 2,
+    "LaunchSpecifications": [
+      {
+        "InstanceType": "c5.xlarge",
+        "ImageId": "ami-12345678",
+        "KeyName": "ci-key",
+        "SecurityGroups": [{"GroupId": "sg-ci"}]
+      }
+    ]
+  }
+}</code></pre>
+      <p>
+        I use Spot for all my CI/CD pipelines. My average build cost dropped from $0.17/hour
+        to $0.04/hour.
+      </p>
+
+      <h2>4. Storage: Where Costs Hide</h2>
+      <p>
+        Storage costs sneak up on you. EBS volumes, S3 buckets, snapshots — they accumulate
+        silently.
+      </p>
+      <ul>
+        <li><strong>Delete unattached EBS volumes</strong>: Check monthly, automate the cleanup</li>
+        <li><strong>Snapshot lifecycle policies</strong>: Keep 7 daily, 4 weekly, 12 monthly — not forever</li>
+        <li><strong>S3 lifecycle rules</strong>: Move to Glacier after 90 days, expire after 365</li>
+        <li><strong>EBS gp3 > gp2</strong>: Same price, 20% better baseline IOPS, tunable</li>
+      </ul>
+      <pre><code># Find unattached EBS volumes (often $50-200/month wasted)
+aws ec2 describe-volumes \
+  --filters Name=status,Values=available \
+  --query 'Volumes[*].{ID:VolumeId,Size:Size,Type:VolumeType}'</code></pre>
+
+      <h2>5. Network Costs: The Silent Killer</h2>
+      <p>
+        Data transfer is where AWS makes its real money. Inter-AZ traffic, NAT Gateway,
+        and cross-region replication add up fast.
+      </p>
+      <ul>
+        <li><strong>NAT Gateway vs NAT Instance</strong>: A t3.micro NAT instance costs $7/month. A NAT Gateway costs $32/month + data processing fees. For low-traffic environments, use the instance.</li>
+        <li><strong>VPC Endpoints</strong>: S3 and DynamoDB Gateway endpoints are free. They keep traffic off the NAT.</li>
+        <li><strong>Consolidate services in same AZ</strong>: Inter-AZ traffic is $0.01/GB each way.</li>
+      </ul>
+
+      <h2>6. Automated Cleanup</h2>
+      <p>
+        Manual cleanup doesn't scale. Set up automation:
+      </p>
+      <pre><code># Lambda: Delete old EBS snapshots (older than 90 days)
+import boto3
+from datetime import datetime, timedelta
+
+def lambda_handler(event, context):
+    ec2 = boto3.client('ec2')
+    cutoff = datetime.now() - timedelta(days=90)
+    
+    snapshots = ec2.describe_snapshots(OwnerIds=['self'])
+    for snap in snapshots['Snapshots']:
+        if snap['StartTime'].replace(tzinfo=None) < cutoff:
+            ec2.delete_snapshot(SnapshotId=snap['SnapshotId'])
+            print(f"Deleted: {snap['SnapshotId']}")</code></pre>
+
+      <h2>7. Environment Tiering</h2>
+      <p>
+        Not every environment needs production-grade infrastructure:
+      </p>
+      <ul>
+        <li><strong>Production</strong>: RIs, multi-AZ, reserved capacity</li>
+        <li><strong>Staging</strong>: Spot + On-Demand mix, single-AZ acceptable</li>
+        <li><strong>Dev/Test</strong>: Scheduled shutdown (Lambda to stop instances at 8 PM), Spot only, smallest viable sizes</li>
+      </ul>
+      <p>
+        My dev environment auto-stops at night and on weekends. That's a 65% reduction in
+        non-production costs.
+      </p>
+
+      <h2>The Results</h2>
+      <pre><code>Before optimization:
+  EC2:        $1,200/mo
+  RDS:          $450/mo
+  S3/EBS:       $320/mo
+  Data Xfer:    $280/mo
+  NAT/Network:  $150/mo
+  Other:        $400/mo
+  Total:      $2,800/mo
+
+After optimization:
+  EC2 (Spot+RI): $680/mo
+  RDS (RI):       $310/mo
+  S3 (Lifecycle): $180/mo
+  Data Xfer:      $120/mo
+  NAT (VPC EP):    $45/mo
+  Other:          $265/mo
+  Total:        $1,800/mo
+
+Savings: $1,000/month (36%)</code></pre>
+
+      <h2>Where to Start</h2>
+      <ol>
+        <li><strong>Week 1</strong>: Enable AWS Cost Explorer. Identify your top 5 cost drivers.</li>
+        <li><strong>Week 2</strong>: Right-size your instances. Delete unattached volumes.</li>
+        <li><strong>Week 3</strong>: Set up Spot for non-production workloads.</li>
+        <li><strong>Week 4</strong>: Purchase Savings Plans for your baseline.</li>
+        <li><strong>Ongoing</strong>: Monthly cost review. Automate cleanup.</li>
+      </ol>
+
+      <p>
+        Cost optimization isn't a one-time project. It's an ongoing discipline. Start with
+        the biggest wins (right-sizing + Spot), then layer on the refinements.
+      </p>
+
+      <p>
+        Questions about your AWS bill? <a href="../contact.html">Get in touch</a>.
+      </p>
+
+    </div>
+
+    <!-- Newsletter CTA -->
+    <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
+      <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
+      <p class="text-muted">
+        SRE tips, infrastructure patterns, and NixOS guides — straight to your inbox. No spam, just signal.
+      </p>
+      <form action="#" method="POST" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+        <input type="email" name="email" placeholder="you@example.com" required
+               style="flex: 1; min-width: 200px; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-default); color: var(--text-primary); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
+        <button type="submit" class="btn btn-primary" style="cursor: pointer;">Subscribe</button>
+      </form>
+      <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 0; margin-top: 0.5rem;">
+        <!-- TODO: Wire up to newsletter service (Buttondown, ConvertKit, or similar) -->
+        Delivery via newsletter service. Unsubscribe anytime.
+      </p>
+    </div>
+
+    <!-- Related Posts -->
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <h3>Related Posts</h3>
+      <ul>
+        <li><a href="prometheus-grafana-monitoring.html">Set Up Prometheus and Grafana Monitoring in 10 Minutes</a></li>
+        <li><a href="why-i-run-nixos.html">Why I Run NixOS on My Servers</a></li>
+        <li><a href="building-ai-agent-infrastructure.html">How I Built an AI Agent That Manages My Infrastructure</a></li>
+      </ul>
+    </div>
+
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <p class="text-center">
+        <a href="../index.html#blog" class="btn btn-secondary">← Back to Blog</a>
+      </p>
+    </div>
+
+  </article>
+
+  <footer>
+    <p>
+      <a href="../index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>

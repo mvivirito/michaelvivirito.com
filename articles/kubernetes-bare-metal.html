@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kubernetes on Bare Metal: A Practical Guide - Michael Vivirito</title>
+  <meta name="description" content="Running Kubernetes on bare metal with Proxmox. Why skip the cloud? Performance, cost, and the joy of owning your stack. Real setup, real configs.">
+  <meta name="keywords" content="Kubernetes, k8s, bare metal, Proxmox, self-hosted, home lab, infrastructure, on-premises, DevOps">
+  <meta name="author" content="Michael Vivirito">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Kubernetes on Bare Metal: A Practical Guide">
+  <meta property="og:description" content="Skip the cloud. Own your stack. A real-world guide to running k8s on bare metal with Proxmox.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#projects">Projects</a></li>
+      <li><a href="../index.html#blog">Blog</a></li>
+      <li><a href="../nixie.html">Nixie</a></li>
+      <li><a href="../visuals.html">Visuals</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>Kubernetes on Bare Metal: A Practical Guide</h1>
+      <p class="text-muted">
+        Published on <time datetime="2026-04-02">April 2, 2026</time>
+      </p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+        <span class="badge">Kubernetes</span>
+        <span class="badge">Proxmox</span>
+        <span class="badge">Self-Hosting</span>
+      </div>
+    </header>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <h2>Why Bare Metal?</h2>
+      <p>
+        "Just use EKS/GKE/AKS" is common advice. And it's good advice — for teams that need
+        managed control planes and have the budget for cloud pricing. But there are legitimate
+        reasons to go bare metal:
+      </p>
+      <ul>
+        <li><strong>Cost</strong>: My 3-node k8s cluster costs $0/month beyond electricity (~$30/month). An equivalent EKS setup runs $200-400/month.</li>
+        <li><strong>Performance</strong>: No hypervisor overhead, no noisy neighbors, direct hardware access for storage I/O.</li>
+        <li><strong>Learning</strong>: You understand every layer — networking, storage, DNS, load balancing. Cloud providers abstract this away, which is fine until something breaks.</li>
+        <li><strong>Control</strong>: Custom kernel parameters, real-time scheduling, GPU passthrough, specialized hardware.</li>
+      </ul>
+
+      <h2>My Setup</h2>
+      <ul>
+        <li><strong>Hypervisor</strong>: Proxmox VE 8.x on a dedicated server</li>
+        <li><strong>VMs</strong>: 3 Ubuntu 24.04 VMs (4 vCPU, 8GB RAM, 100GB each)</li>
+        <li><strong>K8s</strong>: kubeadm with kubeadm, containerd, Cilium CNI</li>
+        <li><strong>Storage</strong>: NFS provisioner backed by Proxmox ZFS pool</li>
+        <li><strong>Ingress</strong>: NGINX Ingress Controller</li>
+        <li><strong>DNS</strong>: PiHole for internal, Cloudflare for external</li>
+      </ul>
+
+      <h2>Step 1: Proxmox VM Setup</h2>
+      <p>
+        Create your VMs. I use a Terraform provider for Proxmox, but the UI works fine too.
+      </p>
+      <pre><code># proxmox VM config (qm.conf)
+agent: 1
+balloon: 0
+cores: 4
+memory: 8192
+net0: virtio=AA:BB:CC:DD:EE:01,bridge=vmbr0
+scsi0: local-lvm:vm-101-disk-0,size=100G
+scsihw: virtio-scsi-pci
+ostype: l26</code></pre>
+
+      <h2>Step 2: Prepare the Nodes</h2>
+      <p>
+        Run this on all three nodes. It installs containerd, kubeadm, kubelet, and kubectl.
+      </p>
+      <pre><code>#!/bin/bash
+# prepare-node.sh — Run on each k8s node
+
+# Disable swap
+swapoff -a
+sed -i '/ swap / s/^/#/' /etc/fstab
+
+# Load required modules
+cat <<EOF | tee /etc/modules-load.d/k8s.conf
+overlay
+br_netfilter
+EOF
+modprobe overlay
+modprobe br_netfilter
+
+# Sysctl settings
+cat <<EOF | tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv4.ip_forward                 = 1
+EOF
+sysctl --system
+
+# Install containerd
+apt-get update && apt-get install -y containerd
+mkdir -p /etc/containerd
+containerd config default | tee /etc/containerd/config.toml
+# Enable SystemdCgroup
+sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
+systemctl restart containerd
+
+# Install kubeadm, kubelet, kubectl
+apt-get install -y apt-transport-https ca-certificates curl
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | \
+  gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | \
+  tee /etc/apt/sources.list.d/kubernetes.list
+apt-get update && apt-get install -y kubelet kubeadm kubectl
+apt-mark hold kubelet kubeadm kubectl</code></pre>
+
+      <h2>Step 3: Initialize the Cluster</h2>
+      <p>
+        On the control plane node:
+      </p>
+      <pre><code># Init cluster with pod network CIDR
+kubeadm init \
+  --pod-network-cidr=10.244.0.0/16 \
+  --control-plane-endpoint=k8s-cp.local:6443 \
+  --upload-certs
+
+# Set up kubectl for your user
+mkdir -p $HOME/.kube
+cp /etc/kubernetes/admin.conf $HOME/.kube/config
+chown $(id -u):$(id -g) $HOME/.kube/config
+
+# Install Cilium CNI
+helm repo add cilium https://helm.cilium.io/
+helm install cilium cilium/cilium \
+  --namespace kube-system \
+  --set kubeProxyReplacement=true \
+  --set k8sServiceHost=k8s-cp.local \
+  --set k8sServicePort=6443</code></pre>
+      <p>
+        On worker nodes, join with the token from <code>kubeadm init</code>:
+      </p>
+      <pre><code>kubeadm join k8s-cp.local:6443 \
+  --token &lt;token&gt; \
+  --discovery-token-ca-cert-hash sha256:&lt;hash&gt;</code></pre>
+
+      <h2>Step 4: Storage with NFS</h2>
+      <p>
+        On bare metal, you need a persistent volume provisioner. NFS is the simplest reliable option.
+      </p>
+      <pre><code># NFS server setup (on Proxmox host or separate VM)
+apt-get install -y nfs-kernel-server
+mkdir -p /srv/nfs/k8s
+echo '/srv/nfs/k8s 10.0.0.0/24(rw,sync,no_subtree_check,no_root_squash)' >> /etc/exports
+exportfs -ra
+
+# NFS provisioner in k8s
+helm repo add nfs-subdir-external-provisioner \
+  https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+helm install nfs-provisioner \
+  nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
+  --set nfs.server=10.0.0.10 \
+  --set nfs.path=/srv/nfs/k8s \
+  --set storageClass.defaultClass=true</code></pre>
+
+      <h2>Step 5: Ingress and DNS</h2>
+      <p>
+        NGINX Ingress for routing, PiHole for internal DNS resolution:
+      </p>
+      <pre><code># Install NGINX Ingress
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm install ingress-nginx ingress-nginx/ingress-nginx \
+  --set controller.service.type=NodePort \
+  --set controller.service.nodePorts.http=30080 \
+  --set controller.service.nodePorts.https=30443
+
+# PiHole DNS entry (admin panel)
+# Add A records pointing to your k8s node IPs
+# grafana.k8s.local  → 10.0.0.11
+# app.k8s.local      → 10.0.0.11</code></pre>
+
+      <h2>What the Cloud Gives You for Free</h2>
+      <p>
+        Be honest with yourself about what you lose:
+      </p>
+      <ul>
+        <li><strong>LoadBalancer services</strong>: No cloud LB. Use NodePort or MetalLB.</li>
+        <li><strong>Managed DNS</strong>: No Route53. Use PiHole + Cloudflare for external.</li>
+        <li><strong>Auto-scaling</strong>: No cluster autoscaler. Pre-provision your nodes.</li>
+        <li><strong>Managed etcd</strong>: You're responsible for backups.</li>
+        <li><strong>Security patches</strong>: You handle OS and k8s updates.</li>
+      </ul>
+      <p>
+        MetalLB gives you LoadBalancer-like services on bare metal:
+      </p>
+      <pre><code># MetalLB for LoadBalancer services
+helm repo add metallb https://metallb.github.io/metallb
+helm install metallb metallb/metallb
+
+# Configure IP pool
+cat <<EOF | kubectl apply -f -
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: main-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - 10.0.0.200-10.0.0.250
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: main-advertisement
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - main-pool
+EOF</code></pre>
+
+      <h2>Backups: Non-Negotiable</h2>
+      <p>
+        Without cloud snapshots, you need your own backup strategy:
+      </p>
+      <ul>
+        <li><strong>etcd snapshots</strong>: Cron job running <code>etcdctl snapshot save</code> hourly</li>
+        <li><strong>PV backups</strong>: Restic or Velero backing up to off-site storage</li>
+        <li><strong>Proxmox snapshots</strong>: ZFS snapshots on the storage pool</li>
+        <li><strong>GitOps</strong>: All manifests in Git. The cluster is re-creatable from scratch.</li>
+      </ul>
+      <pre><code># etcd backup cron
+0 * * * * /usr/local/bin/etcdctl snapshot save \
+  /backup/etcd/snap-$(date +\%Y\%m\%d-\%H\%M).db \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/healthcheck-client.crt \
+  --key=/etc/kubernetes/pki/etcd/healthcheck-client.key</code></pre>
+
+      <h2>Is It Worth It?</h2>
+      <p>
+        If your goal is production workloads with 99.99% SLA requirements, use a managed service.
+        If your goal is learning, home lab, cost savings, or full control — bare metal k8s is
+        genuinely rewarding.
+      </p>
+      <p>
+        I run my monitoring stack, media services, and development environments on bare metal
+        k8s. My production apps still run on cloud-managed k8s. There's room for both.
+      </p>
+
+      <p>
+        Questions about bare metal k8s? <a href="../contact.html">Get in touch</a>.
+      </p>
+
+    </div>
+
+    <!-- Newsletter CTA -->
+    <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
+      <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
+      <p class="text-muted">
+        SRE tips, infrastructure patterns, and NixOS guides — straight to your inbox. No spam, just signal.
+      </p>
+      <form action="#" method="POST" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+        <input type="email" name="email" placeholder="you@example.com" required
+               style="flex: 1; min-width: 200px; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-default); color: var(--text-primary); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
+        <button type="submit" class="btn btn-primary" style="cursor: pointer;">Subscribe</button>
+      </form>
+      <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 0; margin-top: 0.5rem;">
+        <!-- TODO: Wire up to newsletter service (Buttondown, ConvertKit, or similar) -->
+        Delivery via newsletter service. Unsubscribe anytime.
+      </p>
+    </div>
+
+    <!-- Related Posts -->
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <h3>Related Posts</h3>
+      <ul>
+        <li><a href="why-i-run-nixos.html">Why I Run NixOS on My Servers</a></li>
+        <li><a href="aws-cost-optimization.html">AWS Cost Optimization: An SRE's Playbook</a></li>
+        <li><a href="prometheus-grafana-monitoring.html">Set Up Prometheus and Grafana Monitoring in 10 Minutes</a></li>
+      </ul>
+    </div>
+
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <p class="text-center">
+        <a href="../index.html#blog" class="btn btn-secondary">← Back to Blog</a>
+      </p>
+    </div>
+
+  </article>
+
+  <footer>
+    <p>
+      <a href="../index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>
