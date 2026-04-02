@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Why I Run NixOS on My Servers - Michael Vivirito</title>
+  <meta name="description" content="A practical guide to running NixOS in production. Declarative configuration, atomic rollbacks, and reproducible builds — lessons from 3 years of NixOS on Proxmox and bare metal.">
+  <meta name="keywords" content="NixOS, Nix, Linux, server management, declarative configuration, DevOps, SRE, infrastructure">
+  <meta name="author" content="Michael Vivirito">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Why I Run NixOS on My Servers">
+  <meta property="og:description" content="Declarative configuration, atomic rollbacks, and reproducible builds — lessons from running NixOS in production.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#projects">Projects</a></li>
+      <li><a href="../index.html#blog">Blog</a></li>
+      <li><a href="../nixie.html">Nixie</a></li>
+      <li><a href="../visuals.html">Visuals</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>Why I Run NixOS on My Servers</h1>
+      <p class="text-muted">
+        Published on <time datetime="2026-04-02">April 2, 2026</time>
+      </p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+        <span class="badge">NixOS</span>
+        <span class="badge">DevOps</span>
+        <span class="badge">Infrastructure</span>
+      </div>
+    </header>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <h2>The Problem with Traditional Linux</h2>
+      <p>
+        Every SRE has lived this nightmare: you SSH into a production server, make a config
+        change, and something breaks. You don't remember what you changed. There's no diff.
+        The backup is three weeks old. You start grepping through <code>/etc</code> hoping
+        to find what went wrong.
+      </p>
+      <p>
+        I spent years in this cycle. Then I found NixOS, and my servers became <em>declarative</em>.
+      </p>
+
+      <h2>What Makes NixOS Different</h2>
+      <p>
+        NixOS isn't just another Linux distribution. It's built on a fundamentally different
+        idea: your entire system configuration is a single expression written in the Nix
+        language. Every package, every service, every firewall rule — it's all in one file.
+      </p>
+
+      <pre><code># /etc/nixos/configuration.nix (simplified)
+{ config, pkgs, ... }:
+{
+  services.nginx = {
+    enable = true;
+    virtualHosts."example.com" = {
+      root = "/var/www/example";
+      enableACME = true;
+      forceSSL = true;
+    };
+  };
+
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
+
+  environment.systemPackages = with pkgs; [
+    vim git curl jq
+  ];
+}</code></pre>
+
+      <p>
+        That's it. That's your web server config. Commit it to git, and you have a complete
+        audit trail of every change ever made to your system.
+      </p>
+
+      <h2>The Three Killer Features</h2>
+
+      <h3>1. Atomic Rollbacks</h3>
+      <p>
+        Every time you rebuild your NixOS system, it creates a new "generation." If something
+        breaks, you reboot into the previous generation. It's like git for your entire
+        operating system.
+      </p>
+
+      <pre><code># List all system generations
+$ nixos-rebuild list-generations
+  47   2026-04-01 14:23:15   current
+  46   2026-03-28 09:15:42
+  45   2026-03-25 11:30:00
+
+# Roll back to previous generation
+$ sudo nixos-rebuild switch --rollback</code></pre>
+
+      <p>
+        I've rolled back production servers in under 30 seconds. No panic, no manual config
+        restoration. Just pick the generation that worked.
+      </p>
+
+      <h3>2. Reproducible Builds</h3>
+      <p>
+        My entire infrastructure is defined in a <a href="https://nixos.wiki/wiki/Flakes" target="_blank">Nix flake</a>.
+        When I deploy to a new server, I get the <em>exact same system</em>. Not "mostly the
+        same." Not "close enough." <strong>Exactly</strong> the same packages, configs, and
+        services. Pin the flake lock, and you get bit-for-bit reproducibility.
+      </p>
+
+      <h3>3. Safe Experimentation</h3>
+      <p>
+        Want to test a new service? Create a <strong>nix shell</strong> or a
+        <strong>NixOS test</strong>. It runs in isolation, doesn't touch your system, and
+        disappears when you're done. No more "apt install" on production and hoping for the
+        best.
+      </p>
+
+      <pre><code># Try PostgreSQL 16 without installing it
+$ nix shell nixpkgs#postgresql_16
+
+# Test a NixOS configuration in a VM
+$ nixos-rebuild build-vm --flake .#my-server</code></pre>
+
+      <h2>Real-World Setup</h2>
+      <p>
+        Here's what I actually run:
+      </p>
+      <ul>
+        <li><strong>Proxmox VM</strong> running NixOS as my main server</li>
+        <li><strong>OpenClaw</strong> (AI agent gateway) as a NixOS service</li>
+        <li><strong>Kubernetes</strong> cluster on NixOS nodes</li>
+        <li><strong>Ollama</strong> for local LLM inference</li>
+        <li><strong>Docker Compose</strong> stacks for monitoring (Prometheus, Grafana)</li>
+      </ul>
+
+      <p>
+        All configured in one flake. One <code>git push</code> and a rebuild deploys
+        everything consistently.
+      </p>
+
+      <div style="background: var(--bg-surface); padding: 1rem; border: 1px solid var(--border-accent); border-left: 3px solid var(--accent-primary); margin: 1.5rem 0;">
+        <p style="margin: 0;">
+          <strong>Tip:</strong> I packaged my NixOS + K8s configs as a
+          <a href="https://github.com/mvivirito">DevOps toolkit</a>. If you want to get
+          started with declarative infrastructure, it's a solid foundation.
+        </p>
+      </div>
+
+      <h2>The Learning Curve</h2>
+      <p>
+        I won't sugarcoat it: NixOS has a steep learning curve. The Nix language is
+        functional, not imperative. Your first week will feel like you're fighting the
+        system. Your second week will start clicking. By month two, you'll wonder how
+        you ever managed servers without it.
+      </p>
+
+      <p>
+        Resources that helped me:
+      </p>
+      <ul>
+        <li><a href="https://nixos.org/learn.html" target="_blank">Official Nix tutorials</a></li>
+        <li><a href="https://nixos.wiki" target="_blank">NixOS Wiki</a></li>
+        <li><a href="https://github.com/nix-community/home-manager" target="_blank">Home Manager</a> for user-space config</li>
+        <li><a href="https://github.com/nix-community/nixos-generators" target="_blank">nixos-generators</a> for images</li>
+      </ul>
+
+      <h2>When NOT to Use NixOS</h2>
+      <p>
+        NixOS isn't for everyone. If your team is deeply invested in Ansible/Puppet and
+        everything works fine, the migration cost might not be worth it. If you need
+        bleeding-edge hardware support on day one, Ubuntu/Fedora might be better. And if
+        your team doesn't want to learn a new language, Nix will be a hard sell.
+      </p>
+
+      <h2>Conclusion</h2>
+      <p>
+        NixOS transformed how I manage infrastructure. My servers are reproducible,
+        rollbacks are instant, and my configs are version-controlled. It's not perfect —
+        the learning curve is real and documentation can be sparse — but for anyone
+        serious about infrastructure as code, it's worth the investment.
+      </p>
+
+      <p>
+        Got questions about NixOS? <a href="../contact.html">Drop me a line</a>. Or check
+        out my <a href="https://github.com/mvivirito/nix-config" target="_blank">nix-config
+        on GitHub</a> for a working example.
+      </p>
+
+    </div>
+
+    <div style="max-width: 800px; margin: 3rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <p class="text-center">
+        <a href="../index.html#blog" class="btn btn-secondary">← Back to Blog</a>
+      </p>
+    </div>
+
+  </article>
+
+  <footer>
+    <p>
+      <a href="../index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>

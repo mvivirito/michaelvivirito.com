@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Set Up Prometheus and Grafana Monitoring in 10 Minutes - Michael Vivirito</title>
+  <meta name="description" content="A practical guide to setting up Prometheus and Grafana for Kubernetes monitoring. Includes Docker Compose configs, alert rules, and a pre-built dashboard you can deploy immediately.">
+  <meta name="keywords" content="Prometheus, Grafana, monitoring, Kubernetes, DevOps, observability, Docker Compose, alerting">
+  <meta name="author" content="Michael Vivirito">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Set Up Prometheus and Grafana Monitoring in 10 Minutes">
+  <meta property="og:description" content="Deploy Prometheus and Grafana with Docker Compose. Includes pre-configured alert rules and dashboards.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#projects">Projects</a></li>
+      <li><a href="../index.html#blog">Blog</a></li>
+      <li><a href="../nixie.html">Nixie</a></li>
+      <li><a href="../visuals.html">Visuals</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>Set Up Prometheus and Grafana Monitoring in 10 Minutes</h1>
+      <p class="text-muted">
+        Published on <time datetime="2026-04-02">April 2, 2026</time>
+      </p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+        <span class="badge">Monitoring</span>
+        <span class="badge">Prometheus</span>
+        <span class="badge">Grafana</span>
+        <span class="badge">DevOps</span>
+      </div>
+    </header>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <h2>Why Every Team Needs Real Monitoring</h2>
+      <p>
+        If your idea of "monitoring" is SSHing into a server and running <code>top</code>,
+        this post is for you. <strong>Prometheus</strong> and <strong>Grafana</strong> give
+        you real-time visibility into your infrastructure — CPU, memory, disk, network,
+        service health — all in one dashboard.
+      </p>
+      <p>
+        The best part? You can have it running in under 10 minutes with Docker Compose.
+      </p>
+
+      <h2>The Stack</h2>
+      <ul>
+        <li><strong>Prometheus</strong> — Collects and stores time-series metrics</li>
+        <li><strong>Grafana</strong> — Beautiful dashboards and alerting</li>
+        <li><strong>Node Exporter</strong> — Host-level metrics (CPU, RAM, disk, network)</li>
+        <li><strong>Alertmanager</strong> — Routes alerts to Slack, email, PagerDuty</li>
+        <li><strong>cAdvisor</strong> — Container-level metrics</li>
+      </ul>
+
+      <h2>Quick Start</h2>
+      <p>
+        Create a <code>docker-compose.yml</code> with the full monitoring stack:
+      </p>
+
+      <pre><code>services:
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=15d'
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=changeme
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+  node-exporter:
+    image: prom/node-exporter:v1.7.0
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+
+volumes:
+  prometheus_data:
+  grafana_data:</code></pre>
+
+      <p>
+        Run it:
+      </p>
+
+      <pre><code>$ docker compose up -d
+$ open http://localhost:3000  # Grafana (admin/changeme)
+$ open http://localhost:9090  # Prometheus</code></pre>
+
+      <h2>Prometheus Configuration</h2>
+      <p>
+        Save this as <code>prometheus.yml</code>:
+      </p>
+
+      <pre><code>global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']</code></pre>
+
+      <h2>Alert Rules</h2>
+      <p>
+        Don't just collect metrics — act on them. Here are four essential alerts:
+      </p>
+
+      <pre><code>groups:
+  - name: node_alerts
+    rules:
+      - alert: HighMemoryUsage
+        expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Memory above 85% for 5 minutes"
+
+      - alert: HighCpuUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 10m
+        labels:
+          severity: warning
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.10
+        for: 5m
+        labels:
+          severity: critical
+
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical</code></pre>
+
+      <h2>Grafana Dashboard</h2>
+      <p>
+        Once Grafana is running, add Prometheus as a data source
+        (<code>http://prometheus:9090</code>) and create a dashboard with these panels:
+      </p>
+
+      <ul>
+        <li><strong>CPU Usage</strong>: <code>100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)</code></li>
+        <li><strong>Memory Usage</strong>: <code>1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)</code></li>
+        <li><strong>Disk Usage</strong>: <code>1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)</code></li>
+        <li><strong>Network I/O</strong>: <code>rate(node_network_receive_bytes_total[5m])</code></li>
+      </ul>
+
+      <div style="background: var(--bg-surface); padding: 1rem; border: 1px solid var(--border-accent); border-left: 3px solid var(--accent-primary); margin: 1.5rem 0;">
+        <p style="margin: 0;">
+          <strong>Shortcut:</strong> Don't want to configure all this manually? I packaged
+          the entire monitoring stack — Docker Compose, Prometheus config, alert rules,
+          Grafana provisioning, and a pre-built dashboard — as a ready-to-deploy toolkit.
+          Just <code>docker compose up -d</code> and you're monitoring.
+        </p>
+      </div>
+
+      <h2>Going to Production</h2>
+      <p>
+        The Docker Compose setup is great for dev/small deployments. For production:
+      </p>
+      <ul>
+        <li><strong>Persistent storage</strong> — Use named volumes or cloud block storage</li>
+        <li><strong>TLS</strong> — Put Grafana behind a reverse proxy with HTTPS</li>
+        <li><strong>Alertmanager</strong> — Route alerts to Slack, PagerDuty, or email</li>
+        <li><strong>Remote write</strong> — Send metrics to Thanos or Cortex for long-term storage</li>
+        <li><strong>Kubernetes</strong> — Use the Prometheus Operator for managed deployments</li>
+      </ul>
+
+      <h2>What to Monitor</h2>
+      <p>
+        Start with these, then expand:
+      </p>
+      <ul>
+        <li><strong>The Four Golden Signals</strong>: Latency, Traffic, Errors, Saturation</li>
+        <li><strong>Infrastructure</strong>: CPU, memory, disk, network</li>
+        <li><strong>Application</strong>: Request rate, error rate, response time</li>
+        <li><strong>Business</strong>: User signups, revenue, conversion rate</li>
+      </ul>
+
+      <h2>Conclusion</h2>
+      <p>
+        Monitoring isn't optional. It's the difference between finding out about a problem
+        from your users or from your alerts. Prometheus and Grafana give you production-grade
+        monitoring with minimal setup.
+      </p>
+
+      <p>
+        Start with the Docker Compose setup, get comfortable with the basics, then scale up
+        as your needs grow. Your future self (and your on-call rotation) will thank you.
+      </p>
+
+      <p>
+        Questions? <a href="../contact.html">Get in touch</a>.
+      </p>
+
+    </div>
+
+    <div style="max-width: 800px; margin: 3rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <p class="text-center">
+        <a href="../index.html#blog" class="btn btn-secondary">← Back to Blog</a>
+      </p>
+    </div>
+
+  </article>
+
+  <footer>
+    <p>
+      <a href="../index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>
