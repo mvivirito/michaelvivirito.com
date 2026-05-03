@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uses — Michael Vivirito</title>
+  <meta name="description" content="The hardware, software, and tools Michael Vivirito uses every day — from FreeBSD on the edge to Neovim and the Glove80 keyboard.">
+  <meta name="keywords" content="uses, dotfiles, FreeBSD, NixOS, Neovim, Wezterm, Glove80, Advantage360, homelab, Proxmox, mvivirito">
+  <meta name="author" content="Michael Vivirito">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://michaelvivirito.com/uses.html">
+  <meta property="og:title" content="Uses — Michael Vivirito">
+  <meta property="og:description" content="What I use every day — hardware, OS, editor, network, and homelab.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#projects">Projects</a></li>
+      <li><a href="index.html#blog">Blog</a></li>
+      <li><a href="homelab.html">Homelab</a></li>
+      <li><a href="now.html">Now</a></li>
+      <li><a href="uses.html">Uses</a></li>
+      <li><a href="visuals.html">Visuals</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <section>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>Uses</h1>
+      <p class="text-muted">Hardware, software, and the tools I keep around.</p>
+      <p class="text-muted" style="font-size: 0.875rem;">Last updated: May 3, 2026</p>
+    </header>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <pre><code>$ uname -a
+FreeBSD gw.lan 14.2-RELEASE FreeBSD 14.2-RELEASE amd64
+$ cat ~/.workflow
+edit:    nvim
+shell:   zsh
+mux:     tmux
+term:    wezterm
+keys:    glove80</code></pre>
+
+      <h2>Hardware</h2>
+
+      <h3>Keyboards</h3>
+      <ul>
+        <li><strong>Glove80</strong> (MoErgo) — primary daily driver. Split, columnar, contoured. My
+            <a href="https://github.com/mvivirito/glove80-config" target="_blank" rel="noopener noreferrer">layout</a> is on GitHub.</li>
+        <li><strong>Advantage360 Professional</strong> (Kinesis) — travel keyboard with ZMK firmware. Config is
+            <a href="https://github.com/mvivirito/advantage360" target="_blank" rel="noopener noreferrer">here</a>.</li>
+      </ul>
+
+      <h3>Workstation</h3>
+      <ul>
+        <li>A reasonably-spec'd desktop for heavier work and a 14-inch laptop for travel.</li>
+        <li>Two displays. Vertical arrangement, not horizontal.</li>
+        <li>Wired ethernet wherever practical. Wifi is for visitors.</li>
+      </ul>
+
+      <h3>Audio</h3>
+      <ul>
+        <li>Closed-back headphones for focus work.</li>
+        <li>A small XLR mic on a boom arm for calls and the rare YouTube recording.</li>
+      </ul>
+
+      <h2>Operating Systems</h2>
+      <ul>
+        <li><strong>FreeBSD 14.x</strong> on the <a href="homelab.html">edge router</a> and on a small fleet of long-uptime hosts. ZFS root, base-system everything.</li>
+        <li><strong>NixOS 24.11</strong> on workstations and Kubernetes nodes. Declarative, reproducible, and the closest thing to "it just works" once you've climbed the learning curve. (See <a href="articles/why-i-run-nixos.html">why</a>.)</li>
+        <li><strong>Proxmox VE</strong> as the hypervisor under most of it.</li>
+      </ul>
+
+      <h2>Editor &amp; Terminal</h2>
+      <ul>
+        <li><strong>Neovim</strong> with a small Lua config. LSPs for the languages I touch most, telescope for fuzzy navigation, treesitter for highlighting, nothing exotic.</li>
+        <li><strong>Wezterm</strong> as the terminal — GPU-accelerated, scriptable in Lua, sensible defaults.</li>
+        <li><strong>tmux</strong> for persistent sessions on remote hosts. SSH disconnects shouldn't take work with them.</li>
+      </ul>
+
+      <h2>Shell &amp; CLI</h2>
+      <ul>
+        <li><strong>Zsh</strong> with a thin <code>.zshrc</code>. Whatever fancy plugin system you're using, you almost certainly don't need it.</li>
+        <li><strong>Starship</strong> for the prompt — fast, written in Rust, minimal config.</li>
+        <li><strong>ripgrep</strong>, <strong>fd</strong>, <strong>fzf</strong>, <strong>bat</strong>, <strong>jq</strong>, <strong>sd</strong>, <strong>delta</strong>. The boring-modern stack of grep/find/sed/diff replacements.</li>
+        <li><strong>direnv</strong> for per-project environments.</li>
+        <li><strong>git</strong>, of course. Plus <strong>lazygit</strong> for the moments my hands want a TUI.</li>
+        <li><strong>htop</strong>, <strong>btop</strong>, and <strong>iftop</strong> for "what is this box doing right now" — see also the <a href="articles/top-10-tui-apps.html">TUI apps post</a>.</li>
+      </ul>
+
+      <h2>Network &amp; Homelab</h2>
+      <ul>
+        <li><strong>FreeBSD pf router</strong> at the edge — the heart of the network. <a href="homelab.html">Tour the setup</a>.</li>
+        <li><strong>unbound</strong> for recursive DNS, with DNSSEC validation and a small blocklist.</li>
+        <li><strong>WireGuard</strong> for road-warrior VPN back into the LAN. (<a href="articles/freebsd-wireguard.html">Setup post</a>.)</li>
+        <li><strong>Real, native IPv6</strong> via DHCPv6-PD from the ISP. (<a href="articles/freebsd-ipv6-router.html">How</a>.)</li>
+        <li><strong>Managed L2 switch</strong> for VLANs to the IoT and quarantine networks.</li>
+      </ul>
+
+      <h2>Servers &amp; Storage</h2>
+      <ul>
+        <li><strong>Proxmox VE</strong> on a single homelab box hosting most of the VMs.</li>
+        <li><strong>NixOS VMs</strong> for everything that runs more than a handful of services.</li>
+        <li><strong>kubeadm + Cilium</strong> for the Kubernetes cluster, on bare-metal-ish VMs. (<a href="articles/kubernetes-bare-metal.html">Build notes</a>.)</li>
+        <li><strong>ZFS</strong> everywhere — for the boot environments alone.</li>
+        <li><strong>ZFS send/recv</strong> to a remote pool for offsite backups. (<a href="articles/zfs-send-recv-replication.html">Replication script</a>.)</li>
+        <li><strong>Prometheus + Grafana + Alertmanager</strong> for monitoring.</li>
+      </ul>
+
+      <h2>Languages I Reach For</h2>
+      <ul>
+        <li><strong>Bash / Shell</strong> — for glue, ops scripts, and "just enough automation".</li>
+        <li><strong>Python</strong> — for anything past 50 lines of shell.</li>
+        <li><strong>Go</strong> — for tools that need to be a single static binary.</li>
+        <li><strong>Nix expressions</strong> — for the configuration that defines everything else.</li>
+      </ul>
+
+      <h2>Browser &amp; Day-to-Day</h2>
+      <ul>
+        <li><strong>Firefox</strong> with a handful of containers and uBlock Origin.</li>
+        <li>Plain Markdown in a git repo for notes, journal, and drafts.</li>
+        <li>An RSS reader for keeping up with people; not algorithmic feeds.</li>
+        <li>A password manager that doesn't sync through anyone else's cloud.</li>
+      </ul>
+
+      <h2>Things I've Stopped Using</h2>
+      <ul>
+        <li>Heavyweight router GUIs (OPNsense, pfSense). Both fine, both more abstraction than I want.</li>
+        <li>Most Electron apps. The ones I keep are kept reluctantly.</li>
+        <li>Managed cloud Kubernetes for personal projects. Bare metal teaches more.</li>
+        <li>Trying to learn ten things at once. Pick one and go deep.</li>
+      </ul>
+
+      <h2>Influences</h2>
+      <ul>
+        <li><a href="https://www.tedunangst.com/flak/" target="_blank" rel="noopener noreferrer">Ted Unangst's writing</a> — clear thinking about systems.</li>
+        <li>The <a href="https://www.freebsd.org/doc/handbook/" target="_blank" rel="noopener noreferrer">FreeBSD Handbook</a> — what good documentation looks like.</li>
+        <li>Brendan Gregg's performance work — methodologies that survive vendor cycles.</li>
+        <li>Derek Sivers' <a href="https://sive.rs/nowff" target="_blank" rel="noopener noreferrer">/now movement</a> — the inspiration for my <a href="now.html">/now page</a>.</li>
+      </ul>
+
+      <pre><code>$ echo "Boring tools, sharp habits, written down."</code></pre>
+
+    </div>
+
+    <div style="max-width: 800px; margin: 2rem auto 0; text-align: center;">
+      <p class="text-muted">
+        Inspired by <a href="https://uses.tech" target="_blank" rel="noopener noreferrer">uses.tech</a>.
+      </p>
+      <p>
+        <a href="index.html" class="btn btn-secondary">← Home</a>
+        <a href="now.html" class="btn btn-secondary">/now</a>
+        <a href="homelab.html" class="btn btn-primary">Homelab tour</a>
+      </p>
+    </div>
+
+  </section>
+
+  <footer>
+    <p>
+      <a href="index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>

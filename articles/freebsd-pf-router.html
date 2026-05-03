@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building a FreeBSD pf Router - Michael Vivirito</title>
+  <meta name="description" content="A practical, opinionated guide to building a FreeBSD edge router from a 4-port mini PC. ZFS root, pf, unbound, and dhcpd — from boot media to a working gateway.">
+  <meta name="keywords" content="FreeBSD, pf, router, firewall, homelab, networking, unbound, dhcpd, ZFS, igc">
+  <meta name="author" content="Michael Vivirito">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Building a FreeBSD pf Router">
+  <meta property="og:description" content="From boot media to a working FreeBSD edge router with pf, unbound, and dhcpd.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#projects">Projects</a></li>
+      <li><a href="../index.html#blog">Blog</a></li>
+      <li><a href="../homelab.html">Homelab</a></li>
+      <li><a href="../now.html">Now</a></li>
+      <li><a href="../uses.html">Uses</a></li>
+      <li><a href="../visuals.html">Visuals</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>Building a FreeBSD pf Router</h1>
+      <p class="text-muted">
+        Published on <time datetime="2026-05-03">May 3, 2026</time>
+      </p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+        <span class="badge">FreeBSD</span>
+        <span class="badge">pf</span>
+        <span class="badge">Networking</span>
+        <span class="badge">Homelab</span>
+      </div>
+    </header>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <h2>Why Build It Yourself?</h2>
+      <p>
+        Consumer routers run a Linux kernel from 2017, a vendor-modified userspace, and a
+        web UI that lies about what's actually configured. OPNsense and pfSense are
+        excellent — they're both FreeBSD-based, in fact — but their abstraction is also
+        their burden: the GUI eventually doesn't expose the knob you need, and you end up
+        editing a config file that the GUI may overwrite tomorrow.
+      </p>
+      <p>
+        Running plain FreeBSD as your router gives up the GUI and gains everything
+        underneath: a stable kernel, the OpenBSD-derived <code>pf</code> firewall, jails
+        for service isolation, ZFS for storage and rollback, and a documentation tradition
+        that takes itself seriously. This post walks through how I build one.
+      </p>
+
+      <h2>Hardware Pick</h2>
+      <p>
+        I'm boring on purpose:
+      </p>
+      <ul>
+        <li><strong>Fanless 4-port mini PC</strong>, Intel N5105 or N100 class. Search
+            for "Protectli", "Topton", or "Qotom" — many vendors sell variants of the same
+            reference design.</li>
+        <li><strong>4× Intel i225/i226 2.5 GbE NICs</strong>. These use the FreeBSD
+            <code>igc(4)</code> driver, which is in base.</li>
+        <li><strong>16 GB DDR4 SODIMM</strong>. 8 GB is plenty for a router, 16 GB leaves
+            headroom for jails and ZFS ARC.</li>
+        <li><strong>256 GB NVMe</strong>. Anything reputable. Routers don't write much.</li>
+      </ul>
+      <p>
+        Avoid Realtek NICs unless you enjoy writing forum posts. Intel chips are boring
+        and that's the highest praise you can give a router NIC.
+      </p>
+
+      <h2>Install Media</h2>
+      <p>
+        Grab the latest FreeBSD 14.x memstick image and write it to a USB drive:
+      </p>
+      <pre><code># From a Linux/macOS box
+curl -OL https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/14.2/FreeBSD-14.2-RELEASE-amd64-memstick.img
+sudo dd if=FreeBSD-14.2-RELEASE-amd64-memstick.img of=/dev/sdX bs=1M status=progress conv=fsync</code></pre>
+      <p>
+        Plug it in, boot the mini PC, and at the loader prompt drop into a serial console
+        if your hardware supports it (most fanless boxes do, via a DB9 or RJ45 console
+        port). Working over serial means you can recover from your own mistakes later.
+      </p>
+
+      <h2>Install — ZFS Root, Auto, with One Tweak</h2>
+      <p>
+        bsdinstall is genuinely good. Walk through it normally and pick:
+      </p>
+      <ul>
+        <li><strong>Auto (ZFS)</strong> for the partition layout</li>
+        <li><strong>stripe</strong> with one disk (or <strong>mirror</strong> if you have two NVMe slots)</li>
+        <li>Enable <code>sshd</code> at the services prompt; everything else can wait</li>
+        <li>Add a non-root admin user in the <code>wheel</code> group</li>
+      </ul>
+      <p>
+        Reboot, log in over SSH from a workstation cabled to one of the LAN-side NICs,
+        and don't touch a thing on the WAN side until pf is loaded.
+      </p>
+
+      <h2>Naming the Wires</h2>
+      <p>
+        Before any configuration: figure out which physical port maps to which kernel
+        interface name. <code>ifconfig</code> shows you the names; the labels on the case
+        tell you which is which. Plug a workstation into one port at a time and watch
+        which interface comes up.
+      </p>
+      <pre><code>$ ifconfig -l
+igc0 igc1 igc2 igc3 lo0
+
+$ ifconfig igc0 | grep status
+        status: active</code></pre>
+      <p>
+        I conventionally use:
+      </p>
+      <ul>
+        <li><code>igc0</code> — WAN</li>
+        <li><code>igc1</code> — trusted LAN</li>
+        <li><code>igc2</code> — servers / homelab</li>
+        <li><code>igc3</code> — IoT / quarantine</li>
+      </ul>
+
+      <h2>/etc/rc.conf — the One File Most Routers Need</h2>
+      <pre><code>hostname="gw.lan"
+zfs_enable="YES"
+
+# Forwarding both IP versions
+gateway_enable="YES"
+ipv6_gateway_enable="YES"
+
+# Interfaces
+ifconfig_igc0="DHCP"
+ifconfig_igc1="inet 10.10.10.1/24"
+ifconfig_igc2="inet 10.10.20.1/24"
+ifconfig_igc3="inet 10.10.30.1/24"
+
+# Firewall
+pf_enable="YES"
+pflog_enable="YES"
+
+# DNS resolver (FreeBSD's built-in unbound)
+local_unbound_enable="YES"
+
+# DHCP server (from pkg)
+dhcpd_enable="YES"
+dhcpd_ifaces="igc1 igc2 igc3"
+
+# Time
+ntpd_enable="YES"
+ntpd_sync_on_start="YES"
+
+# SSH (limit it later in pf.conf)
+sshd_enable="YES"</code></pre>
+      <p>
+        Apply piecewise:
+      </p>
+      <pre><code>$ service netif restart
+$ sysctl net.inet.ip.forwarding=1
+$ sysctl net.inet6.ip6.forwarding=1</code></pre>
+
+      <h2>Bootstrap pf with a Safety Net</h2>
+      <p>
+        Don't start pf with an empty ruleset and rely on default-pass. Don't start it with
+        a deny-all and lock yourself out either. Start with the smallest ruleset that
+        keeps SSH and the LAN working, then iterate.
+      </p>
+      <pre><code># /etc/pf.conf — bootstrap, replace with the real ruleset later
+ext_if = "igc0"
+int_if = "{ igc1 igc2 igc3 }"
+
+set skip on lo0
+scrub in all
+
+# NAT outbound from any internal LAN
+nat on $ext_if from { 10.10.10.0/24 10.10.20.0/24 10.10.30.0/24 } to any -&gt; ($ext_if)
+
+# Default deny inbound on the WAN
+block in log on $ext_if all
+
+# Pass everything from internal networks (we'll tighten this later)
+pass in on $int_if from any to any keep state
+pass out all keep state</code></pre>
+      <p>
+        Validate before you load it:
+      </p>
+      <pre><code>$ pfctl -nf /etc/pf.conf
+$ service pf start
+$ pfctl -s rules</code></pre>
+      <p>
+        See the <a href="pf-firewall-rules.html">pf.conf design article</a> for the
+        production ruleset I actually use.
+      </p>
+
+      <h2>unbound — Local Recursive DNS</h2>
+      <p>
+        FreeBSD ships <code>unbound</code> in base under the name <em>local_unbound</em>.
+        Set it up to listen on the LANs:
+      </p>
+      <pre><code># /var/unbound/unbound.conf (managed by local-unbound-setup)
+server:
+  interface: 10.10.10.1
+  interface: 10.10.20.1
+  interface: 10.10.30.1
+  access-control: 127.0.0.0/8 allow
+  access-control: 10.10.0.0/16 allow
+  access-control: 0.0.0.0/0 refuse
+
+  hide-identity: yes
+  hide-version: yes
+  qname-minimisation: yes
+  harden-glue: yes
+  harden-dnssec-stripped: yes
+  prefetch: yes</code></pre>
+      <p>
+        Restart:
+      </p>
+      <pre><code>$ service local_unbound restart
+$ drill -u google.com @10.10.10.1   # check DNSSEC validation</code></pre>
+
+      <h2>dhcpd — Leases for the LANs</h2>
+      <pre><code># /usr/local/etc/dhcpd.conf (excerpt)
+default-lease-time 3600;
+max-lease-time     86400;
+authoritative;
+
+subnet 10.10.10.0 netmask 255.255.255.0 {
+  range 10.10.10.100 10.10.10.200;
+  option routers 10.10.10.1;
+  option domain-name-servers 10.10.10.1;
+  option domain-name "lan";
+}
+
+subnet 10.10.20.0 netmask 255.255.255.0 {
+  range 10.10.20.100 10.10.20.200;
+  option routers 10.10.20.1;
+  option domain-name-servers 10.10.20.1;
+}
+
+subnet 10.10.30.0 netmask 255.255.255.0 {
+  range 10.10.30.100 10.10.30.200;
+  option routers 10.10.30.1;
+  option domain-name-servers 10.10.30.1;
+}</code></pre>
+
+      <h2>SSH — Belongs on the LAN, Not the WAN</h2>
+      <p>
+        Three things every router SSH config needs: key-only login, no root login, and a
+        pf rule that limits SSH to the trusted LAN.
+      </p>
+      <pre><code># /etc/ssh/sshd_config
+PermitRootLogin no
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+AllowUsers admin
+ListenAddress 10.10.10.1</code></pre>
+
+      <h2>ZFS Boot Environments — Cheap Insurance</h2>
+      <p>
+        Before you change anything important, snapshot the boot environment so a single
+        reboot reverts you:
+      </p>
+      <pre><code>$ bectl create pre-pf-tightening
+$ bectl list
+BE                NAME      Active Mountpoint Space   Created
+default                     NR     /          12.4G   2026-05-01 09:14
+pre-pf-tightening                  -          1.04M   2026-05-03 17:42</code></pre>
+      <p>
+        If a pf change locks you out and you have console access:
+      </p>
+      <pre><code>$ bectl activate pre-pf-tightening
+$ shutdown -r now</code></pre>
+
+      <h2>Smoke Test</h2>
+      <p>
+        From a workstation on <code>igc1</code>:
+      </p>
+      <pre><code>$ ping -c 3 10.10.10.1            # router LAN address
+$ ping -c 3 1.1.1.1               # outbound IP routing
+$ host www.freebsd.org            # outbound DNS
+$ traceroute www.freebsd.org      # full path</code></pre>
+      <p>
+        If those four things work, you have a working FreeBSD edge router.
+      </p>
+
+      <div style="background: var(--bg-surface); padding: 1rem; border: 1px solid var(--border-accent); border-left: 3px solid var(--accent-primary); margin: 1.5rem 0;">
+        <p style="margin: 0;">
+          <strong>Heads-up:</strong> This is the bare metal. The real work — clean pf
+          rules, jails for services, monitoring, IPv6 — lives in the
+          <a href="../homelab.html">homelab tour</a> and the rest of this series.
+        </p>
+      </div>
+
+      <h2>Next Steps</h2>
+      <ul>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a> — replace the bootstrap ruleset with something deliberate</li>
+        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a> — move DNS and monitoring out of the host</li>
+        <li><a href="freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a> — context for why this stack pays off</li>
+      </ul>
+
+      <p>
+        Building a router along with this guide? <a href="../contact.html">Send me your
+        rc.conf</a>. I always learn from how other people draw the lines.
+      </p>
+
+    </div>
+
+    <!-- Newsletter CTA -->
+    <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
+      <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
+      <p class="text-muted">
+        FreeBSD, pf, and SRE notes — straight to your inbox. No spam, just signal.
+      </p>
+      <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
+      <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"
+            method="post" target="popupwindow"
+            onsubmit="window.open('https://buttondown.email/BUTTONDOWN_USERNAME', 'popupwindow')"
+            style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+        <input type="email" name="email" placeholder="you@example.com" required
+               style="flex: 1; min-width: 200px; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
+        <button type="submit" class="btn btn-primary" style="cursor: pointer;">Subscribe</button>
+      </form>
+      <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 0; margin-top: 0.5rem;">
+        Powered by <a href="https://buttondown.email" target="_blank" rel="noopener noreferrer">Buttondown</a>. Unsubscribe anytime. Or grab the <a href="../feed.xml">RSS feed</a>.
+      </p>
+    </div>
+
+    <!-- Related -->
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <h3>Related Posts</h3>
+      <ul>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a></li>
+        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a></li>
+        <li><a href="freebsd-ipv6-router.html">IPv6 for Home Networks: A FreeBSD Walkthrough</a></li>
+        <li><a href="freebsd-wireguard.html">WireGuard on FreeBSD: A 30-Minute Setup</a></li>
+      </ul>
+    </div>
+
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <p class="text-center">
+        <a href="../index.html#blog" class="btn btn-secondary">← Back to Blog</a>
+      </p>
+    </div>
+
+  </article>
+
+  <footer>
+    <p>
+      <a href="../index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>

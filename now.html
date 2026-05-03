@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Now — Michael Vivirito</title>
-  <meta name="description" content="What Michael Vivirito is focused on right now. SRE, AI agents, NixOS, and building the future of infrastructure.">
+  <meta name="description" content="What Michael Vivirito is focused on right now. SRE work, FreeBSD networking, NixOS, and the rest of the homelab.">
   <link rel="stylesheet" type="text/css" href="style.css">
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
   <link rel="alternate" type="application/rss+xml" title="Blog RSS" href="feed.xml">
@@ -17,7 +17,9 @@
       <li><a href="index.html#about">About</a></li>
       <li><a href="index.html#projects">Projects</a></li>
       <li><a href="index.html#blog">Blog</a></li>
-      <li><a href="nixie.html">Nixie</a></li>
+      <li><a href="homelab.html">Homelab</a></li>
+      <li><a href="now.html">Now</a></li>
+      <li><a href="uses.html">Uses</a></li>
       <li><a href="visuals.html">Visuals</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
@@ -27,63 +29,65 @@
     <header style="text-align: center; margin-bottom: 3rem;">
       <h1>Now</h1>
       <p class="text-muted">What I'm focused on right now.</p>
-      <p class="text-muted" style="font-size: 0.875rem;">Last updated: April 2, 2026</p>
+      <p class="text-muted" style="font-size: 0.875rem;">Last updated: May 3, 2026</p>
     </header>
 
     <div class="card" style="max-width: 800px; margin: 0 auto;">
 
       <pre><code>$ cat ~/.status
-Last updated: 2026-04-02
+Last updated: 2026-05-03
 Location:  Vermont, USA</code></pre>
 
       <h2>Building</h2>
       <ul>
-        <li><strong>Nixie</strong> — An AI agent that manages my infrastructure. Not a chatbot — a real autonomous system that monitors servers, tracks tasks, manages Kubernetes, and proactively solves problems. Built on OpenClaw, running on NixOS.</li>
-        <li><strong>VivDynamics</strong> — Building custom AI agent systems for businesses. Autonomous operations, not just chat interfaces.</li>
-        <li><strong>NixOS + K8s DevOps Toolkit</strong> — A commercial toolkit with Docker Compose stacks, Kubernetes manifests, Helm charts, and NixOS modules. $19, coming soon.</li>
+        <li><strong>FreeBSD pf router</strong> — A self-built edge router and firewall at the heart of my homelab. ZFS root, pf, unbound, dhcpd, and WireGuard, all on a fanless 4-port mini PC. <a href="homelab.html">Tour the setup</a>.</li>
+        <li><strong>Jail-isolated services</strong> — Moving DNS, monitoring, and VPN out of the router host and into VNET jails. One service, one dataset, one ZFS snapshot before every change.</li>
+        <li><strong>NixOS + K8s lab</strong> — A 3-node bare-metal Kubernetes cluster on Proxmox, configured declaratively in a private nix-config flake.</li>
       </ul>
 
       <h2>Running</h2>
       <ul>
+        <li>FreeBSD 14.x edge router with pf, unbound, dhcpd, ntpd</li>
         <li>NixOS on Proxmox — 3-node Kubernetes cluster, bare metal</li>
-        <li>Monitoring stack: Prometheus, Grafana, Alertmanager</li>
-        <li>OpenClaw agent orchestration with 8 specialized agents</li>
-        <li>Ollama (Qwen 2.5 14B) for local LLM inference</li>
+        <li>Monitoring: Prometheus, Grafana, Alertmanager</li>
+        <li>WireGuard for road-warrior VPN back into the LAN</li>
+        <li>ZFS everywhere with hourly snapshots and offsite send/recv</li>
       </ul>
 
       <h2>Learning</h2>
       <ul>
-        <li>Cilium eBPF networking — replacing kube-proxy in the cluster</li>
+        <li>Cilium eBPF networking — replacing kube-proxy on the cluster</li>
         <li>Talos Linux — immutable OS for k8s nodes</li>
-        <li>Agent-to-agent communication patterns (MCP, ACP protocols)</li>
+        <li>FreeBSD VNET internals and bhyve</li>
+        <li>IPv6 design for residential networks (real prefix delegation, not 6to4)</li>
       </ul>
 
       <h2>Writing About</h2>
       <ul>
+        <li>FreeBSD pf router build and operations</li>
+        <li>pf.conf design — rules, NAT, anti-spoofing, logging</li>
+        <li>FreeBSD jails for network services</li>
         <li>NixOS in production</li>
         <li>Kubernetes on bare metal</li>
         <li>AWS cost optimization (real numbers, not fluff)</li>
-        <li>AI agent infrastructure</li>
-        <li>Terminal UI applications</li>
       </ul>
 
       <h2>Stack</h2>
       <pre><code>$ cat ~/.stack
-OS:        NixOS 24.11
+Edge:      FreeBSD 14.x + pf + unbound
+Servers:   NixOS 24.11 (declarative)
+Cluster:   kubeadm + Cilium
+Hypervisor: Proxmox + ZFS
 Editor:    Neovim
 Shell:     Zsh + Starship
 Terminal:  Wezterm
-K8s:       kubeadm + Cilium
-Infra:     Proxmox + ZFS
-Monitoring: Prometheus + Grafana
-LLM:       Claude (Opus/Sonnet/Haiku), Gemini, Ollama
-Agent:     OpenClaw</code></pre>
+Monitoring: Prometheus + Grafana</code></pre>
 
       <h2>Reading</h2>
       <ul>
-        <li>Working through the <em>Designing Data-Intensive Applications</em> patterns in production</li>
-        <li>Following NixOS RFCs and Lix project development</li>
-        <li>Keeping up with the eBPF ecosystem</li>
+        <li>Re-reading <em>The Design and Implementation of the FreeBSD Operating System</em> end to end</li>
+        <li>Working through <em>Designing Data-Intensive Applications</em> patterns in production</li>
+        <li>Following NixOS RFCs and the Lix project</li>
       </ul>
 
       <h2>Not Doing</h2>
@@ -113,8 +117,8 @@ Agent:     OpenClaw</code></pre>
   <footer>
     <p>
       <a href="index.html">Home</a> •
-      <a href="https://github.com/mvivirito" target="_blank">GitHub</a> •
-      <a href="https://www.linkedin.com/in/mvivirito" target="_blank">LinkedIn</a>
+      <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a>
     </p>
     <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
       © 2026 Michael Vivirito

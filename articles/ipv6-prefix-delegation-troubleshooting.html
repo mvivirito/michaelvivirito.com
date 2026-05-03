@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPv6 Prefix Delegation: A Troubleshooting Cookbook - Michael Vivirito</title>
+  <meta name="description" content="A field guide to debugging IPv6 prefix delegation on a FreeBSD home router. dhcp6c silence, missing RAs, broken DNS, PMTU oddities, and a tcpdump cheatsheet.">
+  <meta name="keywords" content="IPv6, DHCPv6-PD, prefix delegation, FreeBSD, dhcp6c, rtadvd, rtsold, troubleshooting, networking, pf, RA, RDNSS">
+  <meta name="author" content="Michael Vivirito">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="IPv6 Prefix Delegation: A Troubleshooting Cookbook">
+  <meta property="og:description" content="When DHCPv6-PD on FreeBSD goes silent — the things to check, in the order to check them.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#projects">Projects</a></li>
+      <li><a href="../index.html#blog">Blog</a></li>
+      <li><a href="../homelab.html">Homelab</a></li>
+      <li><a href="../now.html">Now</a></li>
+      <li><a href="../uses.html">Uses</a></li>
+      <li><a href="../visuals.html">Visuals</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>IPv6 Prefix Delegation: A Troubleshooting Cookbook</h1>
+      <p class="text-muted">
+        Published on <time datetime="2026-05-03">May 3, 2026</time>
+      </p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+        <span class="badge">FreeBSD</span>
+        <span class="badge">IPv6</span>
+        <span class="badge">Troubleshooting</span>
+        <span class="badge">Networking</span>
+      </div>
+    </header>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <h2>Why This Post Exists</h2>
+      <p>
+        The <a href="freebsd-ipv6-router.html">main IPv6 setup post</a> shows you the
+        happy path. This post is everything you reach for when the happy path doesn't
+        happen. Most of these are things I've broken, sometimes more than once, on my
+        own router.
+      </p>
+
+      <h2>The 60-Second Checklist</h2>
+      <p>
+        Before you go deep, sanity-check the obvious:
+      </p>
+      <ol>
+        <li><code>sysctl net.inet6.ip6.forwarding</code> — should be <code>1</code>.</li>
+        <li><code>ifconfig $ext_if</code> shows a link-local v6 address (<code>fe80::</code>) and the <code>ACCEPT_RTADV</code> flag.</li>
+        <li><code>service dhcp6c status</code> says it's running.</li>
+        <li><code>service rtadvd status</code> says it's running, on the LAN-side interfaces.</li>
+        <li>The WAN cable is the WAN cable. (You laugh, but.)</li>
+      </ol>
+      <p>
+        If any of those is off, fix that first; the rest of the post probably won't help.
+      </p>
+
+      <h2>Symptom: dhcp6c Won't Even Try</h2>
+      <p>
+        If dhcp6c starts but the WAN never sees DHCPv6 traffic:
+      </p>
+      <pre><code>$ tcpdump -ni $ext_if 'udp port 546 or udp port 547'</code></pre>
+      <p>
+        Crickets? Check that the interface is actually up and that
+        <code>accept_rtadv</code> is set. Without an RA from upstream, dhcp6c won't
+        send a SOLICIT in <code>statefulonly</code> mode (which is the default for many
+        configs). The fix is usually one of:
+      </p>
+      <ul>
+        <li><code>ifconfig $ext_if inet6 accept_rtadv -ifdisabled</code> — apply now.</li>
+        <li>Set <code>ifconfig_${ext_if}_ipv6="inet6 accept_rtadv"</code> in <code>/etc/rc.conf</code> — apply on reboot.</li>
+        <li>Set <code>rtsold_enable="YES"</code> and <code>rtsold_flags="-aF"</code> so rtsold actively probes for RAs at boot.</li>
+      </ul>
+
+      <h2>Symptom: dhcp6c Tries But Gets Nothing</h2>
+      <p>
+        You see dhcp6c sending SOLICITs, but no ADVERTISE in reply:
+      </p>
+      <pre><code>$ tcpdump -ni $ext_if -vv 'udp port 547'
+... &gt; ff02::1:2.547: dhcp6 solicit
+(silence)</code></pre>
+      <p>
+        Most common causes, in order of likelihood:
+      </p>
+      <ul>
+        <li><strong>The ISP doesn't actually delegate.</strong> Some hand out a /128 on
+            the WAN and call that "IPv6". Open a chat ticket and ask explicitly: "Do you
+            do DHCPv6-PD on this plan, and what prefix size?" If the answer is no, none
+            of the configuration tweaks below will help.</li>
+        <li><strong>You're behind a CPE that's already doing PD.</strong> The ISP's
+            modem grabbed the prefix; you can't take it. Bridge the modem (or put it
+            in passthrough mode) so your FreeBSD box terminates the WAN.</li>
+        <li><strong>VLAN tagging.</strong> Some ISPs use a tagged WAN VLAN. Your
+            interface needs a matching <code>vlanX</code> child, and dhcp6c needs to run
+            on that interface, not the parent.</li>
+        <li><strong>Authentication.</strong> Some ISPs require a specific DUID or
+            authentication string. Check support pages or community wikis for your
+            provider.</li>
+      </ul>
+
+      <h2>Symptom: dhcp6c Got a Prefix, but the LAN Is Quiet</h2>
+      <p>
+        dhcp6c logs say it received a /56, your <code>igc1</code> has a v6 address — and
+        nothing on the LAN gets one. First, confirm the prefix actually landed:
+      </p>
+      <pre><code>$ ifconfig igc1 inet6
+        inet6 fe80::1%igc1 prefixlen 64 scopeid 0x2
+        inet6 2001:db8:cafe:1::1 prefixlen 64
+
+$ netstat -rn -f inet6 | grep igc1</code></pre>
+      <p>
+        If the global address isn't there, dhcp6c's script didn't apply it to the LAN
+        interface. Check <code>/usr/local/etc/dhcp6c.conf</code> for the
+        <code>prefix-interface</code> blocks, and confirm the
+        <code>script "/usr/local/etc/dhcp6c-script"</code> line points at a script that
+        actually runs <code>ifconfig</code> on receipt.
+      </p>
+
+      <h2>Symptom: rtadvd Sends Nothing</h2>
+      <p>
+        Even with the LAN address present, clients don't see RAs:
+      </p>
+      <pre><code># From the router, look at what rtadvd is sending
+$ tcpdump -ni igc1 'icmp6 and ip6[40] == 134'</code></pre>
+      <p>
+        ICMP6 type 134 is <em>Router Advertisement</em>. If you see no traffic, rtadvd
+        isn't running or isn't bound to that interface. Check:
+      </p>
+      <ul>
+        <li><code>service rtadvd status</code></li>
+        <li><code>rtadvd_interfaces</code> in <code>/etc/rc.conf</code> includes the LAN interface</li>
+        <li>The interface has a global v6 address (rtadvd refuses to advertise on link-local-only interfaces)</li>
+        <li>If you wrote a <code>/etc/rtadvd.conf</code>, the syntax is <em>intentionally
+            cryptic</em> — see <code>rtadvd.conf(5)</code>. A typo there is a common
+            source of silence.</li>
+      </ul>
+
+      <h2>Symptom: Clients Get Addresses but Can't Resolve</h2>
+      <p>
+        DNS over v6 has two delivery mechanisms:
+      </p>
+      <ul>
+        <li><strong>RDNSS</strong> — RA option that includes recursive DNS server addresses. Modern clients use this.</li>
+        <li><strong>DHCPv6 stateless</strong> — clients ask DHCPv6 for DNS info even though they SLAAC for the address.</li>
+      </ul>
+      <p>
+        On rtadvd, RDNSS is enabled with a config file:
+      </p>
+      <pre><code># /etc/rtadvd.conf
+igc1:\
+    :rdnss="2001:db8:cafe:1::1":\
+    :dnssl="lan":</code></pre>
+      <p>
+        On dhcp6s (if you also want stateless DHCPv6 for older clients), point clients
+        at the same address. But honestly: RDNSS works on every modern OS, so start
+        there.
+      </p>
+
+      <h2>Symptom: Pings Work, TCP Doesn't</h2>
+      <p>
+        Classic Path MTU bug. v6 doesn't fragment in transit; if a packet is too big for
+        a hop, the router sends back <code>icmp6-type toobig</code>. If pf drops that,
+        large TCP packets vanish into the void.
+      </p>
+      <pre><code># Make sure pf is letting these through
+pass inet6 proto icmp6 all icmp6-type { toobig unreach paramprob } keep state</code></pre>
+      <p>
+        If TCP works for short responses but hangs on large transfers, this is almost
+        always the cause. Confirm with:
+      </p>
+      <pre><code>$ ping6 -s 1450 -D ipv6.google.com
+$ ping6 -s 1500 -D ipv6.google.com   # may fail with PMTU=1492 or similar</code></pre>
+
+      <h2>Symptom: Everything Works, Then Doesn't</h2>
+      <p>
+        v6 works for a few hours, then a client's address goes stale. Causes:
+      </p>
+      <ul>
+        <li><strong>Prefix lifetimes.</strong> rtadvd's default valid-lifetime is 30
+            minutes. If rtadvd dies, addresses age out. Set <code>vltime</code> and
+            <code>pltime</code> generously, but not so generous that a real change
+            (ISP reassigns prefix) takes a day to clear.</li>
+        <li><strong>ISP rotates the prefix.</strong> Some ISPs change your delegated
+            prefix on every renew. dhcp6c picks up the new one, but rtadvd needs to
+            switch its advertisements. Restart rtadvd in your dhcp6c hook script:
+            <code>service rtadvd restart</code>.</li>
+        <li><strong>Privacy addresses confusing your firewall logs.</strong> Clients
+            generate temporary v6 addresses for outbound traffic. They aren't a bug, but
+            "the device that did X" can be hard to identify after the fact.
+            <code>net.inet6.ip6.use_tempaddr</code> sysctl, applied per-host.</li>
+      </ul>
+
+      <h2>The pf Side</h2>
+      <p>
+        v6-specific things that bite:
+      </p>
+      <ul>
+        <li><strong>antispoof for inet6.</strong> The IPv4 antispoof rule doesn't cover
+            v6 by default. Add <code>antispoof quick for { ... } inet6</code>.</li>
+        <li><strong>NDP traffic.</strong> Don't block ICMP6 types
+            <code>neighbrsol</code> or <code>neighbradv</code> — they're v6's ARP. If
+            you do, neighbours go silent.</li>
+        <li><strong>Rule order.</strong> A blanket <code>block in</code> at the top of
+            the WAN ruleset blocks ICMP6 too unless you specifically pass it. Pass v6
+            ICMP early; the existing v4 ICMP <code>pass</code> doesn't cover v6.</li>
+      </ul>
+
+      <h2>The tcpdump Cookbook</h2>
+      <pre><code># DHCPv6 traffic on the WAN
+$ tcpdump -ni $ext_if -vv 'udp port 546 or udp port 547'
+
+# Router solicitations and advertisements on the LAN
+$ tcpdump -ni igc1 'icmp6 and (ip6[40] == 133 or ip6[40] == 134)'
+
+# Neighbour solicitations / advertisements
+$ tcpdump -ni igc1 'icmp6 and (ip6[40] == 135 or ip6[40] == 136)'
+
+# Anything ICMPv6 on a given interface
+$ tcpdump -ni igc1 'icmp6'
+
+# Watch only multicast (RAs, NDP)
+$ tcpdump -ni igc1 'ip6 multicast'
+
+# Pflog for v6 specifically
+$ tcpdump -ni pflog0 'inet6'</code></pre>
+
+      <h2>Useful sysctls</h2>
+      <pre><code># See current values
+$ sysctl net.inet6.ip6 | grep -iE 'forward|tempaddr|accept'
+
+# Common ones to know
+net.inet6.ip6.forwarding             # 1 if router
+net.inet6.ip6.accept_rtadv           # 1 to listen for RAs (set per-iface usually)
+net.inet6.ip6.use_tempaddr           # 1 to enable privacy addresses
+net.inet6.ip6.prefer_tempaddr        # 1 to prefer them on outbound
+net.inet6.icmp6.nd6_useloopback      # 1 by default; rarely needs changing
+net.inet6.ip6.no_radr                # 1 to ignore default routes from RAs (don't set on a CPE)</code></pre>
+
+      <h2>When to Stop and Reboot</h2>
+      <p>
+        IPv6 has more state spread across more daemons than IPv4. Sometimes the right
+        move, after you've checked everything reasonable, is:
+      </p>
+      <pre><code>$ service rtadvd stop
+$ service dhcp6c  stop
+$ ifconfig igc1 inet6 -alias 2001:db8:cafe:1::1
+$ ifconfig igc0 down up
+$ service dhcp6c  start
+$ service rtadvd start</code></pre>
+      <p>
+        That sequence brings everything down, clears any stuck addresses, and brings
+        things back up in the right order. It's not a real fix — but the sun's coming
+        up, your kid wants the wifi back, and tomorrow you'll diff the configs to
+        figure out what changed.
+      </p>
+
+      <h2>The Reading List</h2>
+      <ul>
+        <li><a href="https://man.freebsd.org/cgi/man.cgi?query=rtadvd.conf&amp;sektion=5" target="_blank" rel="noopener noreferrer">rtadvd.conf(5)</a> — read the syntax notes carefully, more than once</li>
+        <li><a href="https://man.freebsd.org/cgi/man.cgi?query=dhcp6c.conf" target="_blank" rel="noopener noreferrer">dhcp6c.conf(5)</a> — the prefix-interface stanza is what most "it works on my Linux box" articles miss on FreeBSD</li>
+        <li><a href="https://datatracker.ietf.org/doc/html/rfc8415" target="_blank" rel="noopener noreferrer">RFC 8415 (DHCPv6)</a> — surprisingly readable for an RFC</li>
+        <li><a href="https://datatracker.ietf.org/doc/html/rfc4861" target="_blank" rel="noopener noreferrer">RFC 4861 (Neighbor Discovery)</a> — what the ICMP6 types in this post actually mean</li>
+      </ul>
+
+      <h2>Where to Go Next</h2>
+      <ul>
+        <li><a href="freebsd-ipv6-router.html">IPv6 for Home Networks: A FreeBSD Walkthrough</a> — the happy path that this post debugs</li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a> — the v4 ruleset; pair it with the v6 must-allows above</li>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a> — the host underneath all of this</li>
+      </ul>
+
+      <p>
+        Stuck on a symptom I haven't covered? <a href="../contact.html">Mail me a
+        tcpdump capture</a> and I'll happily add it to the post.
+      </p>
+
+    </div>
+
+    <!-- Newsletter CTA -->
+    <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
+      <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
+      <p class="text-muted">
+        FreeBSD, pf, and SRE notes — straight to your inbox. No spam, just signal.
+      </p>
+      <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
+      <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"
+            method="post" target="popupwindow"
+            onsubmit="window.open('https://buttondown.email/BUTTONDOWN_USERNAME', 'popupwindow')"
+            style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+        <input type="email" name="email" placeholder="you@example.com" required
+               style="flex: 1; min-width: 200px; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
+        <button type="submit" class="btn btn-primary" style="cursor: pointer;">Subscribe</button>
+      </form>
+      <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 0; margin-top: 0.5rem;">
+        Powered by <a href="https://buttondown.email" target="_blank" rel="noopener noreferrer">Buttondown</a>. Unsubscribe anytime. Or grab the <a href="../feed.xml">RSS feed</a>.
+      </p>
+    </div>
+
+    <!-- Related -->
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <h3>Related Posts</h3>
+      <ul>
+        <li><a href="freebsd-ipv6-router.html">IPv6 for Home Networks: A FreeBSD Walkthrough</a></li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a></li>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a></li>
+        <li><a href="freebsd-wireguard.html">WireGuard on FreeBSD: A 30-Minute Setup</a></li>
+      </ul>
+    </div>
+
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <p class="text-center">
+        <a href="../index.html#blog" class="btn btn-secondary">← Back to Blog</a>
+      </p>
+    </div>
+
+  </article>
+
+  <footer>
+    <p>
+      <a href="../index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>

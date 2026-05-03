@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPv6 for Home Networks: A FreeBSD Walkthrough - Michael Vivirito</title>
+  <meta name="description" content="A practical guide to running real, native IPv6 on a FreeBSD home router. Prefix delegation, rtsold, dhcp6c, rtadvd, and pf rules — without breaking your IPv4 setup.">
+  <meta name="keywords" content="IPv6, FreeBSD, pf, networking, DHCPv6-PD, rtadvd, rtsold, dhcp6c, prefix delegation, home network">
+  <meta name="author" content="Michael Vivirito">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="IPv6 for Home Networks: A FreeBSD Walkthrough">
+  <meta property="og:description" content="Real, native IPv6 on a FreeBSD router — DHCPv6-PD, rtsold, dhcp6c, rtadvd, and pf rules.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#projects">Projects</a></li>
+      <li><a href="../index.html#blog">Blog</a></li>
+      <li><a href="../homelab.html">Homelab</a></li>
+      <li><a href="../now.html">Now</a></li>
+      <li><a href="../uses.html">Uses</a></li>
+      <li><a href="../visuals.html">Visuals</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>IPv6 for Home Networks: A FreeBSD Walkthrough</h1>
+      <p class="text-muted">
+        Published on <time datetime="2026-05-03">May 3, 2026</time>
+      </p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+        <span class="badge">FreeBSD</span>
+        <span class="badge">IPv6</span>
+        <span class="badge">Networking</span>
+        <span class="badge">pf</span>
+      </div>
+    </header>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <h2>Why You Should Care About v6 in 2026</h2>
+      <p>
+        Most residential ISPs in North America and Europe now hand out real IPv6
+        prefixes for free, alongside CGNAT'd IPv4. If you're not using v6, you're
+        sharing one IPv4 address with your neighbours and inheriting all the weirdness
+        that comes with it: failed inbound connections, broken games, mysterious rate
+        limits, and zero ability to host anything.
+      </p>
+      <p>
+        Native v6 fixes all of that. Every device on your LAN gets a globally
+        routable address. Hosting a service to a friend becomes a one-line pf rule. And
+        the configuration on FreeBSD is genuinely smaller than the IPv4 NAT setup it
+        replaces — there's nothing to translate.
+      </p>
+
+      <h2>The Moving Pieces</h2>
+      <ul>
+        <li><strong>rtsold</strong> — listens for IPv6 Router Advertisements (RAs)
+            from your ISP on the WAN.</li>
+        <li><strong>dhcp6c</strong> (from the <code>net/dhcp6</code> port) — speaks
+            DHCPv6 to the ISP and asks for a prefix delegation (PD), typically a /56
+            or /60.</li>
+        <li><strong>rtadvd</strong> — sends RAs to your LAN interfaces, telling clients
+            their prefix and gateway.</li>
+        <li><strong>pf</strong> — filters v6 traffic the same way it filters v4, with
+            a few v6-specific must-allow rules.</li>
+      </ul>
+      <p>
+        That's the whole stack. No NAT66, no proxies, no gateway VMs. The router
+        forwards packets and the LAN gets real addresses.
+      </p>
+
+      <h2>Step 1: Tell the Kernel It's a v6 Router</h2>
+      <pre><code># /etc/rc.conf
+
+# IPv4 forwarding (you presumably already have this)
+gateway_enable="YES"
+
+# IPv6 forwarding and accept-RA on the WAN
+ipv6_gateway_enable="YES"
+ipv6_cpe_wanif="igc0"
+
+# Accept RAs only on the WAN; advertise on the LAN sides
+ifconfig_igc0_ipv6="inet6 accept_rtadv -ifdisabled"
+ifconfig_igc1_ipv6="inet6 -ifdisabled"
+ifconfig_igc2_ipv6="inet6 -ifdisabled"
+ifconfig_igc3_ipv6="inet6 -ifdisabled"
+
+# Daemons
+rtsold_enable="YES"
+rtsold_flags="-aF"
+rtadvd_enable="YES"
+rtadvd_interfaces="igc1 igc2 igc3"</code></pre>
+      <p>
+        <code>ipv6_cpe_wanif</code> is the magic switch that flips a FreeBSD box into
+        "I am the customer-premises router for v6" mode. It tightens up forwarding and
+        ICMP defaults so the box behaves correctly as the edge.
+      </p>
+
+      <h2>Step 2: dhcp6c — Ask for a Prefix</h2>
+      <p>
+        Install the client and add a config:
+      </p>
+      <pre><code>$ pkg install dhcp6</code></pre>
+      <pre><code># /usr/local/etc/dhcp6c.conf
+interface igc0 {
+    send ia-pd 0;
+    send ia-na 0;
+    request domain-name-servers;
+    script "/usr/local/etc/dhcp6c-script";
+};
+
+id-assoc pd 0 {
+    prefix-interface igc1 {
+        sla-id  1;
+        sla-len 8;
+    };
+    prefix-interface igc2 {
+        sla-id  2;
+        sla-len 8;
+    };
+    prefix-interface igc3 {
+        sla-id  3;
+        sla-len 8;
+    };
+};
+
+id-assoc na 0 { };</code></pre>
+      <p>
+        If your ISP delegates a /56, <code>sla-len 8</code> carves it into 256
+        independent /64s — one per LAN, with 253 to spare. <code>sla-id</code> picks
+        which slice each LAN gets.
+      </p>
+      <pre><code># /etc/rc.conf (continued)
+dhcp6c_enable="YES"
+dhcp6c_interfaces="igc0"</code></pre>
+
+      <h2>Step 3: rtadvd — Tell the LAN What Its Prefix Is</h2>
+      <p>
+        rtadvd's defaults are reasonable; you usually only need <code>rtadvd_interfaces</code>
+        in rc.conf. If you want to override things explicitly, drop a config:
+      </p>
+      <pre><code># /etc/rtadvd.conf  (optional — defaults are usually fine)
+igc1:\
+    :raflags="mo":\
+    :rltime#1800:\
+    :addrs#1: \
+    :addr="auto":\
+    :pltime#600:vltime#1200:
+
+igc2:\
+    :raflags="mo":\
+    :rltime#1800:</code></pre>
+      <p>
+        <code>raflags="mo"</code> sets the <em>Managed</em> and <em>Other</em> flags so
+        clients also do DHCPv6 if you want stateful assignment. For pure SLAAC, drop the
+        <code>m</code>.
+      </p>
+
+      <h2>Step 4: pf, but for v6</h2>
+      <p>
+        Most of your existing <a href="pf-firewall-rules.html">pf ruleset</a> handles
+        both families if you wrote <code>inet</code>-agnostic rules. But IPv6 needs a
+        few specific rules to behave:
+      </p>
+      <pre><code># --- IPv6 must-allow ---
+# ICMPv6 is structural, not optional. Path MTU, NDP, RA all live here.
+icmp6_ok = "{ echoreq echorep neighbrsol neighbradv routersol routeradv \
+              unreach toobig timex paramprob }"
+
+pass inet6 proto icmp6 all icmp6-type $icmp6_ok keep state
+
+# DHCPv6 client traffic to/from the WAN
+pass in  on $ext_if inet6 proto udp from any to any port { 546 547 } keep state
+pass out on $ext_if inet6 proto udp from any to any port { 546 547 } keep state
+
+# Anti-spoofing for v6 (covers v4 with the same antispoof you already have)
+antispoof quick for { $lan_if $srv_if $iot_if } inet6</code></pre>
+      <p>
+        <strong>Do not blanket-block ICMPv6.</strong> v6 depends on it for neighbour
+        discovery (the v6 equivalent of ARP), Path MTU, and RA — block it and your
+        network silently falls apart in interesting ways.
+      </p>
+
+      <h2>Step 5: Smoke Test</h2>
+      <pre><code># On the router
+$ ifconfig igc1 inet6
+        inet6 fe80::1%igc1 prefixlen 64 scopeid 0x2
+        inet6 2001:db8:cafe:1::1 prefixlen 64
+
+$ ndp -an              # neighbour table
+$ netstat -rn -f inet6 # routing table
+
+# On a LAN client
+$ ping6 -c 3 ipv6.google.com
+$ traceroute6 ipv6.google.com
+$ curl -6 https://ifconfig.co</code></pre>
+      <p>
+        If the LAN client gets a global address starting with <code>2</code> or
+        <code>3</code> and pings the outside, you have working native v6.
+      </p>
+
+      <h2>Hosting a Service: NAT-Free and Beautiful</h2>
+      <p>
+        With v6 there's no port forwarding because there's no NAT. The server has its
+        own address, you just open the port:
+      </p>
+      <pre><code># Allow inbound HTTPS to a server inside the homelab
+pass in on $ext_if inet6 proto tcp \
+  from any to 2001:db8:cafe:2::20 port https keep state</code></pre>
+      <p>
+        Hand a friend the AAAA record and they connect directly. No router config on
+        their side, no UPnP, no STUN. This is what the protocol was designed to do.
+      </p>
+
+      <h2>Common Pitfalls</h2>
+      <ul>
+        <li><strong>Privacy extensions.</strong> Most clients use temporary v6 addresses
+            for outbound traffic by default. That's fine — but don't expect a stable
+            outbound IP per client unless you turn the temp addresses off. On FreeBSD,
+            <code>net.inet6.ip6.use_tempaddr=0</code>.</li>
+        <li><strong>Link-local vs global.</strong> <code>fe80::/10</code> is link-local
+            and never routable. If you copy-paste a v6 address that starts with
+            <code>fe80:</code>, you also need a scope ID like <code>%igc1</code>.</li>
+        <li><strong>RA flapping.</strong> If you accidentally have two devices sending
+            RAs on the same LAN (an ISP router still attached, plus your FreeBSD box),
+            clients will flip between prefixes. Pick one source of truth.</li>
+        <li><strong>MTU.</strong> Some PPPoE-style WANs have a smaller MTU on v6 than
+            v4. Allow <code>icmp6-type toobig</code> through pf so PMTUD works, or
+            things will hang at random.</li>
+        <li><strong>DNS over v6.</strong> Make sure your DNS server (unbound, etc.)
+            listens on a v6 address and is advertised via DHCPv6 / RDNSS. Otherwise
+            v6-only clients can't resolve anything.</li>
+      </ul>
+
+      <h2>What You Lose, What You Gain</h2>
+      <p>
+        You lose the comforting illusion of NAT-as-firewall — every device is now
+        directly reachable, in principle, from anywhere. That's why <code>pf</code>'s
+        default-deny on the WAN is non-negotiable.
+      </p>
+      <p>
+        You gain a working internet. Real addresses, real routing, no more games of
+        port-forward tetris. Connections that "just don't work" over IPv4 mostly do
+        over v6.
+      </p>
+
+      <h2>Where to Go Next</h2>
+      <ul>
+        <li><a href="ipv6-prefix-delegation-troubleshooting.html">IPv6 Prefix Delegation: A Troubleshooting Cookbook</a> — the companion debugging guide for when the steps above don't go to plan</li>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a> — the host this all runs on</li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a> — the IPv4 ruleset that pairs with this</li>
+        <li><a href="freebsd-wireguard.html">WireGuard on FreeBSD: A 30-Minute Setup</a> — how the v6 prefix makes road-warrior VPN setup nicer</li>
+      </ul>
+
+      <p>
+        Run a different ISP or a different setup? <a href="../contact.html">Send me
+        your config</a>. I'd love to add a section for setups that aren't mine.
+      </p>
+
+    </div>
+
+    <!-- Newsletter CTA -->
+    <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
+      <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
+      <p class="text-muted">
+        FreeBSD, pf, and SRE notes — straight to your inbox. No spam, just signal.
+      </p>
+      <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
+      <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"
+            method="post" target="popupwindow"
+            onsubmit="window.open('https://buttondown.email/BUTTONDOWN_USERNAME', 'popupwindow')"
+            style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+        <input type="email" name="email" placeholder="you@example.com" required
+               style="flex: 1; min-width: 200px; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-default); color: var(--text-primary); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
+        <button type="submit" class="btn btn-primary" style="cursor: pointer;">Subscribe</button>
+      </form>
+      <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 0; margin-top: 0.5rem;">
+        Powered by <a href="https://buttondown.email" target="_blank" rel="noopener noreferrer">Buttondown</a>. Unsubscribe anytime. Or grab the <a href="../feed.xml">RSS feed</a>.
+      </p>
+    </div>
+
+    <!-- Related -->
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <h3>Related Posts</h3>
+      <ul>
+        <li><a href="ipv6-prefix-delegation-troubleshooting.html">IPv6 Prefix Delegation: A Troubleshooting Cookbook</a></li>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a></li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a></li>
+        <li><a href="freebsd-wireguard.html">WireGuard on FreeBSD: A 30-Minute Setup</a></li>
+      </ul>
+    </div>
+
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <p class="text-center">
+        <a href="../index.html#blog" class="btn btn-secondary">← Back to Blog</a>
+      </p>
+    </div>
+
+  </article>
+
+  <footer>
+    <p>
+      <a href="../index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>

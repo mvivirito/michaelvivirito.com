@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homelab — FreeBSD pf Router - Michael Vivirito</title>
+  <meta name="description" content="A self-built FreeBSD edge router running pf, unbound, and dhcpd on dedicated hardware. The network at the core of my homelab — hardware, topology, and software stack.">
+  <meta name="keywords" content="FreeBSD, pf, firewall, router, homelab, networking, self-hosted, unbound, dhcpd, jails, ZFS, edge router">
+  <meta name="author" content="Michael Vivirito">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://michaelvivirito.com/homelab.html">
+  <meta property="og:title" content="Homelab — FreeBSD pf Router">
+  <meta property="og:description" content="A FreeBSD router with pf as the core of my homelab network — hardware, software, and operations.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#projects">Projects</a></li>
+      <li><a href="index.html#blog">Blog</a></li>
+      <li><a href="homelab.html" class="new">Homelab</a></li>
+      <li><a href="now.html">Now</a></li>
+      <li><a href="uses.html">Uses</a></li>
+      <li><a href="visuals.html">Visuals</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>Homelab — FreeBSD pf Router</h1>
+      <p class="subtitle" style="color: var(--text-secondary); font-size: 1.1rem;">
+        A custom edge router running FreeBSD, pf, unbound, and dhcpd
+      </p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+        <span class="badge">FreeBSD</span>
+        <span class="badge">pf</span>
+        <span class="badge">Networking</span>
+        <span class="badge">Self-Hosted</span>
+      </div>
+    </header>
+
+    <!-- Overview -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>What This Is</h2>
+      <p>
+        At the edge of my homelab is a small, fanless FreeBSD box that handles every packet
+        coming into and out of my network. It's the WAN router, the firewall, the DHCP and
+        DNS server, the VPN endpoint, and the boundary that everything else sits behind.
+      </p>
+      <p>
+        I built it instead of buying a turnkey router for the same reason I run NixOS on
+        servers: I want the configuration to be obvious, version-controlled, and learnable.
+        FreeBSD's <code>pf</code>, <code>rc.conf</code>, and tightly integrated networking
+        stack give me exactly that.
+      </p>
+    </div>
+
+    <!-- Why FreeBSD -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Why Not OPNsense or pfSense?</h2>
+      <p>
+        OPNsense and pfSense are both excellent — and both are FreeBSD-based. But they ship
+        a heavyweight web UI on top of FreeBSD, and the moment you click into "Advanced",
+        you discover the UI doesn't expose what you actually want to configure. You SSH in,
+        edit a hidden file, and now your config is split between the GUI and a shadow config
+        you have to remember.
+      </p>
+      <p>
+        Plain FreeBSD avoids that split. Every line of configuration is in
+        <code>/etc/rc.conf</code>, <code>/etc/pf.conf</code>, <code>/usr/local/etc/unbound/</code> —
+        readable, greppable, and trivial to put in git. The router is small enough to fit
+        in my head, which is the entire point.
+      </p>
+    </div>
+
+    <!-- Hardware -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Hardware</h2>
+      <ul>
+        <li><strong>Chassis</strong>: Fanless 4-port mini PC (Intel N5105/N100 class)</li>
+        <li><strong>NICs</strong>: 4× Intel i225/i226 2.5GbE (the <code>igc(4)</code> driver)</li>
+        <li><strong>Memory</strong>: 16 GB DDR4 SODIMM</li>
+        <li><strong>Storage</strong>: 256 GB NVMe with ZFS root and a boot environment</li>
+        <li><strong>Power</strong>: ~10 W idle, no moving parts</li>
+      </ul>
+      <p>
+        Intel NICs matter. Realtek and other budget NICs technically work, but they
+        regularly cost more in debugging time than the BOM saved.
+      </p>
+    </div>
+
+    <!-- Topology -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Network Topology</h2>
+      <pre><code>                 ┌─────────────────────┐
+                 │      Internet       │
+                 └──────────┬──────────┘
+                            │ igc0 (WAN)
+                 ┌──────────┴──────────┐
+                 │   FreeBSD Router    │
+                 │   pf · unbound      │
+                 │   dhcpd · ntpd      │
+                 └──┬─────┬─────┬──────┘
+            igc1   │     │     │  igc3
+        (LAN trust)│igc2 │     │ (IoT / quarantine)
+                   │ (servers)│
+        ┌──────────┴───┐ ┌────┴────────┐ ┌──────────┐
+        │ Workstations │ │ Homelab     │ │ IoT VLAN │
+        │ Phones / TV  │ │ Proxmox/K8s │ │ Cameras  │
+        └──────────────┘ └─────────────┘ └──────────┘</code></pre>
+      <p>
+        Four physical interfaces, four broadcast domains. No VLAN trunking required for
+        the common case — physical separation is the simplest defense against
+        misconfiguration. IoT and trusted LAN traffic never share a wire.
+      </p>
+    </div>
+
+    <!-- Software -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Software Stack</h2>
+      <ul>
+        <li><strong>FreeBSD 14.x</strong> — base OS, ZFS root, GENERIC kernel</li>
+        <li><strong>pf</strong> — stateful firewall, NAT, anti-spoofing, queueing</li>
+        <li><strong>unbound</strong> — local recursive DNS, DNSSEC validation, blocklists</li>
+        <li><strong>dhcpd</strong> — leases per LAN, static reservations for servers</li>
+        <li><strong>ntpd</strong> — local NTP for the network</li>
+        <li><strong>WireGuard</strong> — road-warrior VPN back into the LAN</li>
+        <li><strong>iocage / bastille</strong> — jails for service isolation</li>
+      </ul>
+      <p>
+        Everything is in base or in <code>pkg</code>. No vendor binaries, no upstream-only
+        repos, no kernel modules I didn't build from source.
+      </p>
+    </div>
+
+    <!-- Configuration in spirit -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>The Configuration, in Spirit</h2>
+      <pre><code># /etc/rc.conf (excerpt)
+hostname="gw.lan"
+zfs_enable="YES"
+
+# Enable forwarding for both IP versions
+gateway_enable="YES"
+ipv6_gateway_enable="YES"
+
+# Interfaces
+ifconfig_igc0="DHCP"
+ifconfig_igc1="inet 10.10.10.1/24"
+ifconfig_igc2="inet 10.10.20.1/24"
+ifconfig_igc3="inet 10.10.30.1/24"
+
+# Services
+pf_enable="YES"
+pflog_enable="YES"
+local_unbound_enable="YES"
+dhcpd_enable="YES"
+ntpd_enable="YES"
+sshd_enable="YES"</code></pre>
+      <p>
+        That's the core. Most of the rest is in <code>/etc/pf.conf</code> — see the
+        <a href="articles/pf-firewall-rules.html">pf rules deep dive</a> for the full
+        ruleset and the reasoning behind it.
+      </p>
+    </div>
+
+    <!-- Operational habits -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Operational Habits</h2>
+      <ul>
+        <li><strong>git-tracked config.</strong> <code>/etc</code>,
+            <code>/usr/local/etc</code>, and the jail manifests live in a private git repo.
+            Every change is a commit with a message.</li>
+        <li><strong>ZFS boot environments.</strong> Before any meaningful change I clone
+            the boot environment with <code>bectl create</code>. If something breaks, I
+            reboot to the previous BE in seconds.</li>
+        <li><strong>pfctl -nf before pfctl -f.</strong> Always validate the ruleset before
+            loading it. Never edit pf.conf in place over SSH without a safety net.</li>
+        <li><strong>Console access.</strong> Serial console wired up. The day pf locks me
+            out is the day I'm grateful for it.</li>
+        <li><strong>ZFS snapshots + offsite send.</strong> Hourly snapshots, daily replication
+            to a remote ZFS host. Belt and suspenders.</li>
+      </ul>
+    </div>
+
+    <!-- Deeper Reading -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Articles in This Series</h2>
+      <ul>
+        <li><a href="articles/freebsd-pf-router.html">Building a FreeBSD pf Router</a> — hardware, install, and first-boot configuration</li>
+        <li><a href="articles/pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a> — rule design, NAT, anti-spoofing, and a real config</li>
+        <li><a href="articles/freebsd-jails-network.html">FreeBSD Jails for Network Services</a> — using VNET jails to isolate DNS, monitoring, and VPN</li>
+        <li><a href="articles/freebsd-ipv6-router.html">IPv6 for Home Networks: A FreeBSD Walkthrough</a> — DHCPv6-PD, rtadvd, and v6-aware pf rules</li>
+        <li><a href="articles/ipv6-prefix-delegation-troubleshooting.html">IPv6 Prefix Delegation: A Troubleshooting Cookbook</a> — debugging dhcp6c, RAs, RDNSS, and PMTU</li>
+        <li><a href="articles/freebsd-wireguard.html">WireGuard on FreeBSD: A 30-Minute Setup</a> — server, clients, pf, and DNS through the tunnel</li>
+        <li><a href="articles/zfs-send-recv-replication.html">ZFS Send/Recv: Replicating Your Homelab</a> — snapshots, incremental streams, and a real pull-based cron script</li>
+        <li><a href="articles/freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a> — when to reach for each, and why I run both</li>
+      </ul>
+    </div>
+
+    <!-- Related -->
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+      <h2>Related Reading</h2>
+      <ul>
+        <li><a href="https://www.freebsd.org/doc/handbook/" target="_blank" rel="noopener noreferrer">FreeBSD Handbook</a> — the canonical reference, written like an actual book</li>
+        <li><a href="https://man.freebsd.org/cgi/man.cgi?query=pf.conf&amp;sektion=5" target="_blank" rel="noopener noreferrer">pf.conf(5)</a> — the manual page that does most of the teaching</li>
+        <li><a href="https://man.freebsd.org/cgi/man.cgi?query=jail&amp;sektion=8" target="_blank" rel="noopener noreferrer">jail(8)</a> — the original lightweight container, still going strong</li>
+      </ul>
+      <p>
+        Have questions about the build, or notice something I'd benefit from changing?
+        <a href="contact.html">Drop me a line</a>.
+      </p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer>
+    <p>
+      <a href="index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>

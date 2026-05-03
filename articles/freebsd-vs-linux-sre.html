@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreeBSD vs Linux: An SRE's Take - Michael Vivirito</title>
+  <meta name="description" content="A working SRE's honest comparison of FreeBSD and Linux. Init, networking, ZFS, jails vs containers, package management, and when to reach for each.">
+  <meta name="keywords" content="FreeBSD, Linux, SRE, comparison, ZFS, jails, containers, systemd, rc.d, networking, pf, iptables, nftables">
+  <meta name="author" content="Michael Vivirito">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="FreeBSD vs Linux: An SRE's Take">
+  <meta property="og:description" content="An honest, practical comparison of FreeBSD and Linux from an SRE who runs both.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#projects">Projects</a></li>
+      <li><a href="../index.html#blog">Blog</a></li>
+      <li><a href="../homelab.html">Homelab</a></li>
+      <li><a href="../now.html">Now</a></li>
+      <li><a href="../uses.html">Uses</a></li>
+      <li><a href="../visuals.html">Visuals</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>FreeBSD vs Linux: An SRE's Take</h1>
+      <p class="text-muted">
+        Published on <time datetime="2026-05-03">May 3, 2026</time>
+      </p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+        <span class="badge">FreeBSD</span>
+        <span class="badge">Linux</span>
+        <span class="badge">SRE</span>
+      </div>
+    </header>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <h2>The Position I'm Arguing From</h2>
+      <p>
+        I run both. Linux runs on workstations, on Kubernetes nodes, in containers,
+        anywhere a hardware vendor only ships drivers for one kernel. FreeBSD runs at the
+        edge of my network, on my homelab router, and on a small fleet of "long uptime,
+        small surface area" boxes. After a while, you stop arguing about which is
+        "better" and start noticing the seams: which kind of work each one absorbs without
+        complaint.
+      </p>
+
+      <h2>The Init System</h2>
+      <p>
+        Linux gave us systemd, which is genuinely powerful — units, timers, sockets, and
+        cgroup integration are all useful. It is also a sprawling project with surprising
+        edges. The first time you write a unit file you feel productive; the fortieth time
+        you find yourself reading <code>journalctl</code>'s manual page to figure out why
+        a timer ran twice.
+      </p>
+      <p>
+        FreeBSD's <code>rc.d</code> is the opposite. Each service is a shell script.
+        <code>service foo start</code> calls <code>/etc/rc.d/foo start</code>, which
+        sources <code>/etc/rc.subr</code> and runs the steps as written. There's no
+        message bus, no socket activation, no parallelisation. That's a real cost — boot
+        is slower, and you don't get cgroup-style resource limits for free. But every
+        service is a file you can read end to end in two minutes.
+      </p>
+      <p>
+        For a router with five services, rc.d is plainly easier. For a workstation that
+        starts twelve user-session components in parallel, systemd earns its keep.
+      </p>
+
+      <h2>Networking</h2>
+      <p>
+        This is where FreeBSD's coherence shines. <code>ifconfig</code>, <code>route</code>,
+        and <code>netstat</code> have been doing the same things for thirty years. Their
+        flags don't change between releases. The pf firewall has a configuration syntax
+        that reads like English, and the same syntax works on OpenBSD if you ever drift
+        that way.
+      </p>
+      <p>
+        Linux networking, by contrast, has gone through several generations: ifconfig →
+        ip; iptables → nftables; route → ip route; brctl → ip link. They mostly work, and
+        nftables is a real improvement over iptables — but the documentation lag is
+        chronic, and the ecosystem (Docker, k8s, Cilium, every cloud) layers more
+        abstractions on top.
+      </p>
+      <p>
+        For a network device — a router, a firewall, a VPN concentrator — FreeBSD's
+        stability is a feature, not a bug. The configuration I learn today will still be
+        valid in five years. (See the <a href="pf-firewall-rules.html">pf.conf design
+        article</a> for what that buys you in practice.)
+      </p>
+
+      <h2>Filesystems</h2>
+      <p>
+        ZFS on FreeBSD is first-class — it's part of base, the installer offers it, and
+        the kernel and userland speak it natively. ZFS on Linux is excellent these days
+        too (OpenZFS shares code with FreeBSD), but the integration is one step less
+        smooth: out-of-tree module, distro-specific packaging, occasional friction with
+        new kernels.
+      </p>
+      <p>
+        ZFS-native features that change my day-to-day:
+      </p>
+      <ul>
+        <li><strong>Boot environments.</strong> <code>bectl create</code> before any
+            risky change, reboot to recover.</li>
+        <li><strong>Snapshots and clones.</strong> Cheap. Free. Use them.</li>
+        <li><strong>zfs send/recv.</strong> Replicate a dataset to another host with one
+            command and a pipe.</li>
+        <li><strong>Compression and dedup that just works.</strong> <code>compression=zstd</code>
+            on a dataset and forget about it.</li>
+      </ul>
+      <p>
+        For storage-heavy hosts I'll pick FreeBSD purely for the boot environment story.
+        Linux + ZFS gets you most of the same tooling, but the seams show.
+      </p>
+
+      <h2>Containers and Jails</h2>
+      <p>
+        Linux owns containers. Docker, containerd, Kubernetes, OCI, runc — that ecosystem
+        is huge, well-funded, and where most server software targets first. If your job
+        is to ship containerised services, run them on Linux.
+      </p>
+      <p>
+        FreeBSD's jails predate Docker by years and have a different shape. A jail is a
+        partition of the kernel's userspace, not a packaged image. There's no registry,
+        no <code>jail run nginx:latest</code>, no kubectl. There is a single, well-defined
+        primitive that's been in the kernel since 2000, and a userland that rarely
+        surprises you. (See <a href="freebsd-jails-network.html">FreeBSD Jails for Network
+        Services</a> for what that looks like in practice.)
+      </p>
+      <p>
+        Different problems, different shapes. I run jails on the router and Kubernetes on
+        a Linux cluster, and both teams are happy.
+      </p>
+
+      <h2>Package Management</h2>
+      <p>
+        FreeBSD's split between <code>pkg</code> (binary packages) and <code>ports</code>
+        (build from source) is unusual and good. <code>pkg install nginx</code> works
+        like <code>apt install</code>; <code>cd /usr/ports/www/nginx &amp;&amp; make
+        install</code> rebuilds with whatever options you want. You can mix and match.
+      </p>
+      <p>
+        Linux package management is more diverse, which is both its strength and its
+        weakness. apt, dnf, pacman, zypper, snap, flatpak, AUR helpers — each
+        ecosystem has its own opinions and its own failure modes. NixOS is a notable
+        outlier (and one I run on Linux servers — see
+        <a href="why-i-run-nixos.html">Why I Run NixOS on My Servers</a>), trading the
+        whole package metaphor for a declarative one.
+      </p>
+
+      <h2>Documentation</h2>
+      <p>
+        The FreeBSD Handbook is a real book. It's edited, cross-referenced, and current.
+        Combined with thorough man pages, it's often the only resource you need. The
+        culture of "the manual page is the documentation" is alive there in a way it
+        mostly isn't on Linux any more, where you're as likely to end up on a vendor blog
+        as in <code>man systemd.service</code>.
+      </p>
+      <p>
+        That said, Linux benefits from the largest installed base on the planet. Whatever
+        weird question you have, somebody else has had it and written about it. FreeBSD
+        forces you to build the muscle of reading primary sources first.
+      </p>
+
+      <h2>Security Posture</h2>
+      <p>
+        Both can be hardened. Both can be made into Swiss cheese. The distinguishing
+        factor is what you get out of the box:
+      </p>
+      <ul>
+        <li>FreeBSD: a small base system, conservative defaults, jails as a security
+            boundary, signed updates, ZFS for tamper-evident snapshots.</li>
+        <li>Linux: AppArmor or SELinux for fine-grained MAC, namespaces and seccomp for
+            container isolation, kernel hardening flags everywhere — and an enormous
+            attack surface in the most popular distributions.</li>
+      </ul>
+      <p>
+        For a network appliance with a small set of services, FreeBSD is easier to keep
+        small. For a heterogeneous fleet running everything from databases to web apps,
+        Linux's tooling around containers and namespaces is hard to beat.
+      </p>
+
+      <h2>Where I Reach For Each</h2>
+      <p>
+        Some honest defaults from my own infrastructure:
+      </p>
+      <ul>
+        <li><strong>FreeBSD</strong> for: edge router and firewall, NAS and storage
+            appliances, anything where I want a five-year config that doesn't drift.</li>
+        <li><strong>Linux</strong> (NixOS specifically) for: Kubernetes nodes, GPU hosts,
+            CI runners, anything that needs newer hardware support or vendor-specific
+            kernel modules.</li>
+        <li><strong>Either</strong> works for: web servers, databases, build hosts, VPN
+            endpoints. Pick the one your team is more comfortable with.</li>
+      </ul>
+
+      <h2>What People Get Wrong</h2>
+      <p>
+        Three myths I keep hearing:
+      </p>
+      <ul>
+        <li><strong>"FreeBSD is dying."</strong> It isn't. It's quietly running Netflix's
+            CDN, WhatsApp's servers (historically), enormous storage arrays, and most of
+            the world's network appliances. Quiet is not dead.</li>
+        <li><strong>"Linux is more secure because it gets more eyes."</strong> Eyes
+            without intent don't find bugs. Both projects have serious people doing
+            serious work; "more popular" doesn't translate to "better audited" in any
+            measurable way.</li>
+        <li><strong>"You have to pick one."</strong> You don't. Run both. Use each where
+            it shines.</li>
+      </ul>
+
+      <h2>The Verdict</h2>
+      <p>
+        FreeBSD is a coherent, conservative system that rewards close reading. Linux is a
+        sprawling, opinionated ecosystem that rewards investment in tooling. Both are
+        excellent. The "right" choice depends entirely on what you're building and what
+        you want to ignore.
+      </p>
+      <p>
+        If you've been Linux-only for a decade, spinning up a FreeBSD VM and walking
+        through the Handbook for an evening will sharpen how you think about Linux,
+        too. The act of seeing a different lineage of Unix-shaped ideas makes the one you
+        already use less invisible.
+      </p>
+
+      <h2>Further Reading</h2>
+      <ul>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a> — concrete BSD in action</li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a> — pf in depth</li>
+        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a> — jails on a router</li>
+        <li><a href="why-i-run-nixos.html">Why I Run NixOS on My Servers</a> — the Linux side of my fleet</li>
+      </ul>
+
+      <p>
+        Disagree? <a href="../contact.html">I'd genuinely like to hear it</a>. The best
+        feedback I get on these posts comes from people who run the other way.
+      </p>
+
+    </div>
+
+    <!-- Newsletter CTA -->
+    <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
+      <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
+      <p class="text-muted">
+        FreeBSD, pf, and SRE notes — straight to your inbox. No spam, just signal.
+      </p>
+      <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
+      <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"
+            method="post" target="popupwindow"
+            onsubmit="window.open('https://buttondown.email/BUTTONDOWN_USERNAME', 'popupwindow')"
+            style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+        <input type="email" name="email" placeholder="you@example.com" required
+               style="flex: 1; min-width: 200px; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
+        <button type="submit" class="btn btn-primary" style="cursor: pointer;">Subscribe</button>
+      </form>
+      <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 0; margin-top: 0.5rem;">
+        Powered by <a href="https://buttondown.email" target="_blank" rel="noopener noreferrer">Buttondown</a>. Unsubscribe anytime. Or grab the <a href="../feed.xml">RSS feed</a>.
+      </p>
+    </div>
+
+    <!-- Related -->
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <h3>Related Posts</h3>
+      <ul>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a></li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a></li>
+        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a></li>
+        <li><a href="why-i-run-nixos.html">Why I Run NixOS on My Servers</a></li>
+      </ul>
+    </div>
+
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <p class="text-center">
+        <a href="../index.html#blog" class="btn btn-secondary">← Back to Blog</a>
+      </p>
+    </div>
+
+  </article>
+
+  <footer>
+    <p>
+      <a href="../index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>

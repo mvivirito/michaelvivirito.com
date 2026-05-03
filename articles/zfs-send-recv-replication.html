@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZFS Send/Recv: Replicating Your Homelab - Michael Vivirito</title>
+  <meta name="description" content="A practical guide to ZFS replication with send and recv. Snapshots, incremental streams, raw encrypted send, resumable transfers, and a working pull-based cron script.">
+  <meta name="keywords" content="ZFS, send, recv, replication, FreeBSD, backup, snapshots, OpenZFS, encrypted, incremental, homelab">
+  <meta name="author" content="Michael Vivirito">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="ZFS Send/Recv: Replicating Your Homelab">
+  <meta property="og:description" content="ZFS replication done right — snapshots, incremental streams, raw encrypted send, and a real cron-based pull script.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#projects">Projects</a></li>
+      <li><a href="../index.html#blog">Blog</a></li>
+      <li><a href="../homelab.html">Homelab</a></li>
+      <li><a href="../now.html">Now</a></li>
+      <li><a href="../uses.html">Uses</a></li>
+      <li><a href="../visuals.html">Visuals</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>ZFS Send/Recv: Replicating Your Homelab</h1>
+      <p class="text-muted">
+        Published on <time datetime="2026-05-03">May 3, 2026</time>
+      </p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+        <span class="badge">ZFS</span>
+        <span class="badge">FreeBSD</span>
+        <span class="badge">Backup</span>
+        <span class="badge">Homelab</span>
+      </div>
+    </header>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <h2>The Mental Model</h2>
+      <p>
+        A ZFS snapshot is a read-only point-in-time view of a dataset, almost free to
+        create. A <code>zfs send</code> turns one snapshot (or the delta between two
+        snapshots) into a binary stream on stdout. A <code>zfs recv</code> on the other
+        end reconstructs that snapshot inside a destination pool. Pipe them together,
+        possibly through SSH, and you have replication. That's it.
+      </p>
+      <p>
+        Everything else in this post — incrementals, raw send, resumable transfers,
+        cron — is just operational polish on top of those three primitives.
+      </p>
+
+      <h2>Snapshots First</h2>
+      <pre><code>$ zfs snapshot zroot/home@2026-05-03
+$ zfs list -t snapshot
+NAME                    USED  AVAIL  REFER  MOUNTPOINT
+zroot/home@2026-05-03     0B      -   2.4G  -</code></pre>
+      <p>
+        Snapshots cost nothing until the data they refer to changes. The "USED" column
+        is the size of blocks that <em>only this snapshot</em> still references — for
+        a snapshot taken seconds ago of an idle dataset, that's zero.
+      </p>
+
+      <h2>The Smallest Possible Send</h2>
+      <pre><code># Local: copy one snapshot from one pool to another
+$ zfs send zroot/home@2026-05-03 | zfs recv backup/home
+
+# Remote: same idea, over SSH
+$ zfs send zroot/home@2026-05-03 \
+  | ssh backup-host zfs recv backup/home</code></pre>
+      <p>
+        On the receiving side, <code>backup/home</code> didn't exist before; ZFS
+        creates it. On a subsequent run with the same destination, you'll need either
+        an incremental (recommended) or <code>-F</code> to force a rollback (not
+        recommended).
+      </p>
+
+      <h2>Incrementals Are Where the Win Lives</h2>
+      <p>
+        After the initial full send, you only ever want to send the delta between
+        snapshots:
+      </p>
+      <pre><code>$ zfs snapshot zroot/home@2026-05-04
+$ zfs send -i @2026-05-03 zroot/home@2026-05-04 \
+  | ssh backup-host zfs recv backup/home</code></pre>
+      <p>
+        <code>-i @prev new</code> sends the changes between two named snapshots.
+        <code>-I @prev new</code> (capital I) sends every snapshot in the chain, which
+        is what you want for daily snapshots so the backup pool also has all the
+        intermediate points.
+      </p>
+
+      <h2>Encrypted Datasets: Raw Send</h2>
+      <p>
+        If your source dataset is encrypted (<code>encryption=on</code>), you almost
+        certainly want <code>-w</code> (raw mode). It sends the encrypted blocks
+        verbatim — the receiver never needs the key:
+      </p>
+      <pre><code>$ zfs send -w -i @prev zroot/home@new \
+  | ssh backup-host zfs recv backup/home</code></pre>
+      <p>
+        The backup pool stores ciphertext. If the backup host is compromised, the
+        attacker gets blocks they can't read. If you ever need the data, mount the
+        dataset on the backup host with the key — and only then.
+      </p>
+
+      <h2>Resumable Transfers</h2>
+      <p>
+        Sending 4 TB over a residential uplink and the SSH session drops at 3.7 TB?
+        ZFS has you covered. The receiver leaves a resume token behind:
+      </p>
+      <pre><code># On the receiver
+$ zfs get -H -o value receive_resume_token backup/home
+1-...long-token...
+
+# Resume from the source
+$ zfs send -t 1-...long-token... | ssh backup-host zfs recv -s backup/home</code></pre>
+      <p>
+        The <code>-s</code> flag on <code>recv</code> on the original transfer is what
+        makes resumability work — set it from the start and you never lose progress.
+      </p>
+
+      <h2>A Real Pull-Based Cron Script</h2>
+      <p>
+        I prefer pull replication: the backup host reaches into the source over SSH
+        instead of the source pushing. If the source is compromised, it can't delete
+        the backups. If the backup is compromised, it can't write to the source. Both
+        sides have the smaller blast radius.
+      </p>
+      <pre><code>#!/bin/sh
+# /usr/local/sbin/zfs-pull.sh — runs on the backup host
+set -eu
+
+SRC_HOST="gw.lan"
+SRC_DS="zroot/home"
+DST_DS="backup/home"
+
+# Make a new snapshot on the source
+SNAP=$(date +%Y%m%d-%H%M)
+ssh "$SRC_HOST" "zfs snapshot ${SRC_DS}@${SNAP}"
+
+# Find the latest snapshot we already have on the destination
+PREV=$(zfs list -H -o name -t snapshot -s creation -r "$DST_DS" \
+  | awk -F@ '{print $2}' | tail -n1)
+
+if [ -z "$PREV" ]; then
+  # First run — full send
+  ssh "$SRC_HOST" "zfs send -wc ${SRC_DS}@${SNAP}" \
+    | zfs recv -s "$DST_DS"
+else
+  # Incremental from the last snapshot we know about
+  ssh "$SRC_HOST" "zfs send -wc -I @${PREV} ${SRC_DS}@${SNAP}" \
+    | zfs recv -s "$DST_DS"
+fi
+
+# Prune snapshots older than 30 days on the destination
+zfs list -H -o name -t snapshot -r "$DST_DS" \
+  | while read -r snap; do
+      ts=$(echo "$snap" | awk -F@ '{print $2}' | cut -c1-8)
+      cutoff=$(date -v-30d +%Y%m%d 2&gt;/dev/null || date -d '30 days ago' +%Y%m%d)
+      if [ "$ts" -lt "$cutoff" ]; then
+        zfs destroy "$snap"
+      fi
+    done</code></pre>
+      <p>
+        Throw it in <code>cron</code> on the backup host, four times a day:
+      </p>
+      <pre><code># /etc/crontab on the backup host
+0 */6 * * * root /usr/local/sbin/zfs-pull.sh &gt;&gt; /var/log/zfs-pull.log 2&gt;&amp;1</code></pre>
+
+      <h2>Bandwidth and Compression</h2>
+      <p>
+        The <code>-c</code> flag (lowercase) on <code>send</code> emits compressed
+        records as-is when the source dataset has compression enabled. It saves
+        bandwidth and CPU on both ends — strictly better than re-compressing after the
+        fact.
+      </p>
+      <p>
+        If your source dataset is <em>not</em> compressed but your link is slow, pipe
+        through <code>zstd</code>:
+      </p>
+      <pre><code>zfs send ... | zstd -3 | ssh backup zstd -d \| zfs recv backup/home</code></pre>
+      <p>
+        For most homelabs the bottleneck is the WAN uplink, not CPU.
+      </p>
+
+      <h2>Verifying the Backup</h2>
+      <p>
+        Three habits, in order of strictness:
+      </p>
+      <ol>
+        <li><strong>Compare snapshot lists.</strong>
+            <code>zfs list -t snapshot -r backup/home</code> on the destination should
+            include the snapshot the source just created. Trivial to script as a
+            cron-based alert.</li>
+        <li><strong>Periodic scrub.</strong>
+            <code>zpool scrub backup</code> verifies every block's checksum. Schedule
+            it monthly. Set up email on errors.</li>
+        <li><strong>Restore drill.</strong> Twice a year, mount a snapshot from the
+            backup pool on a fresh host and confirm the files are there. Backups you
+            never restore from aren't backups.</li>
+      </ol>
+
+      <h2>Restoring</h2>
+      <p>
+        The reverse direction works the same:
+      </p>
+      <pre><code># From the backup host, send the latest snapshot back
+$ zfs send backup/home@2026-05-03 | ssh source-host zfs recv -F zroot/home
+
+# Or roll back in place from a local snapshot if the source pool still has it
+$ zfs rollback zroot/home@2026-05-03</code></pre>
+      <p>
+        <code>-F</code> on the receiving side forces a rollback of the destination to
+        match the incoming stream. Use it deliberately — it discards anything newer on
+        the destination.
+      </p>
+
+      <h2>Common Gotchas</h2>
+      <ul>
+        <li><strong>Holds.</strong> If you can't destroy a snapshot, check
+            <code>zfs holds</code>. Some tools place holds; pyznap, sanoid, and
+            half-finished receives are common offenders.</li>
+        <li><strong>Mountpoints on the destination.</strong> Set
+            <code>canmount=noauto</code> on the destination dataset so an in-progress
+            backup doesn't accidentally mount over something on the backup host.</li>
+        <li><strong>Receive permissions over SSH.</strong> If you don't want to use
+            root SSH, use <code>zfs allow</code> to delegate <code>create,mount,
+            receive,destroy,snapshot</code> to a dedicated user on each side.</li>
+        <li><strong>Network at 0 bytes/sec.</strong> A long initial replication can
+            look hung. Use <code>pv</code> in the pipeline (<code>... | pv | ...</code>)
+            to see actual throughput. <code>zfs send -v</code> on the source also
+            prints progress.</li>
+        <li><strong>Different ZFS versions.</strong> Newer source features
+            (e.g. raidz expansion metadata, new compression algorithms) can produce
+            streams the older receiver can't import. Keep both ends roughly in sync.</li>
+      </ul>
+
+      <h2>Why This Matters</h2>
+      <p>
+        Most "backup" setups are really just snapshots on the same physical device. ZFS
+        snapshots are wonderful, but they don't help when the disk dies, the building
+        burns, or someone runs <code>zpool destroy</code> at the wrong shell. Send/recv
+        to a separate pool — ideally on a separate machine in a separate location — is
+        the difference between "I have backups" and "I had backups, theoretically".
+      </p>
+
+      <h2>Where to Go Next</h2>
+      <ul>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a> — context for the homelab this backs up</li>
+        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a> — one ZFS dataset per jail; replication becomes per-jail</li>
+        <li><a href="freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a> — why ZFS being first-class on FreeBSD changes how you think about storage</li>
+      </ul>
+
+      <p>
+        Replicating your own pools? <a href="../contact.html">I'd love to compare
+        scripts</a>. Everyone writes their own zfs-pull.sh; everyone learns something
+        from someone else's.
+      </p>
+
+    </div>
+
+    <!-- Newsletter CTA -->
+    <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
+      <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
+      <p class="text-muted">
+        FreeBSD, pf, and SRE notes — straight to your inbox. No spam, just signal.
+      </p>
+      <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
+      <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"
+            method="post" target="popupwindow"
+            onsubmit="window.open('https://buttondown.email/BUTTONDOWN_USERNAME', 'popupwindow')"
+            style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+        <input type="email" name="email" placeholder="you@example.com" required
+               style="flex: 1; min-width: 200px; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-default); color: var(--text-primary); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
+        <button type="submit" class="btn btn-primary" style="cursor: pointer;">Subscribe</button>
+      </form>
+      <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 0; margin-top: 0.5rem;">
+        Powered by <a href="https://buttondown.email" target="_blank" rel="noopener noreferrer">Buttondown</a>. Unsubscribe anytime. Or grab the <a href="../feed.xml">RSS feed</a>.
+      </p>
+    </div>
+
+    <!-- Related -->
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <h3>Related Posts</h3>
+      <ul>
+        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a></li>
+        <li><a href="freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a></li>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a></li>
+        <li><a href="why-i-run-nixos.html">Why I Run NixOS on My Servers</a></li>
+      </ul>
+    </div>
+
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <p class="text-center">
+        <a href="../index.html#blog" class="btn btn-secondary">← Back to Blog</a>
+      </p>
+    </div>
+
+  </article>
+
+  <footer>
+    <p>
+      <a href="../index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>

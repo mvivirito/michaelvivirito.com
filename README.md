@@ -1,56 +1,82 @@
 # michaelvivirito.com
 
-Modern portfolio website for Michael Vivirito - Systems Administrator & Cloud Engineer.
+Personal site for Michael Vivirito — Lead Site Reliability Engineer.
 
-## 🎨 Design
+Topics: Kubernetes, FreeBSD, networking, AWS, and self-hosted infrastructure.
 
-A modern, responsive portfolio built with clean HTML5, CSS3, and minimal JavaScript. Features a dark theme with vibrant blue/purple accents, smooth animations, and professional typography.
+## Design
 
-### Key Features
+Static HTML5 + CSS3 + a sliver of vanilla JavaScript (smooth scrolling). Dark
+terminal/TUI theme based on Catppuccin Mocha, monospace throughout. No frameworks,
+no build step.
 
-- 🎯 **Modern Design System**: CSS custom properties for easy theming
-- 📱 **Fully Responsive**: Mobile-first design that looks great on all devices
-- 🚀 **Performance**: Static HTML/CSS for fast load times, no frameworks
-- ♿ **Accessible**: WCAG AA compliant with proper semantic HTML
-- 🔍 **SEO Optimized**: Meta tags, Open Graph, and structured data
-- 🎭 **Smooth Interactions**: CSS animations and transitions
-- 📝 **Easy Content Management**: Template system for adding articles
+### Key features
 
-## 📁 Project Structure
+- CSS custom properties for theming
+- Mobile-first responsive layout
+- Semantic HTML with WCAG AA contrast
+- Open Graph, Twitter Card, and JSON-LD structured data
+- A small template (`articles/_template.html`) for adding new posts
+
+## Project structure
 
 ```
 /
-├── index.html              # Main homepage with hero, about, projects, articles
-├── contact.html            # Contact page with email, GPG, guidelines
-├── style.css               # Complete stylesheet with CSS variables
+├── index.html               # Homepage: hero, about, projects, homelab, blog
+├── homelab.html             # FreeBSD pf router showcase
+├── now.html                 # /now page — current focus
+├── uses.html                # /uses page — hardware, software, tools
+├── contact.html             # Contact links
+├── visuals.html             # Pure-CSS visual experiments
+├── feed.xml                 # RSS feed
+├── sitemap.xml              # XML sitemap for search engines
+├── robots.txt               # Crawler rules; points at sitemap.xml
+├── style.css                # Single stylesheet, CSS variables
 ├── articles/
-│   ├── _template.html     # Template for creating new articles
-│   ├── README.md          # Guide for adding articles
-│   └── pix/               # Article images and assets
-├── pix/                   # Main images and assets
-│   ├── portrait.jpg       # Profile photo
-│   ├── btc.svg            # Bitcoin icon
-│   └── home.svg           # Home icon
-├── favicon.ico            # Site favicon
-├── robots.txt             # SEO crawling rules
-└── README.md              # This file
+│   ├── _template.html       # Boilerplate for new articles
+│   ├── README.md            # Author guide
+│   ├── *.html               # Published articles
+│   └── pix/                 # Per-article images
+├── pix/                     # Site-wide images
+├── favicon.ico
+└── README.md                # This file
 ```
 
-## 🚀 Deployment
+## SEO
 
-This site is hosted on **AWS Amplify** with automatic deployment:
+- `sitemap.xml` lists every page with `lastmod`, `changefreq`, and `priority`.
+- `robots.txt` advertises the sitemap location.
+- When you add a new article, also add it to `sitemap.xml` and to the `feed.xml`
+  RSS index, so search engines and feed readers pick it up promptly.
 
-1. Push changes to the branch: `claude/plan-session-wPKbe`
-2. AWS Amplify automatically builds and deploys
-3. Changes go live within minutes
+## Deployment
 
-### Quick Deploy
+Hosted on **AWS Amplify** with automatic deployment from the configured branch.
+Push to the branch Amplify is wired to and changes go live within a couple of
+minutes.
+
+### Quick deploy
 
 ```bash
 git add .
 git commit -m "Your commit message"
-git push -u origin claude/plan-session-wPKbe
+git push -u origin <branch-name>
 ```
+
+## Newsletter
+
+The newsletter form across the site is wired to [Buttondown](https://buttondown.email).
+Before it works in production, replace the placeholder username:
+
+```bash
+# Replace BUTTONDOWN_USERNAME with your actual Buttondown account name
+grep -rl BUTTONDOWN_USERNAME --include="*.html" .
+# Then sed/edit those files to substitute the real username
+```
+
+Until that's done, submitting the form will hit a 404 on Buttondown's API, so
+either swap the username or drop the form entirely if you don't intend to run
+a newsletter.
 
 ## ✍️ Adding New Articles
 
@@ -73,7 +99,7 @@ Creating new articles is easy with the template system:
    ```bash
    git add articles/my-new-article.html
    git commit -m "Add article: My New Article"
-   git push -u origin claude/plan-session-wPKbe
+   git push -u origin <branch-name>
    ```
 
 4. **Update the homepage:**
@@ -112,14 +138,15 @@ The design uses CSS custom properties (variables) for easy customization. Edit `
 
 ## 📊 Features Breakdown
 
-### Homepage Sections
+### Homepage sections
 
-1. **Hero**: Eye-catching introduction with CTA buttons
-2. **About**: Bio, certifications, professional background
-3. **Projects**: Featured GitHub repositories with live links
-4. **Articles**: Topic-organized article categories
-5. **Connect**: Social links and Bitcoin donation
-6. **Footer**: Navigation and copyright
+1. **Hero**: Name, role, focus areas, primary CTAs
+2. **About**: Bio, current focus, certifications
+3. **Projects**: Featured GitHub repositories
+4. **Homelab**: FreeBSD pf router showcase
+5. **Blog**: Article listing in `ls -lah` style
+6. **Newsletter**: Email signup
+7. **Connect**: Contact and social links
 
 ### Responsive Design
 
@@ -208,4 +235,4 @@ Personal portfolio website. All rights reserved.
 
 ---
 
-Built with HTML, CSS, and passion. ✨
+Built with HTML, CSS, and FreeBSD enthusiasm.
