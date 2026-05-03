@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pf.conf: Writing Rules That Survive a Power Outage - Michael Vivirito</title>
+  <meta name="description" content="A deep dive on FreeBSD pf rule design — macros, tables, NAT, anti-spoofing, state tracking, and a real residential gateway ruleset you can adapt.">
+  <meta name="keywords" content="pf, pf.conf, FreeBSD, firewall, NAT, anti-spoofing, networking, security, packet filter">
+  <meta name="author" content="Michael Vivirito">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="pf.conf: Writing Rules That Survive a Power Outage">
+  <meta property="og:description" content="A real, residential pf.conf — macros, tables, NAT, anti-spoofing, and the reasoning behind every line.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#projects">Projects</a></li>
+      <li><a href="../index.html#blog">Blog</a></li>
+      <li><a href="../homelab.html">Homelab</a></li>
+      <li><a href="../now.html">Now</a></li>
+      <li><a href="../visuals.html">Visuals</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>pf.conf: Writing Rules That Survive a Power Outage</h1>
+      <p class="text-muted">
+        Published on <time datetime="2026-05-03">May 3, 2026</time>
+      </p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+        <span class="badge">FreeBSD</span>
+        <span class="badge">pf</span>
+        <span class="badge">Firewall</span>
+        <span class="badge">Networking</span>
+      </div>
+    </header>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <h2>The Rule You Actually Need to Remember</h2>
+      <p>
+        pf evaluates rules <strong>top to bottom</strong>, and the <strong>last matching
+        rule wins</strong> — unless a rule uses <code>quick</code>, in which case
+        evaluation stops at that rule. That single sentence is most of what makes pf
+        rulesets behave the way they do; if you internalise it, the rest of pf.conf is
+        much smaller than it looks.
+      </p>
+      <p>
+        This post is a tour of the ruleset I run on the FreeBSD router at the edge of my
+        homelab. Nothing here is novel — it's all in pf.conf(5) — but having a real,
+        annotated example next to the manual page is what I wish I'd had when I started.
+      </p>
+
+      <h2>The Sections of a pf.conf</h2>
+      <p>
+        pf.conf must appear in this order. Mixing the order produces confusing errors:
+      </p>
+      <ol>
+        <li><strong>Macros</strong> — variable definitions</li>
+        <li><strong>Tables</strong> — IP address sets, queryable at runtime</li>
+        <li><strong>Options</strong> — <code>set</code> directives that change pf behaviour</li>
+        <li><strong>Traffic normalization</strong> — <code>scrub</code></li>
+        <li><strong>Queueing</strong> — ALTQ, optional</li>
+        <li><strong>Translation</strong> — <code>nat</code>, <code>rdr</code>, <code>binat</code></li>
+        <li><strong>Filter</strong> — <code>block</code> and <code>pass</code></li>
+      </ol>
+
+      <h2>Macros and Tables — Stay DRY</h2>
+      <pre><code># /etc/pf.conf
+
+# --- macros ---
+ext_if    = "igc0"
+lan_if    = "igc1"
+srv_if    = "igc2"
+iot_if    = "igc3"
+int_ifs   = "{ " $lan_if " " $srv_if " " $iot_if " }"
+
+lan_net   = "10.10.10.0/24"
+srv_net   = "10.10.20.0/24"
+iot_net   = "10.10.30.0/24"
+rfc1918   = "{ 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 }"
+
+icmp_ok   = "{ echoreq unreach time-exceeded }"
+tcp_svc   = "{ ssh http https }"
+
+# --- tables ---
+table &lt;bogons&gt;     persist file "/etc/pf.bogons"     # martian/bogon ranges
+table &lt;bruteforce&gt; persist                           # populated by overload
+table &lt;blocklist&gt;  persist file "/etc/pf.blocklist"  # known bad IPs</code></pre>
+
+      <h2>Options — Sensible Defaults</h2>
+      <pre><code># --- options ---
+set skip on lo0
+set block-policy drop
+set state-policy if-bound
+set loginterface $ext_if
+
+# Traffic normalization: reassemble fragments, randomize TCP IDs
+scrub in on $ext_if all fragment reassemble random-id</code></pre>
+      <p>
+        <code>block-policy drop</code> drops packets silently rather than sending TCP
+        RSTs. <code>state-policy if-bound</code> ties state entries to specific
+        interfaces, which makes anti-spoofing and asymmetric-routing bugs much louder
+        instead of silently passing.
+      </p>
+
+      <h2>NAT and Redirects</h2>
+      <pre><code># --- translation ---
+# Outbound NAT for everything in RFC1918
+nat on $ext_if inet from $rfc1918 to any -&gt; ($ext_if)
+
+# Optional: redirect inbound HTTPS to a server on the trusted LAN
+# rdr on $ext_if inet proto tcp from any to ($ext_if) port 443 \
+#   -&gt; 10.10.20.20 port 443</code></pre>
+      <p>
+        Note <code>($ext_if)</code> in parentheses: that resolves the address at packet
+        time, not at load time. On a DHCP WAN, this means pf doesn't have to be reloaded
+        when the WAN IP changes.
+      </p>
+
+      <h2>Default Deny — Then Add Trust</h2>
+      <pre><code># --- filter ---
+# Default deny everywhere, log on the WAN
+block in  log on $ext_if all
+block in  on $int_ifs all
+block out on $ext_if all
+block return        # default for all "block" without modifier
+
+# Drop bogons and known-bad immediately on the WAN
+block in quick on $ext_if from { &lt;bogons&gt; &lt;blocklist&gt; } to any
+block in quick on $ext_if from any to { &lt;bogons&gt; }
+
+# Anti-spoofing: a packet arriving on $ext_if claiming a LAN source is bogus
+antispoof quick for { $lan_if $srv_if $iot_if }</code></pre>
+      <p>
+        The <code>antispoof</code> macro expands to a small set of rules that drop
+        packets arriving on the wrong interface for their claimed source.
+      </p>
+
+      <h2>Outbound — Trusted LANs Reach the Internet</h2>
+      <pre><code># LAN: trusted, can reach anywhere
+pass in  on $lan_if from $lan_net to any keep state
+pass out on $ext_if from $lan_net to any keep state
+
+# Servers: can reach anywhere, plus reach trusted LAN
+pass in  on $srv_if from $srv_net to any keep state
+pass out on $ext_if from $srv_net to any keep state
+
+# IoT: can reach the internet ONLY. Cannot talk to LAN or servers.
+pass in  on $iot_if proto { tcp udp } from $iot_net to !$rfc1918 keep state
+pass out on $ext_if from $iot_net to any keep state</code></pre>
+      <p>
+        That <code>!$rfc1918</code> is the entire reason IoT lives on its own NIC: an
+        Internet-connected camera or smart bulb cannot, by rule, talk to anything on
+        another LAN. The router itself answers DHCP and DNS for them; nothing else does.
+      </p>
+
+      <h2>Inbound — Just Enough</h2>
+      <pre><code># SSH only from the trusted LAN, with brute-force tarpitting
+pass in on $lan_if proto tcp from $lan_net to ($lan_if) port ssh \
+  flags S/SA keep state \
+  (max-src-conn 5, max-src-conn-rate 5/60, \
+   overload &lt;bruteforce&gt; flush global)
+
+# DNS and DHCP — answer requests on every internal interface
+pass in on $int_ifs proto { tcp udp } from any to (self) port domain keep state
+pass in on $int_ifs proto udp        from any to (self) port { 67 68 } keep state
+
+# NTP
+pass in on $int_ifs proto udp from any to (self) port ntp keep state
+
+# WireGuard listener (if used)
+pass in on $ext_if proto udp from any to ($ext_if) port 51820 keep state</code></pre>
+      <p>
+        The SSH rule is more interesting than it looks. <code>overload &lt;bruteforce&gt;</code>
+        moves any source that exceeds the rate limit into the <code>bruteforce</code>
+        table; a separate <code>block quick from &lt;bruteforce&gt;</code> rule will then
+        drop them, no matter what they try. <code>flush global</code> kills any open
+        states they already have.
+      </p>
+
+      <h2>ICMP — Allow, but Allow on Purpose</h2>
+      <pre><code># Allow useful ICMP and traceroute return paths
+pass inet  proto icmp  all icmp-type  $icmp_ok keep state
+pass inet6 proto icmp6 all icmp6-type $icmp_ok keep state</code></pre>
+      <p>
+        Blanket-blocking ICMP feels secure but breaks Path MTU Discovery and traceroute,
+        which makes future debugging harder. Allow specific types and trust state.
+      </p>
+
+      <h2>Logging — pflog Is a Real Interface</h2>
+      <p>
+        Anything you tag with <code>log</code> shows up on the <code>pflog0</code>
+        interface. You can tcpdump it like any other interface:
+      </p>
+      <pre><code>$ tcpdump -n -e -ttt -i pflog0
+$ tcpdump -n -e -ttt -i pflog0 'host 10.10.10.42'</code></pre>
+      <p>
+        Pair this with a small log shipper to feed pf decisions into the same monitoring
+        stack as everything else. (See the
+        <a href="prometheus-grafana-monitoring.html">Prometheus and Grafana setup</a>.)
+      </p>
+
+      <h2>Loading Safely</h2>
+      <p>
+        Validate before you load. Always.
+      </p>
+      <pre><code># Parse-check only
+$ pfctl -nf /etc/pf.conf
+
+# Load
+$ pfctl -f /etc/pf.conf
+
+# Inspect
+$ pfctl -s rules
+$ pfctl -s nat
+$ pfctl -s states | head
+$ pfctl -t bruteforce -T show</code></pre>
+      <p>
+        For changes you're nervous about, use <code>at(1)</code> or <code>shutdown -r
+        +5</code> as a dead-man's switch: schedule a reboot to a known-good boot
+        environment, then load your new ruleset. If you lose the connection, the box
+        reboots back to safety on its own.
+      </p>
+
+      <h2>Common Pitfalls</h2>
+      <ul>
+        <li><strong>Order matters.</strong> Macros first, then tables, options, scrub,
+            translation, filter. The parser will yell, but the message isn't always
+            obvious.</li>
+        <li><strong><code>quick</code> changes everything.</strong> Use it for explicit
+            blocks at the top (bogons, blocklist) and for must-match rules — but realise
+            it short-circuits the rest of evaluation.</li>
+        <li><strong>State doesn't survive ruleset reload.</strong> By default pf keeps
+            existing states across <code>pfctl -f</code>. If you need to flush them,
+            <code>pfctl -F states</code> — but don't run that over SSH.</li>
+        <li><strong>NAT requires forwarding to be on.</strong> <code>net.inet.ip.forwarding=1</code>
+            and <code>gateway_enable="YES"</code> in rc.conf, or the rules pass nothing.</li>
+        <li><strong>Don't share <code>pf.conf</code> between hosts blindly.</strong>
+            Interface names and table contents differ; macros help, but every host's
+            ruleset deserves its own review.</li>
+      </ul>
+
+      <h2>The Whole File, in One Place</h2>
+      <p>
+        Everything above is in <em>pf.conf(5)</em>, but for completeness, the file as one
+        block:
+      </p>
+      <pre><code># /etc/pf.conf
+
+# --- macros ---
+ext_if    = "igc0"
+lan_if    = "igc1"
+srv_if    = "igc2"
+iot_if    = "igc3"
+int_ifs   = "{ " $lan_if " " $srv_if " " $iot_if " }"
+
+lan_net   = "10.10.10.0/24"
+srv_net   = "10.10.20.0/24"
+iot_net   = "10.10.30.0/24"
+rfc1918   = "{ 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 }"
+
+icmp_ok   = "{ echoreq unreach time-exceeded }"
+
+# --- tables ---
+table &lt;bogons&gt;     persist file "/etc/pf.bogons"
+table &lt;bruteforce&gt; persist
+table &lt;blocklist&gt;  persist file "/etc/pf.blocklist"
+
+# --- options ---
+set skip on lo0
+set block-policy drop
+set state-policy if-bound
+set loginterface $ext_if
+
+scrub in on $ext_if all fragment reassemble random-id
+
+# --- translation ---
+nat on $ext_if inet from $rfc1918 to any -&gt; ($ext_if)
+
+# --- filter ---
+block in  log on $ext_if all
+block in  on $int_ifs all
+block out on $ext_if all
+
+block in quick on $ext_if from { &lt;bogons&gt; &lt;blocklist&gt; &lt;bruteforce&gt; } to any
+block in quick on $ext_if from any to &lt;bogons&gt;
+antispoof quick for { $lan_if $srv_if $iot_if }
+
+pass in  on $lan_if from $lan_net to any keep state
+pass out on $ext_if from $lan_net to any keep state
+
+pass in  on $srv_if from $srv_net to any keep state
+pass out on $ext_if from $srv_net to any keep state
+
+pass in  on $iot_if proto { tcp udp } from $iot_net to !$rfc1918 keep state
+pass out on $ext_if from $iot_net to any keep state
+
+pass in on $lan_if proto tcp from $lan_net to ($lan_if) port ssh \
+  flags S/SA keep state \
+  (max-src-conn 5, max-src-conn-rate 5/60, \
+   overload &lt;bruteforce&gt; flush global)
+
+pass in on $int_ifs proto { tcp udp } from any to (self) port domain keep state
+pass in on $int_ifs proto udp        from any to (self) port { 67 68 } keep state
+pass in on $int_ifs proto udp from any to (self) port ntp keep state
+
+pass inet  proto icmp  all icmp-type  $icmp_ok keep state
+pass inet6 proto icmp6 all icmp6-type $icmp_ok keep state</code></pre>
+
+      <h2>Where to Go Next</h2>
+      <ul>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a> — the hardware and OS install that this ruleset runs on</li>
+        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a> — once your router is solid, move services off the host</li>
+        <li><a href="freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a> — why pf and the FreeBSD networking stack feel coherent</li>
+      </ul>
+
+      <p>
+        If you've spotted something I should tighten, please
+        <a href="../contact.html">tell me</a>. Firewalls get better with every honest pair
+        of eyes.
+      </p>
+
+    </div>
+
+    <!-- Newsletter CTA -->
+    <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
+      <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
+      <p class="text-muted">
+        FreeBSD, pf, and SRE notes — straight to your inbox. No spam, just signal.
+      </p>
+      <form action="#" method="POST" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+        <input type="email" name="email" placeholder="you@example.com" required
+               style="flex: 1; min-width: 200px; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-default); color: var(--text-primary); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
+        <button type="submit" class="btn btn-primary" style="cursor: pointer;">Subscribe</button>
+      </form>
+      <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 0; margin-top: 0.5rem;">
+        Delivery via newsletter service. Unsubscribe anytime.
+      </p>
+    </div>
+
+    <!-- Related -->
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <h3>Related Posts</h3>
+      <ul>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a></li>
+        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a></li>
+        <li><a href="freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a></li>
+        <li><a href="prometheus-grafana-monitoring.html">Set Up Prometheus and Grafana Monitoring in 10 Minutes</a></li>
+      </ul>
+    </div>
+
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <p class="text-center">
+        <a href="../index.html#blog" class="btn btn-secondary">← Back to Blog</a>
+      </p>
+    </div>
+
+  </article>
+
+  <footer>
+    <p>
+      <a href="../index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>

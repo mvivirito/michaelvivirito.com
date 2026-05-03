@@ -38,10 +38,10 @@ Open your new file and look for sections marked with `<!-- EDIT THIS: ... -->` c
 ```bash
 git add your-article-name.html
 git commit -m "Add article: Your Article Title"
-git push origin claude/plan-session-wPKbe
+git push origin <branch-name>
 ```
 
-AWS Amplify will automatically deploy your changes!
+AWS Amplify will automatically deploy your changes.
 
 ## Available HTML Elements
 

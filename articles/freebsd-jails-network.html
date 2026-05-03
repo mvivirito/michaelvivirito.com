@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreeBSD Jails for Network Services - Michael Vivirito</title>
+  <meta name="description" content="Using FreeBSD jails to isolate DNS, monitoring, and VPN on a single router. VNET vs shared networking, ZFS datasets, jail.conf, and pf integration.">
+  <meta name="keywords" content="FreeBSD, jails, jail.conf, VNET, networking, isolation, unbound, WireGuard, pf, ZFS">
+  <meta name="author" content="Michael Vivirito">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="FreeBSD Jails for Network Services">
+  <meta property="og:description" content="Run DNS, monitoring, and VPN inside FreeBSD jails on the same box as your router — without giving up isolation.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#projects">Projects</a></li>
+      <li><a href="../index.html#blog">Blog</a></li>
+      <li><a href="../homelab.html">Homelab</a></li>
+      <li><a href="../now.html">Now</a></li>
+      <li><a href="../visuals.html">Visuals</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>FreeBSD Jails for Network Services</h1>
+      <p class="text-muted">
+        Published on <time datetime="2026-05-03">May 3, 2026</time>
+      </p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+        <span class="badge">FreeBSD</span>
+        <span class="badge">Jails</span>
+        <span class="badge">VNET</span>
+        <span class="badge">Networking</span>
+      </div>
+    </header>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <h2>Jails, in One Paragraph</h2>
+      <p>
+        A FreeBSD jail is a partition of the kernel's userspace: its own filesystem root,
+        its own process list, its own networking surface. There's no separate kernel,
+        because there's only ever one kernel. From the outside it looks like a tiny
+        machine you can <code>jexec</code> into; from the inside it looks like FreeBSD,
+        because it is FreeBSD. Jails predate Docker by a long time, and on a router they
+        do exactly what Docker is constantly trying to be — small, boring, and obviously
+        correct.
+      </p>
+
+      <h2>Why Bother on a Router?</h2>
+      <p>
+        Most homelab routers run a handful of services next to packet forwarding: a DNS
+        resolver, a DHCP server, an NTP daemon, sometimes a monitoring agent or a
+        WireGuard endpoint. Running them on the host works, but it conflates concerns:
+        a panic in unbound can take the whole router with it, and the host's
+        <code>/usr/local/etc</code> turns into a rats' nest of unrelated configs.
+      </p>
+      <p>
+        Putting each service in its own jail gives you four cheap wins:
+      </p>
+      <ul>
+        <li><strong>Independent restarts.</strong> Reload unbound by restarting one jail.</li>
+        <li><strong>Per-service filesystems.</strong> One ZFS dataset per jail, snapshot
+            and rollback at the granularity that matters.</li>
+        <li><strong>Independent network identities.</strong> With VNET, each jail sees
+            its own <code>ifconfig</code>, routes, and pf state.</li>
+        <li><strong>Honest config sprawl.</strong> Each jail's config lives in its own
+            tree. You can blow it away without affecting anything else.</li>
+      </ul>
+
+      <h2>VNET vs Shared Networking</h2>
+      <p>
+        Jails come with two networking models:
+      </p>
+      <ul>
+        <li><strong>Shared IP</strong> (the default): the jail uses the host's network
+            stack and is restricted to specific IP addresses on the host's interfaces.
+            Cheap, fast, no kernel options required, but the jail can't run its own
+            firewall or modify its own routing table.</li>
+        <li><strong>VNET</strong> (virtualised network stack): the jail gets its own
+            network stack, its own interfaces, its own routes, its own pf state. It
+            costs you a kernel option (<code>options VIMAGE</code>, on by default in
+            14.x <code>GENERIC</code>) and a tiny bit more memory per jail, and it gives
+            you near-VM isolation at near-jail cost.</li>
+      </ul>
+      <p>
+        For network services on a router, VNET is the right default. The host's pf
+        ruleset stays clean, and the jail's own firewall (if it has one) can be as loose
+        or strict as the service needs.
+      </p>
+
+      <h2>ZFS Layout</h2>
+      <p>
+        One dataset per jail, mounted at <code>/jails/&lt;name&gt;</code>:
+      </p>
+      <pre><code>$ zfs create -o mountpoint=/jails zroot/jails
+$ zfs create zroot/jails/unbound
+$ zfs create zroot/jails/wireguard
+$ zfs create zroot/jails/monitor</code></pre>
+      <p>
+        Now <code>zfs snapshot zroot/jails/unbound@before-upgrade</code> is a free
+        rollback before any change. This habit alone has saved me from at least three
+        late-night oh-no moments.
+      </p>
+
+      <h2>Bootstrapping the Filesystem</h2>
+      <p>
+        Drop a base userland into each jail. The lazy way:
+      </p>
+      <pre><code>$ fetch https://download.freebsd.org/releases/amd64/14.2-RELEASE/base.txz
+$ tar -C /jails/unbound -xpf base.txz
+$ cp /etc/resolv.conf /jails/unbound/etc/
+$ cp /etc/localtime   /jails/unbound/etc/</code></pre>
+      <p>
+        For real life, <code>iocage</code> and <code>bastille</code> wrap this nicely.
+        Both are good; I lean on <code>bastille</code> on newer hosts because it's a
+        thin shell layer with no daemon, and it stays out of my way.
+      </p>
+
+      <h2>jail.conf — One File, All the Jails</h2>
+      <pre><code># /etc/jail.conf
+
+# defaults applied to every jail unless overridden
+exec.start  = "/bin/sh /etc/rc";
+exec.stop   = "/bin/sh /etc/rc.shutdown";
+exec.clean;
+mount.devfs;
+allow.raw_sockets;
+host.hostname = "$name";
+
+# unbound — VNET jail with its own epair link to the LAN bridge
+unbound {
+  vnet;
+  vnet.interface = "epair0b";
+  exec.prestart  = "ifconfig epair0 create up; \
+                    ifconfig bridge0 addm epair0a up; \
+                    ifconfig epair0b vnet unbound";
+  exec.poststop  = "ifconfig epair0a destroy";
+  path           = "/jails/unbound";
+  persist;
+}
+
+# wireguard — VNET jail, separate epair, on the WAN-facing bridge
+wireguard {
+  vnet;
+  vnet.interface = "epair1b";
+  exec.prestart  = "ifconfig epair1 create up; \
+                    ifconfig bridge1 addm epair1a up; \
+                    ifconfig epair1b vnet wireguard";
+  exec.poststop  = "ifconfig epair1a destroy";
+  path           = "/jails/wireguard";
+  persist;
+}</code></pre>
+      <p>
+        Each jail gets an <code>epair</code> pseudo-interface — a virtual back-to-back
+        cable. One side stays in the host and joins a bridge that's connected to a real
+        LAN; the other side moves into the jail's network namespace. Inside the jail,
+        configure that interface like any other.
+      </p>
+
+      <h2>Inside the unbound Jail</h2>
+      <pre><code># /jails/unbound/etc/rc.conf
+hostname="unbound.lan"
+ifconfig_epair0b="inet 10.10.10.53/24"
+defaultrouter="10.10.10.1"
+local_unbound_enable="YES"
+syslogd_flags="-ss"</code></pre>
+      <p>
+        Now the resolver listens on <code>10.10.10.53</code>, and the host's DHCP server
+        hands that out to clients. The router itself is no longer a DNS resolver — that's
+        a feature.
+      </p>
+
+      <h2>pf and Jails Get Along</h2>
+      <p>
+        With VNET, the host's pf rules don't see traffic that stays inside a jail. They
+        do see traffic that crosses bridges. A small addition to the
+        <a href="pf-firewall-rules.html">main ruleset</a> covers the new flow:
+      </p>
+      <pre><code># Allow LAN clients to reach the unbound jail's IP on port 53
+pass in on $lan_if proto { tcp udp } \
+  from $lan_net to 10.10.10.53 port domain keep state
+
+# Allow the unbound jail outbound to root servers
+pass out on $ext_if from 10.10.10.53 to any port domain keep state</code></pre>
+
+      <h2>Resource Limits</h2>
+      <p>
+        Jails will happily eat all the host's memory if you let them. <code>rctl(8)</code>
+        is the answer:
+      </p>
+      <pre><code># /etc/rctl.conf
+jail:unbound:memoryuse:deny=512M
+jail:unbound:maxproc:deny=64
+jail:wireguard:memoryuse:deny=128M
+jail:wireguard:maxproc:deny=32
+
+# enable on boot
+# /etc/rc.conf
+rctl_enable="YES"</code></pre>
+
+      <h2>Updating Jails</h2>
+      <p>
+        Each jail has its own copy of the base system. Updating one doesn't update the
+        rest:
+      </p>
+      <pre><code># Per-jail update
+$ freebsd-update -b /jails/unbound fetch install
+
+# Or, with bastille
+$ bastille update unbound</code></pre>
+      <p>
+        Always snapshot first. Always.
+      </p>
+
+      <h2>Daily Operations</h2>
+      <pre><code>$ jls               # list running jails
+   JID  IP Address      Hostname              Path
+     1  -               unbound.lan           /jails/unbound
+     2  -               wireguard.lan         /jails/wireguard
+
+$ jexec unbound /bin/sh                  # shell into a jail
+$ service jail restart unbound           # restart one jail
+$ service jail status                    # are they all up?</code></pre>
+
+      <h2>Common Gotchas</h2>
+      <ul>
+        <li><strong>devfs rules.</strong> By default a VNET jail can see far more of
+            <code>/dev</code> than it needs. Use <code>devfs_ruleset = "4";</code> in
+            jail.conf and the standard <code>devfsrules_jail</code> ruleset to lock it
+            down.</li>
+        <li><strong>raw sockets.</strong> If the service inside needs ping or traceroute,
+            set <code>allow.raw_sockets;</code>. If not, leave it off.</li>
+        <li><strong>persistent jails vs ephemeral.</strong> <code>persist;</code> keeps
+            a jail up even if its main process dies — useful for jails managed by their
+            own rc scripts. Without it, the jail exits when the start command exits.</li>
+        <li><strong>Boot ordering.</strong> If a jail depends on a host bridge, make sure
+            the bridge exists before the jail starts. <code>cloned_interfaces</code> in
+            <code>/etc/rc.conf</code> handles this cleanly.</li>
+      </ul>
+
+      <h2>When NOT to Use Jails</h2>
+      <p>
+        Jails are FreeBSD-specific. If you need to run a Linux-only binary, use a Linux
+        VM or a bhyve guest — Linuxulator is a tar pit for this kind of work. If you
+        need GPU acceleration, you'll usually be happier with a dedicated VM. And if you
+        only have one service to run, a jail is overkill — just run it on the host.
+      </p>
+
+      <h2>Bigger Picture</h2>
+      <p>
+        Once you have one service in a jail, the next ten get easier. The router's host
+        OS shrinks back to: a kernel, pf, ssh, and the boot environment. Everything else
+        becomes a small dataset, a small <code>jail.conf</code> stanza, and a small set
+        of pf rules. The whole shape of the box becomes legible.
+      </p>
+
+      <h2>Where to Go Next</h2>
+      <ul>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a> — the host this all runs on</li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a> — what to add when jails join the network</li>
+        <li><a href="freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a> — context for why this is so much nicer than the Linux equivalent</li>
+      </ul>
+
+      <p>
+        Running services in jails of your own? <a href="../contact.html">I'd love to
+        compare notes</a>.
+      </p>
+
+    </div>
+
+    <!-- Newsletter CTA -->
+    <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
+      <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
+      <p class="text-muted">
+        FreeBSD, pf, and SRE notes — straight to your inbox. No spam, just signal.
+      </p>
+      <form action="#" method="POST" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+        <input type="email" name="email" placeholder="you@example.com" required
+               style="flex: 1; min-width: 200px; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-default); color: var(--text-primary); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
+        <button type="submit" class="btn btn-primary" style="cursor: pointer;">Subscribe</button>
+      </form>
+      <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 0; margin-top: 0.5rem;">
+        Delivery via newsletter service. Unsubscribe anytime.
+      </p>
+    </div>
+
+    <!-- Related -->
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <h3>Related Posts</h3>
+      <ul>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a></li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a></li>
+        <li><a href="freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a></li>
+        <li><a href="why-i-run-nixos.html">Why I Run NixOS on My Servers</a></li>
+      </ul>
+    </div>
+
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <p class="text-center">
+        <a href="../index.html#blog" class="btn btn-secondary">← Back to Blog</a>
+      </p>
+    </div>
+
+  </article>
+
+  <footer>
+    <p>
+      <a href="../index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>

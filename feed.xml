@@ -3,10 +3,42 @@
   <channel>
     <title>Michael Vivirito — Blog</title>
     <link>https://michaelvivirito.com</link>
-    <description>SRE, infrastructure, and AI agent engineering. Real-world DevOps from the trenches.</description>
+    <description>SRE, FreeBSD, networking, and self-hosted infrastructure. Real-world DevOps from the trenches.</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 02 Apr 2026 14:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 03 May 2026 14:00:00 GMT</lastBuildDate>
     <atom:link href="https://michaelvivirito.com/feed.xml" rel="self" type="application/rss+xml"/>
+
+    <item>
+      <title>Building a FreeBSD pf Router</title>
+      <link>https://michaelvivirito.com/articles/freebsd-pf-router.html</link>
+      <guid isPermaLink="true">https://michaelvivirito.com/articles/freebsd-pf-router.html</guid>
+      <pubDate>Sun, 03 May 2026 14:00:00 GMT</pubDate>
+      <description>A practical, opinionated guide to building a FreeBSD edge router from a 4-port mini PC. ZFS root, pf, unbound, and dhcpd — from boot media to a working gateway.</description>
+    </item>
+
+    <item>
+      <title>pf.conf: Writing Rules That Survive a Power Outage</title>
+      <link>https://michaelvivirito.com/articles/pf-firewall-rules.html</link>
+      <guid isPermaLink="true">https://michaelvivirito.com/articles/pf-firewall-rules.html</guid>
+      <pubDate>Sun, 03 May 2026 13:30:00 GMT</pubDate>
+      <description>A deep dive on FreeBSD pf rule design — macros, tables, NAT, anti-spoofing, state tracking, and a real residential gateway ruleset you can adapt.</description>
+    </item>
+
+    <item>
+      <title>FreeBSD Jails for Network Services</title>
+      <link>https://michaelvivirito.com/articles/freebsd-jails-network.html</link>
+      <guid isPermaLink="true">https://michaelvivirito.com/articles/freebsd-jails-network.html</guid>
+      <pubDate>Sun, 03 May 2026 13:00:00 GMT</pubDate>
+      <description>Using FreeBSD jails to isolate DNS, monitoring, and VPN on a single router. VNET vs shared networking, ZFS datasets, jail.conf, and pf integration.</description>
+    </item>
+
+    <item>
+      <title>FreeBSD vs Linux: An SRE's Take</title>
+      <link>https://michaelvivirito.com/articles/freebsd-vs-linux-sre.html</link>
+      <guid isPermaLink="true">https://michaelvivirito.com/articles/freebsd-vs-linux-sre.html</guid>
+      <pubDate>Sun, 03 May 2026 12:30:00 GMT</pubDate>
+      <description>A working SRE's honest comparison of FreeBSD and Linux. Init, networking, ZFS, jails vs containers, package management, and when to reach for each.</description>
+    </item>
 
     <item>
       <title>Kubernetes on Bare Metal: A Practical Guide</title>
@@ -25,14 +57,6 @@
     </item>
 
     <item>
-      <title>How I Built an AI Agent That Manages My Infrastructure</title>
-      <link>https://michaelvivirito.com/articles/building-ai-agent-infrastructure.html</link>
-      <guid isPermaLink="true">https://michaelvivirito.com/articles/building-ai-agent-infrastructure.html</guid>
-      <pubDate>Wed, 02 Apr 2026 06:00:00 GMT</pubDate>
-      <description>Not a chatbot. A real autonomous agent that manages NixOS servers, Kubernetes clusters, task tracking, and proactive infrastructure monitoring — built with OpenClaw.</description>
-    </item>
-
-    <item>
       <title>Set Up Prometheus and Grafana Monitoring in 10 Minutes</title>
       <link>https://michaelvivirito.com/articles/prometheus-grafana-monitoring.html</link>
       <guid isPermaLink="true">https://michaelvivirito.com/articles/prometheus-grafana-monitoring.html</guid>
@@ -45,7 +69,7 @@
       <link>https://michaelvivirito.com/articles/why-i-run-nixos.html</link>
       <guid isPermaLink="true">https://michaelvivirito.com/articles/why-i-run-nixos.html</guid>
       <pubDate>Wed, 02 Apr 2026 05:00:00 GMT</pubDate>
-      <description>Declarative configuration, atomic rollbacks, and reproducible builds — lessons from 3 years of NixOS in production on Proxmox and bare metal.</description>
+      <description>Declarative configuration, atomic rollbacks, and reproducible builds — lessons from running NixOS in production on Proxmox and bare metal.</description>
     </item>
 
     <item>

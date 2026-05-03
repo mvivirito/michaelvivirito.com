@@ -4,21 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Michael Vivirito - Lead Site Reliability Engineer</title>
-  <meta name="description" content="Michael Vivirito is a Lead Site Reliability Engineer L3 with 10 years of professional IT experience including 3.5 years in SRE, specializing in Kubernetes, AI, AWS cloud infrastructure, and modern DevOps practices. AWS certified professional.">
-  <meta name="keywords" content="Michael Vivirito, Site Reliability Engineer, SRE, Lead SRE, Kubernetes, AI, AWS, DevOps, FreeBSD, Linux, mvivirito">
+  <meta name="description" content="Michael Vivirito is a Lead Site Reliability Engineer with 10+ years in IT, specialising in Kubernetes, FreeBSD, networking, and AWS cloud infrastructure. AWS-certified, FreeBSD advocate, and homelab tinkerer.">
+  <meta name="keywords" content="Michael Vivirito, Site Reliability Engineer, SRE, Lead SRE, Kubernetes, FreeBSD, pf, networking, AWS, DevOps, homelab, self-hosted, Linux, NixOS, mvivirito">
   <meta name="author" content="Michael Vivirito">
 
   <!-- Open Graph / Social Media -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://michaelvivirito.com">
   <meta property="og:title" content="Michael Vivirito - Lead Site Reliability Engineer">
-  <meta property="og:description" content="Lead Site Reliability Engineer L3 with 10 years of professional IT experience including 3.5 years in SRE. Specializing in Kubernetes, AI, and AWS cloud infrastructure.">
+  <meta property="og:description" content="Lead Site Reliability Engineer specialising in Kubernetes, FreeBSD, networking, and AWS cloud infrastructure. Self-hosted homelab on FreeBSD with pf.">
   <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Michael Vivirito - Lead Site Reliability Engineer">
-  <meta name="twitter:description" content="Lead Site Reliability Engineer L3 specializing in Kubernetes, AI, and cloud infrastructure.">
+  <meta name="twitter:description" content="Lead Site Reliability Engineer specialising in Kubernetes, FreeBSD, networking, and AWS infrastructure.">
   <meta name="twitter:image" content="https://michaelvivirito.com/pix/portrait.jpg">
 
   <link rel="stylesheet" type="text/css" href="style.css">
@@ -56,7 +56,7 @@
       <li><a href="#about">About</a></li>
       <li><a href="#projects">Projects</a></li>
       <li><a href="#blog">Blog</a></li>
-      <li><a href="nixie.html" class="new">Nixie</a></li>
+      <li><a href="homelab.html" class="new">Homelab</a></li>
       <li><a href="now.html">Now</a></li>
       <li><a href="visuals.html">Visuals</a></li>
       <li><a href="contact.html">Contact</a></li>
@@ -67,10 +67,11 @@
   <section id="home" class="hero">
     <div class="hero-content">
       <h1>Michael Vivirito</h1>
-      <p class="subtitle">Lead Site Reliability Engineer L3</p>
-      <p class="text-muted">Kubernetes • AI • AWS Cloud Infrastructure • FreeBSD advocate • Vim golfer</p>
+      <p class="subtitle">Lead Site Reliability Engineer</p>
+      <p class="text-muted">Kubernetes • FreeBSD • Networking • AWS • Self-Hosted Infrastructure</p>
       <div class="hero-cta">
-        <a href="#projects" class="btn btn-primary">View Projects</a>
+        <a href="homelab.html" class="btn btn-primary">Tour the Homelab</a>
+        <a href="#blog" class="btn btn-secondary">Read the Blog</a>
         <a href="contact.html" class="btn btn-secondary">Get in Touch</a>
       </div>
     </div>
@@ -81,19 +82,43 @@
     <h2>About Me</h2>
     <div class="about-content">
       <div>
-        <p>I am a passionate Site Reliability Engineer with 10 years of professional IT experience, including 3.5 years specializing in SRE work and currently serving as a Lead Site Reliability Engineer L3 for the past 7 months. I have been using computers since I was 3 years old and have matured alongside the technology.</p>
+        <p>
+          I'm a Lead Site Reliability Engineer with a decade of professional IT experience.
+          I've been at a keyboard since I was three years old, and I've spent most of my
+          adult life trying to understand how the layers underneath a running service
+          actually work — from packet to process to platform.
+        </p>
 
-        <p>I am mostly self-taught but began my foray into a formal education in 2017. I hold a <strong>Bachelor's degree in Computer Science</strong>, along with Associate degrees in CS, Math and Physics.</p>
+        <p>
+          Most of my hands-on work today sits at two ends of the same spectrum:
+          <strong>Kubernetes and AWS</strong> on the production side, where I run highly
+          available platforms for a living, and <strong>FreeBSD and networking</strong>
+          on the homelab side, where I run a self-built <code>pf</code> router and a
+          fleet of small services that exist mostly to keep me sharp.
+        </p>
 
-        <p>My current interests include <strong>Kubernetes</strong> and <strong>AI</strong>, where I'm exploring container orchestration and machine learning applications. My favorite OS is <strong>FreeBSD</strong>, and I am an avid Vim Golfer. In my spare time I am working on several personal projects on AWS, implementing technologies such as S3, CloudFront, Route53, Cognito, API Gateway, Lambda and DynamoDB. I use Github, CodeDeploy with CodePipeline for continuous integration and deployment.</p>
+        <p>
+          I'm mostly self-taught but I started formal CS coursework in 2017 and finished
+          a <strong>Bachelor's in Computer Science</strong> along with Associate degrees
+          in CS, Math, and Physics. I'm AWS-certified, a long-time FreeBSD advocate,
+          and a committed Vim golfer.
+        </p>
+
+        <p>
+          When I'm not on call I'm usually iterating on the network — building out the
+          <a href="homelab.html">FreeBSD pf router</a>, writing about the
+          <a href="articles/pf-firewall-rules.html">pf rules</a> that hold it together,
+          or refining the <a href="articles/why-i-run-nixos.html">NixOS configs</a> that
+          define everything behind it.
+        </p>
 
         <div class="certifications">
-          <span class="badge">Bachelor's Computer Science</span>
+          <span class="badge">B.S. Computer Science</span>
           <span class="badge">AWS Solutions Architect Associate</span>
           <span class="badge">AWS Developer Associate</span>
           <span class="badge">CompTIA Security+</span>
-          <span class="badge">Associate CS</span>
-          <span class="badge">Associate Math</span>
+          <span class="badge">A.S. Computer Science</span>
+          <span class="badge">A.S. Mathematics</span>
         </div>
       </div>
       <div>
@@ -175,22 +200,37 @@
     </div>
   </section>
 
-  <!-- Nixie Section -->
-  <section id="nixie">
-    <h2>Nixie — AI Digital Butler</h2>
+  <!-- Homelab Section -->
+  <section id="homelab">
+    <h2>Homelab — FreeBSD pf Router</h2>
     <div class="card" style="max-width: 800px; margin: 0 auto;">
       <p>
-        I built an <strong>AI agent</strong> that manages my infrastructure 24/7. Not a
-        chatbot — an autonomous system that monitors servers, tracks tasks, and proactively
-        solves problems.
+        At the edge of my homelab is a fanless FreeBSD box that handles every packet
+        coming into and out of the network — WAN router, stateful <code>pf</code>
+        firewall, recursive DNS, DHCP, NTP, and a WireGuard endpoint. No vendor GUI, no
+        shadow configs. Just <code>/etc/rc.conf</code>, <code>/etc/pf.conf</code>, and
+        a git repo.
       </p>
+      <pre><code>            ┌─────────────────────┐
+            │      Internet       │
+            └──────────┬──────────┘
+                       │ igc0 (WAN)
+            ┌──────────┴──────────┐
+            │   FreeBSD Router    │
+            │   pf · unbound      │
+            │   dhcpd · ntpd      │
+            └──┬──────┬──────┬────┘
+        igc1   │   igc2  │   igc3
+       (LAN)   │ (servers)   (IoT)</code></pre>
       <p>
-        Nixie runs on NixOS, uses Claude for complex reasoning and Ollama for budget work,
-        and communicates via Telegram. She handles ~70% of my routine SRE work.
+        Four physical interfaces, four broadcast domains, default-deny everywhere. IoT
+        traffic is rule-prevented from talking to anything but the internet. Boot
+        environments via ZFS make every change reversible with a reboot.
       </p>
       <div style="margin-top: 1.5rem;">
-        <a href="nixie.html" class="btn btn-primary">Meet Nixie →</a>
-        <a href="articles/building-ai-agent-infrastructure.html" class="btn btn-secondary">How I Built Her</a>
+        <a href="homelab.html" class="btn btn-primary">Tour the Setup →</a>
+        <a href="articles/freebsd-pf-router.html" class="btn btn-secondary">Build Guide</a>
+        <a href="articles/pf-firewall-rules.html" class="btn btn-secondary">pf.conf Deep Dive</a>
       </div>
     </div>
   </section>
@@ -203,6 +243,26 @@
         <div class="blog-ls-header">$ ls -lah ~/blog/</div>
         <div class="blog-ls-item">
           <span class="blog-ls-perms">-rw-r--r--</span>
+          <span class="blog-ls-date">2026-05-03</span>
+          <a href="articles/freebsd-pf-router.html" class="blog-ls-link">freebsd-pf-router.html</a>
+        </div>
+        <div class="blog-ls-item">
+          <span class="blog-ls-perms">-rw-r--r--</span>
+          <span class="blog-ls-date">2026-05-03</span>
+          <a href="articles/pf-firewall-rules.html" class="blog-ls-link">pf-firewall-rules.html</a>
+        </div>
+        <div class="blog-ls-item">
+          <span class="blog-ls-perms">-rw-r--r--</span>
+          <span class="blog-ls-date">2026-05-03</span>
+          <a href="articles/freebsd-jails-network.html" class="blog-ls-link">freebsd-jails-network.html</a>
+        </div>
+        <div class="blog-ls-item">
+          <span class="blog-ls-perms">-rw-r--r--</span>
+          <span class="blog-ls-date">2026-05-03</span>
+          <a href="articles/freebsd-vs-linux-sre.html" class="blog-ls-link">freebsd-vs-linux-sre.html</a>
+        </div>
+        <div class="blog-ls-item">
+          <span class="blog-ls-perms">-rw-r--r--</span>
           <span class="blog-ls-date">2026-04-02</span>
           <a href="articles/kubernetes-bare-metal.html" class="blog-ls-link">kubernetes-bare-metal.html</a>
         </div>
@@ -210,11 +270,6 @@
           <span class="blog-ls-perms">-rw-r--r--</span>
           <span class="blog-ls-date">2026-04-02</span>
           <a href="articles/aws-cost-optimization.html" class="blog-ls-link">aws-cost-optimization.html</a>
-        </div>
-        <div class="blog-ls-item">
-          <span class="blog-ls-perms">-rw-r--r--</span>
-          <span class="blog-ls-date">2026-04-02</span>
-          <a href="articles/building-ai-agent-infrastructure.html" class="blog-ls-link">building-ai-agent-infrastructure.html</a>
         </div>
         <div class="blog-ls-item">
           <span class="blog-ls-perms">-rw-r--r--</span>
@@ -231,7 +286,6 @@
           <span class="blog-ls-date">2024-01-22</span>
           <a href="articles/top-10-tui-apps.html" class="blog-ls-link">top-10-tui-apps.html</a>
         </div>
-        <!-- Future articles will be added here -->
       </div>
 
       <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
@@ -248,7 +302,8 @@
     <h2>$ subscribe --to newsletter</h2>
     <div class="card" style="max-width: 600px; margin: 0 auto;">
       <p class="text-muted">
-        SRE tips, infrastructure patterns, and NixOS guides. No spam, just signal.
+        SRE tips, FreeBSD pf and networking notes, NixOS guides, and infrastructure
+        patterns. No spam, just signal.
       </p>
       <form action="#" method="POST" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
         <input type="email" name="email" placeholder="you@example.com" required
