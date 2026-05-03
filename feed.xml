@@ -33,10 +33,34 @@
     </item>
 
     <item>
+      <title>IPv6 for Home Networks: A FreeBSD Walkthrough</title>
+      <link>https://michaelvivirito.com/articles/freebsd-ipv6-router.html</link>
+      <guid isPermaLink="true">https://michaelvivirito.com/articles/freebsd-ipv6-router.html</guid>
+      <pubDate>Sun, 03 May 2026 12:45:00 GMT</pubDate>
+      <description>A practical guide to running real, native IPv6 on a FreeBSD home router. Prefix delegation, rtsold, dhcp6c, rtadvd, and pf rules — without breaking your IPv4 setup.</description>
+    </item>
+
+    <item>
+      <title>WireGuard on FreeBSD: A 30-Minute Setup</title>
+      <link>https://michaelvivirito.com/articles/freebsd-wireguard.html</link>
+      <guid isPermaLink="true">https://michaelvivirito.com/articles/freebsd-wireguard.html</guid>
+      <pubDate>Sun, 03 May 2026 12:30:00 GMT</pubDate>
+      <description>A practical, no-fluff guide to running a WireGuard VPN on FreeBSD. Kernel module, key generation, server and client config, pf rules, and DNS through the tunnel.</description>
+    </item>
+
+    <item>
+      <title>ZFS Send/Recv: Replicating Your Homelab</title>
+      <link>https://michaelvivirito.com/articles/zfs-send-recv-replication.html</link>
+      <guid isPermaLink="true">https://michaelvivirito.com/articles/zfs-send-recv-replication.html</guid>
+      <pubDate>Sun, 03 May 2026 12:15:00 GMT</pubDate>
+      <description>A practical guide to ZFS replication with send and recv. Snapshots, incremental streams, raw encrypted send, resumable transfers, and a working pull-based cron script.</description>
+    </item>
+
+    <item>
       <title>FreeBSD vs Linux: An SRE's Take</title>
       <link>https://michaelvivirito.com/articles/freebsd-vs-linux-sre.html</link>
       <guid isPermaLink="true">https://michaelvivirito.com/articles/freebsd-vs-linux-sre.html</guid>
-      <pubDate>Sun, 03 May 2026 12:30:00 GMT</pubDate>
+      <pubDate>Sun, 03 May 2026 12:00:00 GMT</pubDate>
       <description>A working SRE's honest comparison of FreeBSD and Linux. Init, networking, ZFS, jails vs containers, package management, and when to reach for each.</description>
     </item>
 

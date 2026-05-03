@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WireGuard on FreeBSD: A 30-Minute Setup - Michael Vivirito</title>
+  <meta name="description" content="A practical, no-fluff guide to running a WireGuard VPN on FreeBSD. Kernel module, key generation, server and client config, pf rules, and DNS through the tunnel.">
+  <meta name="keywords" content="WireGuard, FreeBSD, VPN, networking, pf, road warrior, kernel module, wg-tools, mobile VPN">
+  <meta name="author" content="Michael Vivirito">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="WireGuard on FreeBSD: A 30-Minute Setup">
+  <meta property="og:description" content="A working WireGuard VPN on FreeBSD in under 30 minutes — server, clients, pf, and DNS.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#projects">Projects</a></li>
+      <li><a href="../index.html#blog">Blog</a></li>
+      <li><a href="../homelab.html">Homelab</a></li>
+      <li><a href="../now.html">Now</a></li>
+      <li><a href="../visuals.html">Visuals</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>WireGuard on FreeBSD: A 30-Minute Setup</h1>
+      <p class="text-muted">
+        Published on <time datetime="2026-05-03">May 3, 2026</time>
+      </p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+        <span class="badge">FreeBSD</span>
+        <span class="badge">WireGuard</span>
+        <span class="badge">VPN</span>
+        <span class="badge">Networking</span>
+      </div>
+    </header>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <h2>Why WireGuard</h2>
+      <p>
+        WireGuard fits in your head. The protocol is small enough to read in an evening,
+        the userland config file is half a screen, and the Linux/FreeBSD kernel modules
+        are well-audited. Compared to OpenVPN — TLS, certificates, MTU bargaining, weeks
+        of "why does my phone disconnect every 30 seconds" — WireGuard is a relief.
+      </p>
+      <p>
+        On FreeBSD, the kernel module is in base since 13.0 (<code>if_wg(4)</code>) and
+        the userland tools live in <code>net/wireguard-tools</code>. Setup takes about
+        as long as reading this post.
+      </p>
+
+      <h2>The Mental Model</h2>
+      <p>
+        WireGuard is point-to-point at the protocol level: every endpoint is a "peer",
+        identified by a public key. There's no client/server distinction in the
+        protocol — the labels are about who initiates and who has a static IP. A
+        "VPN server" is just a peer with a public WAN address that other peers
+        connect to.
+      </p>
+      <p>
+        Each peer has:
+      </p>
+      <ul>
+        <li>A <strong>private key</strong> (kept secret, generated locally)</li>
+        <li>A <strong>public key</strong> (shared with peers)</li>
+        <li>A list of <strong>AllowedIPs</strong> per peer (which destinations route to that peer)</li>
+        <li>Optionally, a <strong>PresharedKey</strong> for post-quantum-friendly mixing</li>
+      </ul>
+
+      <h2>Install</h2>
+      <pre><code>$ pkg install wireguard-tools
+$ kldload if_wg                 # load now
+$ sysrc kld_list+=if_wg         # load on boot</code></pre>
+      <p>
+        Confirm the kernel module is up:
+      </p>
+      <pre><code>$ kldstat | grep wg
+ 12    1 0xffffffff82800000   12340  if_wg.ko</code></pre>
+
+      <h2>Generate Keys for the Router</h2>
+      <pre><code>$ umask 077
+$ mkdir -p /usr/local/etc/wireguard
+$ cd /usr/local/etc/wireguard
+$ wg genkey | tee privatekey | wg pubkey &gt; publickey
+$ cat publickey
+3v9ZZ...= </code></pre>
+      <p>
+        That public key is what every peer will need. The private key never leaves the
+        router.
+      </p>
+
+      <h2>Server Config</h2>
+      <pre><code># /usr/local/etc/wireguard/wg0.conf
+
+[Interface]
+PrivateKey = &lt;contents of privatekey&gt;
+ListenPort = 51820
+Address    = 10.66.66.1/24
+
+# Each [Peer] block is one client
+[Peer]
+# laptop
+PublicKey  = &lt;laptop public key&gt;
+AllowedIPs = 10.66.66.10/32
+
+[Peer]
+# phone
+PublicKey  = &lt;phone public key&gt;
+AllowedIPs = 10.66.66.11/32</code></pre>
+      <p>
+        On FreeBSD, AllowedIPs on the server side is <strong>also a routing table
+        entry</strong>. Anything inside <code>10.66.66.10/32</code> is routed to the
+        laptop peer. Don't make the AllowedIPs overlap between peers; the kernel will
+        complain and you'll lose your afternoon.
+      </p>
+
+      <h2>Bring It Up</h2>
+      <pre><code># /etc/rc.conf
+wireguard_enable="YES"
+wireguard_interfaces="wg0"</code></pre>
+      <pre><code>$ service wireguard start
+$ wg show wg0
+interface: wg0
+  public key: 3v9ZZ...
+  private key: (hidden)
+  listening port: 51820
+
+peer: laptop-pubkey-here
+  allowed ips: 10.66.66.10/32
+
+peer: phone-pubkey-here
+  allowed ips: 10.66.66.11/32</code></pre>
+
+      <h2>pf Rules: Listener and Forwarding</h2>
+      <pre><code># Allow the WireGuard listener on the WAN
+pass in on $ext_if proto udp from any to ($ext_if) port 51820 keep state
+
+# Allow VPN clients into the LAN, NAT'd as the router
+pass in  on wg0     from 10.66.66.0/24 to any keep state
+pass out on $ext_if from 10.66.66.0/24 to any keep state
+
+# If you want VPN clients to reach the trusted LAN unmodified
+nat on $ext_if from 10.66.66.0/24 to any -&gt; ($ext_if)</code></pre>
+      <p>
+        The <a href="pf-firewall-rules.html">main pf ruleset</a> already handles
+        outbound NAT for RFC1918 — if you tagged the VPN subnet into <code>$rfc1918</code>
+        or your <code>nat</code> source set, you don't need a separate rule.
+      </p>
+
+      <h2>Client Configs</h2>
+      <p>
+        Generate the client's keys on the client (never on the server):
+      </p>
+      <pre><code>$ wg genkey | tee laptop.privatekey | wg pubkey &gt; laptop.publickey</code></pre>
+      <p>
+        Then build a config the client can import:
+      </p>
+      <pre><code># laptop.conf
+[Interface]
+PrivateKey = &lt;laptop privatekey&gt;
+Address    = 10.66.66.10/32
+DNS        = 10.10.10.1
+
+[Peer]
+PublicKey         = &lt;router public key&gt;
+Endpoint          = vpn.example.com:51820
+AllowedIPs        = 0.0.0.0/0, ::/0
+PersistentKeepalive = 25</code></pre>
+      <p>
+        On the client side, AllowedIPs means "send traffic for these destinations into
+        the tunnel". <code>0.0.0.0/0, ::/0</code> means "everything" — full tunnel. If
+        you want split tunnel, list only the LAN ranges you want to reach.
+      </p>
+
+      <h2>Phone Setup</h2>
+      <p>
+        The official WireGuard apps for iOS and Android both read QR codes. Generate one
+        from the client config:
+      </p>
+      <pre><code>$ pkg install qrencode
+$ qrencode -t ansiutf8 &lt; phone.conf</code></pre>
+      <p>
+        Hold the phone up, scan, accept. The phone is on the VPN. Total elapsed time:
+        about 30 seconds.
+      </p>
+
+      <h2>DNS Through the Tunnel</h2>
+      <p>
+        If you set <code>DNS = 10.10.10.1</code> in the client config (your router's
+        unbound), every DNS query from the client goes through the tunnel. This is
+        usually what you want — it means the client's queries aren't visible to the
+        coffee shop wifi, and clients can resolve your internal hostnames.
+      </p>
+      <p>
+        Don't forget to allow that traffic on the router-side pf:
+      </p>
+      <pre><code>pass in on wg0 proto { tcp udp } from 10.66.66.0/24 to (self) port domain keep state</code></pre>
+
+      <h2>Persistent Keepalive: When You Need It</h2>
+      <p>
+        If a client is behind NAT (most phones, most laptops on hotel wifi), the
+        upstream NAT mapping for the WireGuard UDP flow will eventually time out, and
+        the next inbound packet from the server will get dropped. Setting
+        <code>PersistentKeepalive = 25</code> on the client tells it to send a
+        heartbeat every 25 seconds, which keeps the NAT mapping alive.
+      </p>
+      <p>
+        Don't set keepalive on the server side. Servers with public IPs don't need it,
+        and setting it just burns battery on idle connections.
+      </p>
+
+      <h2>Troubleshooting</h2>
+      <ul>
+        <li><strong>Handshake never completes.</strong> Check the firewall on the WAN —
+            <code>pf</code> needs to <code>pass in</code> UDP 51820. Tcpdump on
+            <code>$ext_if</code> for <code>udp port 51820</code> to confirm packets
+            arrive.</li>
+        <li><strong>Handshake completes but no traffic.</strong> Check AllowedIPs on
+            both ends. Server must list the client's tunnel IP; client must list the
+            destinations it wants to reach. Then check your pf <code>pass</code> rules
+            for the <code>wg0</code> interface.</li>
+        <li><strong>MTU weirdness.</strong> WireGuard adds 60 bytes of overhead. If
+            your WAN MTU is 1500, the WireGuard MTU is effectively 1420. Most platforms
+            handle this automatically, but on flaky links you can pin it with
+            <code>MTU = 1400</code> in the client config.</li>
+        <li><strong>Clock skew.</strong> WireGuard doesn't care about wall-clock time
+            for handshakes, but if a client's clock is years off and you're using
+            certificate-based auth elsewhere on the same VPN, you'll waste time
+            chasing the wrong bug. <code>ntpd</code> on every endpoint.</li>
+      </ul>
+
+      <h2>Operational Habits</h2>
+      <ul>
+        <li><strong>Key rotation.</strong> Cheap. Generate new keys, swap the configs,
+            restart. Take a snapshot first.</li>
+        <li><strong>Per-device peers.</strong> One peer per device, not one shared
+            credential. Lost phone? Delete the peer, no key rotation needed elsewhere.</li>
+        <li><strong>Document the AllowedIPs map.</strong> A small Markdown file mapping
+            tunnel IPs to devices saves real time the next time you debug.</li>
+        <li><strong>Backup the configs and keys offline.</strong> Encrypted USB,
+            paper printout, however you back up secrets — but not just on the router
+            itself.</li>
+      </ul>
+
+      <h2>Going Further</h2>
+      <ul>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a> — the host this VPN attaches to</li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a> — pf integration in detail</li>
+        <li><a href="freebsd-ipv6-router.html">IPv6 for Home Networks</a> — once you have v6, WireGuard over v6 is the same config with different addresses</li>
+      </ul>
+
+      <p>
+        Got a different topology — site-to-site, mesh, hub-and-spoke?
+        <a href="../contact.html">Tell me about it</a>. I'm always curious how other
+        people lay out their VPN graphs.
+      </p>
+
+    </div>
+
+    <!-- Newsletter CTA -->
+    <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
+      <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
+      <p class="text-muted">
+        FreeBSD, pf, and SRE notes — straight to your inbox. No spam, just signal.
+      </p>
+      <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
+      <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"
+            method="post" target="popupwindow"
+            onsubmit="window.open('https://buttondown.email/BUTTONDOWN_USERNAME', 'popupwindow')"
+            style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+        <input type="email" name="email" placeholder="you@example.com" required
+               style="flex: 1; min-width: 200px; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-default); color: var(--text-primary); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
+        <button type="submit" class="btn btn-primary" style="cursor: pointer;">Subscribe</button>
+      </form>
+      <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 0; margin-top: 0.5rem;">
+        Powered by <a href="https://buttondown.email" target="_blank" rel="noopener noreferrer">Buttondown</a>. Unsubscribe anytime. Or grab the <a href="../feed.xml">RSS feed</a>.
+      </p>
+    </div>
+
+    <!-- Related -->
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <h3>Related Posts</h3>
+      <ul>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a></li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a></li>
+        <li><a href="freebsd-ipv6-router.html">IPv6 for Home Networks: A FreeBSD Walkthrough</a></li>
+        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a></li>
+      </ul>
+    </div>
+
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <p class="text-center">
+        <a href="../index.html#blog" class="btn btn-secondary">← Back to Blog</a>
+      </p>
+    </div>
+
+  </article>
+
+  <footer>
+    <p>
+      <a href="../index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>

@@ -132,6 +132,19 @@
     <h2>Featured Projects</h2>
     <div class="grid grid-3">
 
+      <!-- freebsd-router -->
+      <div class="card project-card">
+        <h3>freebsd-router</h3>
+        <p>Self-built FreeBSD edge router and firewall — pf, unbound, dhcpd, WireGuard. The hub of the homelab.</p>
+        <div class="project-meta">
+          <span class="project-language">
+            <span class="language-dot" style="background: #ab2b28;"></span>
+            FreeBSD
+          </span>
+          <a href="homelab.html" class="project-link">Tour the setup →</a>
+        </div>
+      </div>
+
       <!-- nix-config -->
       <div class="card project-card">
         <h3>nix-config</h3>
@@ -259,6 +272,21 @@
         <div class="blog-ls-item">
           <span class="blog-ls-perms">-rw-r--r--</span>
           <span class="blog-ls-date">2026-05-03</span>
+          <a href="articles/freebsd-ipv6-router.html" class="blog-ls-link">freebsd-ipv6-router.html</a>
+        </div>
+        <div class="blog-ls-item">
+          <span class="blog-ls-perms">-rw-r--r--</span>
+          <span class="blog-ls-date">2026-05-03</span>
+          <a href="articles/freebsd-wireguard.html" class="blog-ls-link">freebsd-wireguard.html</a>
+        </div>
+        <div class="blog-ls-item">
+          <span class="blog-ls-perms">-rw-r--r--</span>
+          <span class="blog-ls-date">2026-05-03</span>
+          <a href="articles/zfs-send-recv-replication.html" class="blog-ls-link">zfs-send-recv-replication.html</a>
+        </div>
+        <div class="blog-ls-item">
+          <span class="blog-ls-perms">-rw-r--r--</span>
+          <span class="blog-ls-date">2026-05-03</span>
           <a href="articles/freebsd-vs-linux-sre.html" class="blog-ls-link">freebsd-vs-linux-sre.html</a>
         </div>
         <div class="blog-ls-item">
@@ -305,14 +333,17 @@
         SRE tips, FreeBSD pf and networking notes, NixOS guides, and infrastructure
         patterns. No spam, just signal.
       </p>
-      <form action="#" method="POST" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+      <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
+      <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"
+            method="post" target="popupwindow"
+            onsubmit="window.open('https://buttondown.email/BUTTONDOWN_USERNAME', 'popupwindow')"
+            style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
         <input type="email" name="email" placeholder="you@example.com" required
-               style="flex: 1; min-width: 200px; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-default); color: var(--text-primary); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
+               style="flex: 1; min-width: 200px; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
         <button type="submit" class="btn btn-primary" style="cursor: pointer;">Subscribe</button>
       </form>
       <p class="text-muted" style="font-size: 0.75rem; margin-top: 0.75rem; margin-bottom: 0;">
-        <!-- TODO: Wire up to newsletter service (Buttondown, ConvertKit, or similar) -->
-        Powered by a newsletter service. Unsubscribe anytime. ~2 emails/month.
+        Powered by <a href="https://buttondown.email" target="_blank" rel="noopener noreferrer">Buttondown</a>. Unsubscribe anytime. ~2 emails/month. Or grab the <a href="feed.xml">RSS feed</a>.
       </p>
     </div>
   </section>
