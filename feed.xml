@@ -41,6 +41,14 @@
     </item>
 
     <item>
+      <title>IPv6 Prefix Delegation: A Troubleshooting Cookbook</title>
+      <link>https://michaelvivirito.com/articles/ipv6-prefix-delegation-troubleshooting.html</link>
+      <guid isPermaLink="true">https://michaelvivirito.com/articles/ipv6-prefix-delegation-troubleshooting.html</guid>
+      <pubDate>Sun, 03 May 2026 12:40:00 GMT</pubDate>
+      <description>A field guide to debugging IPv6 prefix delegation on a FreeBSD home router. dhcp6c silence, missing RAs, broken DNS, PMTU oddities, and a tcpdump cheatsheet.</description>
+    </item>
+
+    <item>
       <title>WireGuard on FreeBSD: A 30-Minute Setup</title>
       <link>https://michaelvivirito.com/articles/freebsd-wireguard.html</link>
       <guid isPermaLink="true">https://michaelvivirito.com/articles/freebsd-wireguard.html</guid>

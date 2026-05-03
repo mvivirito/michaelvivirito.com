@@ -1,4 +1,4 @@
-User-agent: * 
-Crawl-Delay: 20
+User-agent: *
+Crawl-delay: 20
 
-Sitemap: https://michaelvivirito.com/feed.xml
+Sitemap: https://michaelvivirito.com/sitemap.xml

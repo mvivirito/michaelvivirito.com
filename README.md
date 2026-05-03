@@ -25,9 +25,12 @@ no build step.
 ├── index.html               # Homepage: hero, about, projects, homelab, blog
 ├── homelab.html             # FreeBSD pf router showcase
 ├── now.html                 # /now page — current focus
+├── uses.html                # /uses page — hardware, software, tools
 ├── contact.html             # Contact links
 ├── visuals.html             # Pure-CSS visual experiments
 ├── feed.xml                 # RSS feed
+├── sitemap.xml              # XML sitemap for search engines
+├── robots.txt               # Crawler rules; points at sitemap.xml
 ├── style.css                # Single stylesheet, CSS variables
 ├── articles/
 │   ├── _template.html       # Boilerplate for new articles
@@ -36,9 +39,15 @@ no build step.
 │   └── pix/                 # Per-article images
 ├── pix/                     # Site-wide images
 ├── favicon.ico
-├── robots.txt
 └── README.md                # This file
 ```
+
+## SEO
+
+- `sitemap.xml` lists every page with `lastmod`, `changefreq`, and `priority`.
+- `robots.txt` advertises the sitemap location.
+- When you add a new article, also add it to `sitemap.xml` and to the `feed.xml`
+  RSS index, so search engines and feed readers pick it up promptly.
 
 ## Deployment
 
