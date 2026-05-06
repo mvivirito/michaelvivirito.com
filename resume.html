@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume — Michael Vivirito</title>
+  <meta name="description" content="Michael Vivirito — Lead Site Reliability Engineer at Meta, Enterprise Platforms Integration. Resume covering experience, key achievements, technical skills, and career timeline.">
+  <meta name="keywords" content="Michael Vivirito, resume, CV, Lead SRE, Site Reliability Engineer, Meta, Enterprise Platforms Integration, Kubernetes, AWS, FreeBSD, NixOS, MCP, mvivirito">
+  <meta name="author" content="Michael Vivirito">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="profile">
+  <meta property="og:url" content="https://michaelvivirito.com/resume.html">
+  <meta property="og:title" content="Resume — Michael Vivirito">
+  <meta property="og:description" content="Lead Site Reliability Engineer at Meta — Enterprise Platforms Integration. 4 years managing critical infrastructure for billions of users.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li><a href="index.html#projects">Projects</a></li>
+      <li><a href="index.html#blog">Blog</a></li>
+      <li><a href="homelab.html">Homelab</a></li>
+      <li><a href="now.html">Now</a></li>
+      <li><a href="uses.html">Uses</a></li>
+      <li><a href="visuals.html">Visuals</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <!-- Header -->
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>Michael Vivirito</h1>
+      <p class="subtitle" style="color: var(--text-secondary); font-size: 1.1rem;">
+        Lead Site Reliability Engineer · Enterprise Platforms Integration
+      </p>
+      <p class="text-muted" style="font-size: 0.9rem;">
+        Meta · Remote (United States) · 2022 – Present
+      </p>
+      <p class="text-muted" style="font-size: 0.875rem; margin-top: 0.5rem;">
+        <a href="contact.html">Contact</a> ·
+        <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a> ·
+        <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </p>
+    </header>
+
+    <!-- Stats Hero -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <pre><code>$ cat ~/career/stats
+tenure_at_meta:       4 years
+code_changes:         750+
+tasks_completed:      500
+applications_managed: 7+
+team_size_led:        4 engineers
+team_role:            Lead SRE, EPI</code></pre>
+    </div>
+
+    <!-- Professional Summary -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Professional Summary</h2>
+      <p>
+        Results-driven Site Reliability Engineering Lead with extensive experience
+        managing enterprise platform operations at Meta. Proven track record of leading
+        cross-functional initiatives spanning application lifecycle management, security
+        compliance, VPNless architecture, and AI-powered tooling. Skilled at translating
+        complex technical challenges into actionable solutions by bridging engineering
+        teams, stakeholders, and leadership. Currently leading a team of 4 engineers
+        supporting 3P application integration, reliability, and automation across
+        Meta's enterprise infrastructure.
+      </p>
+    </div>
+
+    <!-- Experience -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Experience</h2>
+
+      <h3>Meta — Lead SRE, Enterprise Platforms Integration (EPI)</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">
+        Remote · 2022 – Present
+      </p>
+
+      <h4>Team Leadership &amp; Operations</h4>
+      <ul>
+        <li>Lead a team of 4 SRE engineers responsible for the lifecycle management of third-party enterprise applications across Meta's global infrastructure.</li>
+        <li>Serve as Tier 2 escalation point for EPI Application Lifecycle Operations, coordinating incident response and resolution across multiple stakeholder groups.</li>
+        <li>Manage NORAM office hours rotation, providing real-time operational support and cross-functional troubleshooting for enterprise platform issues.</li>
+      </ul>
+
+      <h4>Tableau MCP — AI Agent Integration &amp; Auth Infrastructure</h4>
+      <ul>
+        <li>Architected and implemented a Thrift-based authentication proxy service for Tableau MCP, enabling secure integration with Meta's Confucius / Metamate analytics agent platform.</li>
+        <li>Delivered end-to-end implementation across 8+ diffs: Thrift IDL design, ServiceRouter configuration, handler testing, client migration, and VC generator compatibility fixes.</li>
+        <li>Created the Tableau Analytics Agent skillbook for Metamate, enabling enterprise users to query Tableau dashboards through conversational AI.</li>
+        <li>Authored user documentation and organized wiki resources to support team adoption of the new auth architecture.</li>
+        <li>Resolved complex cross-tier authentication challenges, including bringing Hack class auth (per-controller identities) to the async tier — coordinating with PE teams across Meta.</li>
+      </ul>
+
+      <h4>VPNless Architecture — Enterprise Application Migration</h4>
+      <ul>
+        <li>Led the migration of enterprise applications to Meta's VPNless infrastructure, reducing VPN dependency and improving access reliability for global users.</li>
+        <li>Implemented FwdProxy filter configurations, DNS CNAME entries, and backend Nginx service entries for Enablon's VPNless integration across production and dev environments.</li>
+        <li>Enabled affiliate user access to VPNless enterprise endpoints, expanding secure access to Meta's extended workforce.</li>
+      </ul>
+
+      <h4>CrashPlan / Code42 — Enterprise Backup Platform Management</h4>
+      <ul>
+        <li>Managed the full lifecycle of Meta's enterprise backup solution across 15+ diffs spanning deployment, rebranding, disaster recovery, and compliance operations.</li>
+        <li>Led the CrashPlan rebranding migration: engineered the client swap method including post-install scripts, identity file preservation, incremental rollout (2% → 60%), and cross-platform uninstall automation (Windows and Mac).</li>
+        <li>Built region-based deployment automation (EMEA / global) using Chocolatey packages and gatekeeper-controlled rollouts.</li>
+        <li>Developed a custom ODS metrics pipeline: wrote a script controller to send organizational metrics to ODS for real-time monitoring and capacity planning.</li>
+        <li>Executed disaster recovery operations including failover from DR replica to primary, and Vault migration fixes.</li>
+        <li>Integrated with Exterro via InternGraph controller calls for legal hold compliance.</li>
+        <li>Managed ad-hoc legal matter operations and user deployment scripting for Linux endpoints.</li>
+      </ul>
+
+      <h4>Legal Hold Integration (LHI) — Compliance Infrastructure</h4>
+      <ul>
+        <li>Owned the Legal Hold Status Agent infrastructure, managing rollout progression and x2p packaging.</li>
+        <li>Migrated RPM ACLs to EAPS (Enterprise Application Platform Services) for improved security posture.</li>
+        <li>Deprecated legacy controllers and cleaned up logging configurations as part of infrastructure modernization.</li>
+        <li>Built and maintained packman build pipelines for cross-platform agent distribution.</li>
+      </ul>
+
+      <h4>Eyelit — Manufacturing Execution System</h4>
+      <ul>
+        <li>Executed major version upgrade (8.0) for the Eyelit production environment.</li>
+        <li>Led full decommission effort: removed Chef cookbooks, deleted Slick configurations, and cleaned up DNS aliases — demonstrating disciplined infrastructure lifecycle management.</li>
+      </ul>
+
+      <h4>Excalidraw Recruiting — Internal Tool Development</h4>
+      <ul>
+        <li>Fixed critical React bugs and XSS vulnerabilities in the Excalidraw Recruiting application.</li>
+        <li>Managed production harbor deployment pipeline for the recruiting whiteboard tool.</li>
+      </ul>
+
+      <h4>Developer Experience &amp; Knowledge Sharing</h4>
+      <ul>
+        <li>Published <em>Skipping Hatch: Develop Nest Apps Directly in VS Code</em> guide to Hack of the Day — enabling engineers across Meta to develop Nest applications locally with shareable preview URLs.</li>
+        <li>Created comprehensive developer setup documentation including yarn path configuration, npmrc proxy fixes, and per-app workflow guides.</li>
+        <li>Built data pipelines using Dataswarm for automated data processing workflows.</li>
+      </ul>
+
+      <h4>Infrastructure &amp; Cloud Operations</h4>
+      <ul>
+        <li>Managed cloud infrastructure using Terraform, updating deprecated attributes and maintaining configuration as code.</li>
+        <li>Configured ZippyDB ACLs, Chef cookbooks, and Configerator settings across multiple enterprise services.</li>
+        <li>Maintained DNS configurations, FQDN aliases, and service routing for enterprise application availability.</li>
+      </ul>
+    </div>
+
+    <!-- Key Achievements -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Key Achievements</h2>
+
+      <h3>Built and Operated Enterprise Endpoint Backup Platform</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">374 code changes</p>
+      <p>
+        <strong>What:</strong> Owned the full lifecycle of an enterprise endpoint backup
+        solution protecting corporate devices across a global fleet. Built automated
+        employee transition workflows, international rollout infrastructure, secrets
+        management cluster with disaster recovery, data pipeline for user lifecycle
+        automation, and fleet-wide metric collection.
+      </p>
+      <p>
+        <strong>Scale:</strong> Fleet of tens of thousands of corporate devices
+        (Mac / Windows) across dozens of countries.
+      </p>
+      <p>
+        <strong>Technologies:</strong> PHP / Hack, Python, Chef, Terraform, HashiCorp
+        Vault, AWS EKS, data pipeline orchestration, distributed graph databases,
+        dynamic configuration, feature flags.
+      </p>
+      <p>
+        <strong>Result:</strong> Achieved reliable enterprise backup coverage across
+        the global corporate device fleet with automated onboarding / offboarding,
+        multi-region DR, and compliance-driven legal hold integration.
+      </p>
+
+      <h3>Pioneered AI Tool Integration Across Four Enterprise AI Platforms</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">95+ code changes</p>
+      <p>
+        <strong>What:</strong> Led the integration of an enterprise data analytics
+        platform with four internal AI / ML agent platforms. Rewrote the tool server
+        from Python to a typed server-side language for platform compatibility.
+        Designed self-service authentication architecture replacing admin-managed
+        credentials.
+      </p>
+      <p>
+        <strong>Result:</strong> Delivered working AI tool integration across all four
+        platforms. Navigated a month-long platform outage by rewriting the entire
+        server in a different language to bypass the blocked path. Established
+        reusable patterns for the broader team.
+      </p>
+
+      <h3>Led Infrastructure Takeover of Mission-Critical Recruiting Application</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">38 code changes</p>
+      <p>
+        <strong>What:</strong> Completed full infrastructure takeover of a real-time
+        collaborative whiteboard application used in technical interviews. Migrated
+        from legacy VMs to Kubernetes with multi-datacenter high availability.
+      </p>
+      <p>
+        <strong>Scale:</strong> ~500 daily active users on mission-critical interview
+        infrastructure.
+      </p>
+      <p>
+        <strong>Result:</strong> Deprovisioned 14 legacy VMs, removed 8+ unused load
+        balancer records, established comprehensive documentation. Reduced incident
+        frequency from ~1 SEV / month through proactive monitoring. Completed one
+        month ahead of schedule.
+      </p>
+
+      <h3>Built Legal Hold Compliance Integration System</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">79 code changes</p>
+      <p>
+        <strong>What:</strong> Designed and maintained a compliance system connecting
+        legal hold processes with enterprise backup infrastructure. Managed
+        third-party e-discovery platform integration, custodian lifecycle syncing,
+        and data preservation workflows.
+      </p>
+      <p>
+        <strong>Result:</strong> Ensured continuous legal compliance for data
+        preservation requirements with automated custodian management, handling edge
+        cases like employee leave status and identity transitions.
+      </p>
+
+      <h3>Enabled Native AI Capabilities on Enterprise Analytics Platform</h3>
+      <p>
+        <strong>What:</strong> Led the integration of a cloud AI service with an
+        enterprise analytics platform, allowing users to use natural language to
+        generate visualizations, create calculated fields, and build data flows.
+      </p>
+      <p>
+        <strong>Result:</strong> Successfully delivered AI-powered analytics
+        capabilities to beta users with full project closure documentation and
+        architecture diagrams for ongoing operations.
+      </p>
+    </div>
+
+    <!-- Career Timeline -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Career Timeline</h2>
+
+      <h3>2022 — 78 code changes</h3>
+      <p>
+        Joined as an enterprise infrastructure engineer focused on endpoint backup
+        solutions. Ramped quickly on the corporate device management stack, building
+        configuration management cookbooks, API controllers, and package management
+        automation.
+      </p>
+
+      <h3>2023 — 171 code changes</h3>
+      <p>
+        Expanded scope significantly. Took ownership of the legal hold compliance
+        integration, built secrets management disaster recovery infrastructure, and
+        deepened cloud operations expertise. Became an active knowledge-sharing
+        contributor across engineering communities.
+      </p>
+
+      <h3>2024 — 233 code changes</h3>
+      <p>
+        Peak productivity year. Broadened portfolio to include data analytics platform
+        management. Began managing multiple enterprise application environments and
+        incident response. Drove major refactoring efforts to modernize legacy
+        codebases.
+      </p>
+
+      <h3>2025 — 196 code changes</h3>
+      <p>
+        Shifted toward higher-impact project leadership. Led analytics Tier 2
+        enablement, managed platform upgrades, and supported data center infrastructure
+        tooling. Took on the recruiting whiteboard infrastructure takeover project.
+      </p>
+
+      <h3>2026 — 75 code changes (YTD)</h3>
+      <p>
+        Transitioned into AI-focused technical leadership. Pioneered MCP tool
+        integration across four AI platforms, completed recruiting infrastructure
+        takeover ahead of schedule, and established reusable AI onboarding patterns
+        for the broader team.
+      </p>
+    </div>
+
+    <!-- Technical Skills -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Technical Skills</h2>
+
+      <h3>Languages &amp; Frameworks</h3>
+      <ul>
+        <li>PHP / Hack (typed server-side language) — <strong>Expert</strong></li>
+        <li>Chef / Configuration Management — <strong>Expert</strong></li>
+        <li>Python — <strong>Advanced</strong></li>
+        <li>Terraform / Infrastructure as Code — <strong>Advanced</strong></li>
+        <li>Shell scripting (Bash / Zsh) — <strong>Advanced</strong></li>
+        <li>HCL (Terraform) — <strong>Advanced</strong></li>
+        <li>Ruby (Chef DSL) — <strong>Advanced</strong></li>
+        <li>JavaScript / React — <strong>Working</strong></li>
+        <li>Thrift IDL — <strong>Working</strong></li>
+      </ul>
+
+      <h3>Infrastructure &amp; Systems</h3>
+      <ul>
+        <li>Kubernetes / Helm — <strong>Advanced</strong> (container CI/CD, multi-DC)</li>
+        <li>AWS (EKS, IAM, multi-region) — <strong>Advanced</strong></li>
+        <li>HashiCorp Vault (HA, DR, auto-unseal) — <strong>Advanced</strong></li>
+        <li>Nginx, reverse proxies, DNS — <strong>Advanced</strong></li>
+        <li>Monitoring &amp; observability — <strong>Intermediate</strong></li>
+        <li>Data pipelines / ETL — <strong>Intermediate</strong></li>
+      </ul>
+
+      <h3>Domains</h3>
+      <ul>
+        <li>Enterprise application lifecycle management</li>
+        <li>Endpoint security &amp; backup at scale</li>
+        <li>Legal compliance &amp; e-discovery integration</li>
+        <li>AI / ML tool integration (MCP — Model Context Protocol)</li>
+        <li>Incident response &amp; SEV management</li>
+        <li>VPNless architecture &amp; secure access</li>
+      </ul>
+
+      <h3>Practices</h3>
+      <ul>
+        <li>Infrastructure as Code</li>
+        <li>Cross-platform fleet management</li>
+        <li>Feature flag–driven rollouts</li>
+        <li>Documentation-first delivery</li>
+        <li>Multi-datacenter HA architecture</li>
+      </ul>
+
+      <h3>Meta Internal Tooling</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">
+        Configerator · ServiceRouter · Tupperware · ODS · Scuba · Conveyor · Pantri ·
+        GateKeeper · InternGraph · Phabricator · Dataswarm · Confucius / Metamate
+      </p>
+
+      <h3>Platforms Owned or Operated</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">
+        Tableau · CrashPlan / Code42 · Eyelit · Enablon · Excalidraw Recruiting · Nest
+      </p>
+
+      <h3>Architecture &amp; Security</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">
+        VPNless infrastructure · Thrift services · MCP (Model Context Protocol) ·
+        AI agent integration · Authentication proxy design · Legal hold ·
+        Vault migration · ACL management · EAPS · FwdProxy
+      </p>
+    </div>
+
+    <!-- Leadership & Soft Skills -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Leadership &amp; Soft Skills</h2>
+      <ul>
+        <li><strong>Cross-functional Mediation:</strong> Proven ability to align engineering teams, PMs, and stakeholders around solutions — even when not the deepest technical expert in the room.</li>
+        <li><strong>Problem Decomposition:</strong> Skilled at breaking complex, ambiguous problems into actionable work streams and guiding teams to resolution.</li>
+        <li><strong>Knowledge Sharing:</strong> Proactive documentation author and community contributor (Hack of the Day, wiki authoring, developer workflow guides).</li>
+        <li><strong>Team Building:</strong> Experience managing direct reports, running operational rotations, and mentoring engineers across skill levels.</li>
+      </ul>
+
+      <h3>Selected Community &amp; Documentation Contributions</h3>
+      <ul>
+        <li>Authored <em>EPI Application Operations — Tier 2</em> wiki resource.</li>
+        <li>Authored <em>EPI Applications Portfolio — AI Enablement / MCP Analysis</em>; drove AI Week participation; proposed Metamate Spaces for EPI applications.</li>
+        <li>Published <em>Skipping Hatch: Develop Nest Apps Directly in VS Code</em> on Hack of the Day.</li>
+        <li>Ran Kubernetes teach sessions and Tableau learning sessions for engineering communities.</li>
+      </ul>
+    </div>
+
+    <!-- Education & Certifications -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Education &amp; Certifications</h2>
+
+      <h3>Education</h3>
+      <ul>
+        <li>Bachelor of Science, Computer Science</li>
+        <li>Associate of Science, Computer Science</li>
+        <li>Associate of Science, Mathematics</li>
+        <li>Associate of Science, Physics</li>
+      </ul>
+
+      <h3>Certifications</h3>
+      <div class="certifications" style="margin-top: 0.5rem;">
+        <span class="badge">AWS Solutions Architect Associate</span>
+        <span class="badge">AWS Developer Associate</span>
+        <span class="badge">CompTIA Security+</span>
+      </div>
+    </div>
+
+    <!-- Side Projects callout -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Beyond the Day Job</h2>
+      <p>
+        Outside of Meta I run a self-built FreeBSD edge router and write about the
+        infrastructure choices behind it. The deeper write-ups live in the
+        <a href="homelab.html">homelab tour</a> and the
+        <a href="index.html#blog">blog</a>. I'm also building
+        <a href="https://www.openworld.run" target="_blank" rel="noopener noreferrer">OpenWorld</a> —
+        a platform for proposing and collaborating on real-world infrastructure
+        improvements.
+      </p>
+    </div>
+
+    <!-- Footer / call to action -->
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2); text-align: center;">
+      <p>
+        <a href="contact.html" class="btn btn-primary">Get in Touch</a>
+        <a href="index.html#about" class="btn btn-secondary">About</a>
+        <a href="homelab.html" class="btn btn-secondary">Homelab</a>
+      </p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer>
+    <p>
+      <a href="index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>
