@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Michael Vivirito - Lead Site Reliability Engineer</title>
-  <meta name="description" content="Michael Vivirito is a Lead Site Reliability Engineer with 10+ years in IT, specialising in Kubernetes, FreeBSD, networking, and AWS cloud infrastructure. AWS-certified, FreeBSD advocate, and homelab tinkerer.">
-  <meta name="keywords" content="Michael Vivirito, Site Reliability Engineer, SRE, Lead SRE, Kubernetes, FreeBSD, pf, networking, AWS, DevOps, homelab, self-hosted, Linux, NixOS, mvivirito">
+  <title>Michael Vivirito - Lead Site Reliability Engineer · Building OpenWorld</title>
+  <meta name="description" content="Michael Vivirito is a Lead Site Reliability Engineer building OpenWorld — a coordination layer for civic action — alongside contract SRE work, FreeBSD networking, and AWS infrastructure.">
+  <meta name="keywords" content="Michael Vivirito, OpenWorld, openworld.run, civic tech, Site Reliability Engineer, SRE, Lead SRE, Kubernetes, FreeBSD, pf, networking, AWS, DevOps, homelab, self-hosted, mvivirito">
   <meta name="author" content="Michael Vivirito">
 
   <!-- Open Graph / Social Media -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://michaelvivirito.com">
-  <meta property="og:title" content="Michael Vivirito - Lead Site Reliability Engineer">
-  <meta property="og:description" content="Lead Site Reliability Engineer specialising in Kubernetes, FreeBSD, networking, and AWS cloud infrastructure. Self-hosted homelab on FreeBSD with pf.">
+  <meta property="og:title" content="Michael Vivirito - Lead SRE · Building OpenWorld">
+  <meta property="og:description" content="Lead Site Reliability Engineer building OpenWorld — a mobile-first coordination layer for civic action — and a self-built FreeBSD homelab on the side.">
   <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Michael Vivirito - Lead Site Reliability Engineer">
-  <meta name="twitter:description" content="Lead Site Reliability Engineer specialising in Kubernetes, FreeBSD, networking, and AWS infrastructure.">
+  <meta name="twitter:title" content="Michael Vivirito - Lead SRE · Building OpenWorld">
+  <meta name="twitter:description" content="Lead SRE building OpenWorld — a coordination layer for civic action. Plus FreeBSD networking and AWS infrastructure.">
   <meta name="twitter:image" content="https://michaelvivirito.com/pix/portrait.jpg">
 
   <link rel="stylesheet" type="text/css" href="style.css">
@@ -53,11 +53,12 @@
   <nav>
     <ul>
       <li><a href="#home">Home</a></li>
+      <li><a href="openworld.html" class="new">OpenWorld</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="resume.html">Resume</a></li>
       <li><a href="#projects">Projects</a></li>
       <li><a href="#blog">Blog</a></li>
-      <li><a href="homelab.html" class="new">Homelab</a></li>
+      <li><a href="homelab.html">Homelab</a></li>
       <li><a href="now.html">Now</a></li>
       <li><a href="uses.html">Uses</a></li>
       <li><a href="visuals.html">Visuals</a></li>
@@ -69,12 +70,12 @@
   <section id="home" class="hero">
     <div class="hero-content">
       <h1>Michael Vivirito</h1>
-      <p class="subtitle">Lead Site Reliability Engineer</p>
-      <p class="text-muted">Kubernetes • FreeBSD • Networking • AWS • Self-Hosted Infrastructure</p>
+      <p class="subtitle">Lead Site Reliability Engineer · Building OpenWorld</p>
+      <p class="text-muted">A coordination layer for civic action — plus FreeBSD, Kubernetes, and self-hosted infrastructure.</p>
       <div class="hero-cta">
-        <a href="homelab.html" class="btn btn-primary">Tour the Homelab</a>
+        <a href="openworld.html" class="btn btn-primary">Meet OpenWorld →</a>
+        <a href="homelab.html" class="btn btn-secondary">Tour the Homelab</a>
         <a href="#blog" class="btn btn-secondary">Read the Blog</a>
-        <a href="contact.html" class="btn btn-secondary">Get in Touch</a>
       </div>
     </div>
   </section>
@@ -97,6 +98,15 @@
           available platforms for a living, and <strong>FreeBSD and networking</strong>
           on the homelab side, where I run a self-built <code>pf</code> router and a
           fleet of small services that exist mostly to keep me sharp.
+        </p>
+
+        <p>
+          The project I keep coming back to is
+          <a href="openworld.html"><strong>OpenWorld</strong></a> — a mobile-first
+          coordination layer for civic action. Truly open-sourcing the world: an
+          overlay where anyone can pin a place, propose an idea, flag an issue,
+          recognise something working, or organise a time-bounded event. People
+          are good. Action compounds. Agency over guilt.
         </p>
 
         <p>
@@ -136,10 +146,58 @@
     </div>
   </section>
 
+  <!-- OpenWorld Feature Section -->
+  <section id="openworld">
+    <h2>OpenWorld — A Coordination Layer for Civic Action</h2>
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+      <p style="font-size: 1.05rem; font-style: italic; color: var(--text-primary);">
+        "I just want to help make the world a better place. An overlay over the
+        world where everyone can propose ideas to make the infrastructure of our
+        world better. Truly open-sourcing the world."
+      </p>
+      <p>
+        OpenWorld is the project I keep coming back to. A mobile-first platform
+        where anyone can pin a place and attach an <strong>idea</strong>, an
+        <strong>issue</strong>, <strong>kudos</strong>, or a time-bounded
+        <strong>timer</strong> event — and connect with everyone else who cares
+        about that same square of ground.
+      </p>
+      <pre><code>$ ls -lah ~/openworld/pins/
+idea    · proposed improvement
+issue   · something broken
+kudos   · something working, worth recognition
+timer   · beach cleanup · 2026-05-23 09:00</code></pre>
+      <p>
+        The action rails — GoFundMe, sign-ups, petitions, contact-your-rep tools —
+        already exist. OpenWorld is the layer that lets people <em>coordinate</em>
+        around them. Currently in closed Android testing on Google Play; iOS
+        TestFlight submission this week.
+      </p>
+      <div style="margin-top: 1.5rem;">
+        <a href="openworld.html" class="btn btn-primary">Meet OpenWorld →</a>
+        <a href="https://www.openworld.run" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">www.openworld.run</a>
+        <a href="articles/truly-open-sourcing-the-world.html" class="btn btn-secondary">Why I'm Building It</a>
+      </div>
+    </div>
+  </section>
+
   <!-- Projects Section -->
   <section id="projects">
     <h2>Featured Projects</h2>
     <div class="grid grid-3">
+
+      <!-- openworld -->
+      <div class="card project-card">
+        <h3>openworld</h3>
+        <p>A mobile-first coordination layer for civic action — pin a place, propose an idea, flag an issue, give kudos, or organize an event.</p>
+        <div class="project-meta">
+          <span class="project-language">
+            <span class="language-dot" style="background: #74c7ec;"></span>
+            Mobile + Web
+          </span>
+          <a href="openworld.html" class="project-link">Showcase →</a>
+        </div>
+      </div>
 
       <!-- freebsd-router -->
       <div class="card project-card">
@@ -263,6 +321,11 @@
     <div class="card" style="max-width: 800px; margin: 0 auto;">
       <div class="blog-ls">
         <div class="blog-ls-header">$ ls -lah ~/blog/</div>
+        <div class="blog-ls-item">
+          <span class="blog-ls-perms">-rw-r--r--</span>
+          <span class="blog-ls-date">2026-05-06</span>
+          <a href="articles/truly-open-sourcing-the-world.html" class="blog-ls-link">truly-open-sourcing-the-world.html</a>
+        </div>
         <div class="blog-ls-item">
           <span class="blog-ls-perms">-rw-r--r--</span>
           <span class="blog-ls-date">2026-05-03</span>
