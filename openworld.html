@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenWorld — Truly Open-Sourcing the World - Michael Vivirito</title>
+  <meta name="description" content="OpenWorld is a mobile-first coordination layer for civic action. Pin a place. Propose an idea, flag an issue, give kudos, or organize a timed event. Truly open-sourcing the world.">
+  <meta name="keywords" content="OpenWorld, openworld.run, civic tech, civic coordination, civic action, infrastructure, blueprints, mobile platform, Michael Vivirito">
+  <meta name="author" content="Michael Vivirito">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://michaelvivirito.com/openworld.html">
+  <meta property="og:title" content="OpenWorld — A Coordination Layer for Civic Action">
+  <meta property="og:description" content="Truly open-sourcing the world. A platform where anyone can propose, organize, and act on improvements to the world around us.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="openworld.html" class="new">OpenWorld</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li><a href="index.html#projects">Projects</a></li>
+      <li><a href="index.html#blog">Blog</a></li>
+      <li><a href="homelab.html">Homelab</a></li>
+      <li><a href="now.html">Now</a></li>
+      <li><a href="uses.html">Uses</a></li>
+      <li><a href="visuals.html">Visuals</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <!-- Header -->
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>OpenWorld</h1>
+      <p class="subtitle" style="color: var(--text-secondary); font-size: 1.2rem;">
+        A coordination layer for civic action.
+      </p>
+      <p class="text-muted" style="font-size: 1rem; font-style: italic;">
+        "Truly open-sourcing the world."
+      </p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+        <span class="badge">Mobile-first</span>
+        <span class="badge">iOS live on the App Store</span>
+        <span class="badge">Android in closed testing</span>
+      </div>
+      <div style="margin-top: 1.5rem;">
+        <a href="https://apps.apple.com/us/app/openworld-pin-improve/id6762533990" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Download on the App Store →</a>
+        <a href="https://www.openworld.run" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">www.openworld.run</a>
+        <a href="https://app.openworld.run" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">Web app</a>
+        <a href="articles/truly-open-sourcing-the-world.html" class="btn btn-secondary">Why I'm Building It</a>
+      </div>
+    </header>
+
+    <!-- Manifesto -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>The Idea</h2>
+      <p style="font-size: 1.05rem;">
+        I see so many problems in the world. I wanted to give people a chance to
+        make it better.
+      </p>
+      <p>
+        OpenWorld is an overlay over the world where everyone can propose ideas to
+        improve the infrastructure of our world. Like the concept of git and GitHub,
+        but for the physical world. The pothole that keeps coming back. The
+        intersection that needs a smart stop sign. The empty lot that should be a
+        park. The trail someone is quietly maintaining and doesn't get credit for.
+      </p>
+      <p>
+        Pin a place. Say what you see. Link to the people who can do something
+        about it. Then everybody else who walks past can see it too.
+      </p>
+    </div>
+
+    <!-- Vocabulary -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Four Kinds of Pin</h2>
+      <pre><code>$ ls -lah ~/openworld/pins/
+idea    · a proposed improvement
+issue   · something broken, needs attention
+kudos   · something working, worth recognition
+timer   · a time-bounded event (cleanup, town hall, march)</code></pre>
+      <p>
+        Most civic platforms are problem-engines: <em>broken thing → report</em>.
+        OpenWorld treats <strong>Kudos</strong> as a first-class pin type because the
+        world is more than its broken parts. The volunteer-run library on the corner.
+        The trail someone maintains. The contractor who actually fixed the
+        intersection well. Naming what works changes the emotional gravity of the
+        whole platform — from <em>"here's what's broken"</em> to <em>"here's what
+        we have, here's what's broken, and here's what we want."</em>
+      </p>
+      <p>
+        <strong>Timer</strong> pins exist because civic action is often a moment, not
+        a state. A beach cleanup at 9 AM Saturday. A town hall on the 14th. A march.
+        After the moment passes, the pin retires.
+      </p>
+    </div>
+
+    <!-- The mechanic: proposals + blueprints -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Proposals and Blueprints</h2>
+      <p>
+        Every pin supports full <strong>markdown</strong> — descriptions, headings,
+        bullets, links, and diagrams. That's the proposal layer.
+      </p>
+      <p>
+        On top of proposals sits a second primitive: <strong>Blueprints</strong>.
+        A blueprint is a reusable design — a smart stop sign, a parklet, a
+        modular bus shelter — that anyone can reference from their own pin. One
+        person designs the blueprint once; a thousand pins in a thousand cities
+        can apply it. That's the open-source-the-world part. It's the same
+        relationship as a git repository to an issue: a proposal is specific and
+        located; a blueprint is generalizable and portable.
+      </p>
+    </div>
+
+    <!-- How a pin becomes real -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>How a Pin Becomes Real</h2>
+      <p>
+        OpenWorld is the <strong>coordination layer</strong>, not the implementation
+        layer. The rails for action already exist:
+      </p>
+      <ul>
+        <li><strong>GoFundMe</strong> and other funding platforms for the money</li>
+        <li>Government and representative contact pages for the political path</li>
+        <li>Petition platforms for collective signal</li>
+        <li>Sign-up sheets and event pages for volunteers</li>
+        <li>Existing community organizations for the on-the-ground work</li>
+      </ul>
+      <p>
+        Rebuilding any of those would be a worse use of energy than letting
+        OpenWorld <em>link out</em> to them. So a Timer pin for a Saturday cleanup
+        links to the sign-up sheet. An Idea pin for a smart stop sign links to a
+        GoFundMe — or to your council member's office. A Kudos pin can link to the
+        contractor's site so other neighborhoods can hire them.
+      </p>
+      <p>
+        The bridge from proposal to reality is humans taking action. OpenWorld
+        doesn't replace that bridge — it makes it shorter.
+      </p>
+    </div>
+
+    <!-- Discovery -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Discovery</h2>
+      <p>
+        When you open the app you see pins near your location scattered on a map.
+      </p>
+      <ul>
+        <li><strong>Filter</strong> by pin type — Idea, Issue, Kudos, Timer, or all.</li>
+        <li><strong>List view</strong> for the same nearby pins, when scrolling a map isn't what you need.</li>
+        <li><strong>Global feed</strong> for everything, not just nearby — accessible from the nearby list and from the bottom navbar.</li>
+        <li><strong>Sort</strong> by newest or most voted.</li>
+        <li><strong>Search</strong> by tag or by location — so a politician can watch their patch, an organizer can follow a topic, and a citizen moving to a new city can see what people there are working on.</li>
+      </ul>
+    </div>
+
+    <!-- Status -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Where It Is Today</h2>
+      <pre><code>$ openworld status
+marketing site:  https://www.openworld.run         live
+web app:         https://app.openworld.run         early access
+ios:             App Store                         live
+android:         Google Play Console               closed testing</code></pre>
+      <p>
+        The full experience is mobile, because pinning is a <em>physical-place</em>
+        act — you do it standing in front of the thing. The web app exists for
+        viewing and admin work; the phone is where you actually use OpenWorld.
+      </p>
+      <p>
+        <strong>iOS is now live</strong> —
+        <a href="https://apps.apple.com/us/app/openworld-pin-improve/id6762533990" target="_blank" rel="noopener noreferrer">download <em>OpenWorld: Pin &amp; Improve</em> on the App Store</a>.
+        Android is still in closed Play Console testing while we wait on Google's
+        review; <a href="contact.html">drop me a line</a> to be added to the testing
+        group, or watch this page for the public release.
+      </p>
+    </div>
+
+    <!-- Six-month vision -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>The Next Six Months</h2>
+      <p>
+        Six months from now I want:
+      </p>
+      <ul>
+        <li><strong>iOS and Android publicly in the stores.</strong></li>
+        <li><strong>Hundreds of users</strong> on the platform.</li>
+        <li><strong>Creative use I didn't anticipate</strong> — the surest sign that the primitive is right.</li>
+        <li><strong>Real action taken</strong> because of an OpenWorld pin — a politician who responded, a cleanup that happened with strangers, a blueprint reused in a city I've never been to.</li>
+        <li><strong>Donations and sponsorships</strong> that make the project sustainable without forcing ads or selling user data.</li>
+        <li><strong>An active community</strong> recommending features and ideas.</li>
+        <li><strong>Personal growth</strong> as a leader of the platform — continuing to mature alongside it.</li>
+        <li><strong>Starting to make waves.</strong></li>
+      </ul>
+    </div>
+
+    <!-- Origin -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Origin</h2>
+      <p>
+        The idea came when I was in community college at West LA. I don't have an
+        exact memory of the moment, but I remember the vision — an overlay over the
+        world where everyone could propose ideas to improve the infrastructure
+        around us.
+      </p>
+      <p>
+        Then there was a specific scene: I was walking through an intersection and
+        imagined a smart stop sign — one that turns its face green when it detects
+        no pedestrians or cars, so you can drive through without stopping. Slightly
+        silly, and exactly the right kind of silly: small enough to picture, big
+        enough to imply a whole platform behind it. A thing one citizen could design
+        as a blueprint, and a thousand cities could install.
+      </p>
+      <p>
+        OpenWorld is what that intersection-walk turned into.
+      </p>
+    </div>
+
+    <!-- Why this -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Why This Project, of All Things</h2>
+      <p>
+        I've always been the one in my family to try to make things better. To
+        heal relationships. To give people the benefit of the doubt. I've done
+        good and bad. Truthfully, I just want to help make the world a better
+        place.
+      </p>
+      <p>
+        I had this idea before I had children. They're here now, and they're
+        entering a world that might be very different than the world I grew up
+        in. I want a platform where people can actually have their ideas heard
+        and we can act on them.
+      </p>
+      <p>
+        I'm not a super environmental type. I don't like the idea that humans are
+        the cause of all the issues — we might be, but if everyone can fix the
+        little things, make tiny changes and improvements to the world, that
+        compounds. And maybe it's not so bad that we drive gas-powered cars, if
+        the rest of the time we're continuously improving the world together.
+      </p>
+      <p>
+        That's the dream. <strong>People are good. Action compounds. Agency over
+        guilt.</strong> A future where we are all continuously improving the world
+        together. I hope it inspires others.
+      </p>
+    </div>
+
+    <!-- Get involved -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Get Involved</h2>
+      <ul>
+        <li><strong>Download iOS:</strong> <a href="https://apps.apple.com/us/app/openworld-pin-improve/id6762533990" target="_blank" rel="noopener noreferrer">OpenWorld: Pin &amp; Improve on the App Store</a>.</li>
+        <li>Visit <a href="https://www.openworld.run" target="_blank" rel="noopener noreferrer">www.openworld.run</a> for the marketing page.</li>
+        <li>Try the web app at <a href="https://app.openworld.run" target="_blank" rel="noopener noreferrer">app.openworld.run</a>. It's intentionally minimal; the phone is the real experience.</li>
+        <li><a href="contact.html">Email me</a> to join Android closed testing.</li>
+        <li>If you're a politician, organizer, journalist, or community leader: I'd <em>especially</em> love to hear what you'd want from the platform. Whatever I'm building probably needs your eyes.</li>
+        <li>Read the <a href="articles/truly-open-sourcing-the-world.html">launch post</a> if you want the longer story.</li>
+      </ul>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer>
+    <p>
+      <a href="index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>
