@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Building a FreeBSD pf Router - Michael Vivirito</title>
-  <meta name="description" content="A practical, opinionated guide to building a FreeBSD edge router from a 4-port mini PC. ZFS root, pf, unbound, and dhcpd — from boot media to a working gateway.">
+  <meta name="description" content="A practical, opinionated guide to building a FreeBSD edge router from a 4-port mini PC. ZFS root, pf, unbound, and dhcpd, from boot media to a working gateway.">
   <meta name="keywords" content="FreeBSD, pf, router, firewall, homelab, networking, unbound, dhcpd, ZFS, igc">
   <meta name="author" content="Michael Vivirito">
 
@@ -54,7 +54,7 @@
       <p>
         Consumer routers run a Linux kernel from 2017, a vendor-modified userspace, and a
         web UI that lies about what's actually configured. OPNsense and pfSense are
-        excellent — they're both FreeBSD-based, in fact — but their abstraction is also
+        excellent, they're both FreeBSD-based, in fact, but their abstraction is also
         their burden: the GUI eventually doesn't expose the knob you need, and you end up
         editing a config file that the GUI may overwrite tomorrow.
       </p>
@@ -71,7 +71,7 @@
       </p>
       <ul>
         <li><strong>Fanless 4-port mini PC</strong>, Intel N5105 or N100 class. Search
-            for "Protectli", "Topton", or "Qotom" — many vendors sell variants of the same
+            for "Protectli", "Topton", or "Qotom", many vendors sell variants of the same
             reference design.</li>
         <li><strong>4× Intel i225/i226 2.5 GbE NICs</strong>. These use the FreeBSD
             <code>igc(4)</code> driver, which is in base.</li>
@@ -97,7 +97,7 @@ sudo dd if=FreeBSD-14.2-RELEASE-amd64-memstick.img of=/dev/sdX bs=1M status=prog
         port). Working over serial means you can recover from your own mistakes later.
       </p>
 
-      <h2>Install — ZFS Root, Auto, with One Tweak</h2>
+      <h2>Install: ZFS Root, Auto, with One Tweak</h2>
       <p>
         bsdinstall is genuinely good. Walk through it normally and pick:
       </p>
@@ -128,13 +128,13 @@ $ ifconfig igc0 | grep status
         I conventionally use:
       </p>
       <ul>
-        <li><code>igc0</code> — WAN</li>
-        <li><code>igc1</code> — trusted LAN</li>
-        <li><code>igc2</code> — servers / homelab</li>
-        <li><code>igc3</code> — IoT / quarantine</li>
+        <li><code>igc0</code>: WAN</li>
+        <li><code>igc1</code>: trusted LAN</li>
+        <li><code>igc2</code>: servers / homelab</li>
+        <li><code>igc3</code>: IoT / quarantine</li>
       </ul>
 
-      <h2>/etc/rc.conf — the One File Most Routers Need</h2>
+      <h2>/etc/rc.conf: the One File Most Routers Need</h2>
       <pre><code>hostname="gw.lan"
 zfs_enable="YES"
 
@@ -178,7 +178,7 @@ $ sysctl net.inet6.ip6.forwarding=1</code></pre>
         a deny-all and lock yourself out either. Start with the smallest ruleset that
         keeps SSH and the LAN working, then iterate.
       </p>
-      <pre><code># /etc/pf.conf — bootstrap, replace with the real ruleset later
+      <pre><code># /etc/pf.conf, bootstrap, replace with the real ruleset later
 ext_if = "igc0"
 int_if = "{ igc1 igc2 igc3 }"
 
@@ -205,7 +205,7 @@ $ pfctl -s rules</code></pre>
         production ruleset I actually use.
       </p>
 
-      <h2>unbound — Local Recursive DNS</h2>
+      <h2>unbound: Local Recursive DNS</h2>
       <p>
         FreeBSD ships <code>unbound</code> in base under the name <em>local_unbound</em>.
         Set it up to listen on the LANs:
@@ -231,7 +231,7 @@ server:
       <pre><code>$ service local_unbound restart
 $ drill -u google.com @10.10.10.1   # check DNSSEC validation</code></pre>
 
-      <h2>dhcpd — Leases for the LANs</h2>
+      <h2>dhcpd: Leases for the LANs</h2>
       <pre><code># /usr/local/etc/dhcpd.conf (excerpt)
 default-lease-time 3600;
 max-lease-time     86400;
@@ -256,7 +256,7 @@ subnet 10.10.30.0 netmask 255.255.255.0 {
   option domain-name-servers 10.10.30.1;
 }</code></pre>
 
-      <h2>SSH — Belongs on the LAN, Not the WAN</h2>
+      <h2>SSH: Belongs on the LAN, Not the WAN</h2>
       <p>
         Three things every router SSH config needs: key-only login, no root login, and a
         pf rule that limits SSH to the trusted LAN.
@@ -268,7 +268,7 @@ ChallengeResponseAuthentication no
 AllowUsers admin
 ListenAddress 10.10.10.1</code></pre>
 
-      <h2>ZFS Boot Environments — Cheap Insurance</h2>
+      <h2>ZFS Boot Environments: Cheap Insurance</h2>
       <p>
         Before you change anything important, snapshot the boot environment so a single
         reboot reverts you:
@@ -298,17 +298,17 @@ $ traceroute www.freebsd.org      # full path</code></pre>
 
       <div style="background: var(--bg-surface); padding: 1rem; border: 1px solid var(--border-accent); border-left: 3px solid var(--accent-primary); margin: 1.5rem 0;">
         <p style="margin: 0;">
-          <strong>Heads-up:</strong> This is the bare metal. The real work — clean pf
-          rules, jails for services, monitoring, IPv6 — lives in the
+          <strong>Heads-up:</strong> This is the bare metal. The real work, clean pf
+          rules, jails for services, monitoring, IPv6, lives in the
           <a href="../homelab.html">homelab tour</a> and the rest of this series.
         </p>
       </div>
 
       <h2>Next Steps</h2>
       <ul>
-        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a> — replace the bootstrap ruleset with something deliberate</li>
-        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a> — move DNS and monitoring out of the host</li>
-        <li><a href="freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a> — context for why this stack pays off</li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a>: replace the bootstrap ruleset with something deliberate</li>
+        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a>: move DNS and monitoring out of the host</li>
+        <li><a href="freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a>: context for why this stack pays off</li>
       </ul>
 
       <p>
@@ -322,7 +322,7 @@ $ traceroute www.freebsd.org      # full path</code></pre>
     <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
       <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
       <p class="text-muted">
-        FreeBSD, pf, and SRE notes — straight to your inbox. No spam, just signal.
+        FreeBSD, pf, and SRE notes, straight to your inbox. No spam, just signal.
       </p>
       <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
       <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"

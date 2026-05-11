@@ -10,7 +10,7 @@
 
   <meta property="og:type" content="article">
   <meta property="og:title" content="FreeBSD Jails for Network Services">
-  <meta property="og:description" content="Run DNS, monitoring, and VPN inside FreeBSD jails on the same box as your router — without giving up isolation.">
+  <meta property="og:description" content="Run DNS, monitoring, and VPN inside FreeBSD jails on the same box as your router, without giving up isolation.">
   <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
 
   <link rel="stylesheet" type="text/css" href="../style.css">
@@ -57,7 +57,7 @@
         because there's only ever one kernel. From the outside it looks like a tiny
         machine you can <code>jexec</code> into; from the inside it looks like FreeBSD,
         because it is FreeBSD. Jails predate Docker by a long time, and on a router they
-        do exactly what Docker is constantly trying to be — small, boring, and obviously
+        do exactly what Docker is constantly trying to be, small, boring, and obviously
         correct.
       </p>
 
@@ -131,7 +131,7 @@ $ cp /etc/localtime   /jails/unbound/etc/</code></pre>
         thin shell layer with no daemon, and it stays out of my way.
       </p>
 
-      <h2>jail.conf — One File, All the Jails</h2>
+      <h2>jail.conf: One File, All the Jails</h2>
       <pre><code># /etc/jail.conf
 
 # defaults applied to every jail unless overridden
@@ -142,7 +142,7 @@ mount.devfs;
 allow.raw_sockets;
 host.hostname = "$name";
 
-# unbound — VNET jail with its own epair link to the LAN bridge
+# unbound, VNET jail with its own epair link to the LAN bridge
 unbound {
   vnet;
   vnet.interface = "epair0b";
@@ -154,7 +154,7 @@ unbound {
   persist;
 }
 
-# wireguard — VNET jail, separate epair, on the WAN-facing bridge
+# wireguard, VNET jail, separate epair, on the WAN-facing bridge
 wireguard {
   vnet;
   vnet.interface = "epair1b";
@@ -166,7 +166,7 @@ wireguard {
   persist;
 }</code></pre>
       <p>
-        Each jail gets an <code>epair</code> pseudo-interface — a virtual back-to-back
+        Each jail gets an <code>epair</code> pseudo-interface, a virtual back-to-back
         cable. One side stays in the host and joins a bridge that's connected to a real
         LAN; the other side moves into the jail's network namespace. Inside the jail,
         configure that interface like any other.
@@ -181,7 +181,7 @@ local_unbound_enable="YES"
 syslogd_flags="-ss"</code></pre>
       <p>
         Now the resolver listens on <code>10.10.10.53</code>, and the host's DHCP server
-        hands that out to clients. The router itself is no longer a DNS resolver — that's
+        hands that out to clients. The router itself is no longer a DNS resolver, that's
         a feature.
       </p>
 
@@ -246,7 +246,7 @@ $ service jail status                    # are they all up?</code></pre>
         <li><strong>raw sockets.</strong> If the service inside needs ping or traceroute,
             set <code>allow.raw_sockets;</code>. If not, leave it off.</li>
         <li><strong>persistent jails vs ephemeral.</strong> <code>persist;</code> keeps
-            a jail up even if its main process dies — useful for jails managed by their
+            a jail up even if its main process dies, useful for jails managed by their
             own rc scripts. Without it, the jail exits when the start command exits.</li>
         <li><strong>Boot ordering.</strong> If a jail depends on a host bridge, make sure
             the bridge exists before the jail starts. <code>cloned_interfaces</code> in
@@ -256,9 +256,9 @@ $ service jail status                    # are they all up?</code></pre>
       <h2>When NOT to Use Jails</h2>
       <p>
         Jails are FreeBSD-specific. If you need to run a Linux-only binary, use a Linux
-        VM or a bhyve guest — Linuxulator is a tar pit for this kind of work. If you
+        VM or a bhyve guest, Linuxulator is a tar pit for this kind of work. If you
         need GPU acceleration, you'll usually be happier with a dedicated VM. And if you
-        only have one service to run, a jail is overkill — just run it on the host.
+        only have one service to run, a jail is overkill, just run it on the host.
       </p>
 
       <h2>Bigger Picture</h2>
@@ -271,9 +271,9 @@ $ service jail status                    # are they all up?</code></pre>
 
       <h2>Where to Go Next</h2>
       <ul>
-        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a> — the host this all runs on</li>
-        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a> — what to add when jails join the network</li>
-        <li><a href="freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a> — context for why this is so much nicer than the Linux equivalent</li>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a>: the host this all runs on</li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a>: what to add when jails join the network</li>
+        <li><a href="freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a>: context for why this is so much nicer than the Linux equivalent</li>
       </ul>
 
       <p>
@@ -287,7 +287,7 @@ $ service jail status                    # are they all up?</code></pre>
     <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
       <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
       <p class="text-muted">
-        FreeBSD, pf, and SRE notes — straight to your inbox. No spam, just signal.
+        FreeBSD, pf, and SRE notes, straight to your inbox. No spam, just signal.
       </p>
       <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
       <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"

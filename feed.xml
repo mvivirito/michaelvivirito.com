@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Michael Vivirito — Blog</title>
+    <title>Michael Vivirito: Blog</title>
     <link>https://michaelvivirito.com</link>
     <description>OpenWorld, civic action, FreeBSD, networking, and SRE writing. Building tools and writing about infrastructure.</description>
     <language>en-us</language>
@@ -13,7 +13,7 @@
       <link>https://michaelvivirito.com/articles/truly-open-sourcing-the-world.html</link>
       <guid isPermaLink="true">https://michaelvivirito.com/articles/truly-open-sourcing-the-world.html</guid>
       <pubDate>Wed, 06 May 2026 12:00:00 GMT</pubDate>
-      <description>Why I'm building OpenWorld — a coordination layer for civic action. The smart-stop-sign moment, the four kinds of pin, and the worldview behind the platform: people are good, action compounds, agency over guilt.</description>
+      <description>Why I'm building OpenWorld, a coordination layer for civic action. The smart-stop-sign moment, the four kinds of pin, and the worldview behind the platform: people are good, action compounds, agency over guilt.</description>
     </item>
 
     <item>
@@ -21,7 +21,7 @@
       <link>https://michaelvivirito.com/articles/freebsd-pf-router.html</link>
       <guid isPermaLink="true">https://michaelvivirito.com/articles/freebsd-pf-router.html</guid>
       <pubDate>Sun, 03 May 2026 14:00:00 GMT</pubDate>
-      <description>A practical, opinionated guide to building a FreeBSD edge router from a 4-port mini PC. ZFS root, pf, unbound, and dhcpd — from boot media to a working gateway.</description>
+      <description>A practical, opinionated guide to building a FreeBSD edge router from a 4-port mini PC. ZFS root, pf, unbound, and dhcpd, from boot media to a working gateway.</description>
     </item>
 
     <item>
@@ -29,7 +29,7 @@
       <link>https://michaelvivirito.com/articles/pf-firewall-rules.html</link>
       <guid isPermaLink="true">https://michaelvivirito.com/articles/pf-firewall-rules.html</guid>
       <pubDate>Sun, 03 May 2026 13:30:00 GMT</pubDate>
-      <description>A deep dive on FreeBSD pf rule design — macros, tables, NAT, anti-spoofing, state tracking, and a real residential gateway ruleset you can adapt.</description>
+      <description>A deep dive on FreeBSD pf rule design, macros, tables, NAT, anti-spoofing, state tracking, and a real residential gateway ruleset you can adapt.</description>
     </item>
 
     <item>
@@ -45,7 +45,7 @@
       <link>https://michaelvivirito.com/articles/freebsd-ipv6-router.html</link>
       <guid isPermaLink="true">https://michaelvivirito.com/articles/freebsd-ipv6-router.html</guid>
       <pubDate>Sun, 03 May 2026 12:45:00 GMT</pubDate>
-      <description>A practical guide to running real, native IPv6 on a FreeBSD home router. Prefix delegation, rtsold, dhcp6c, rtadvd, and pf rules — without breaking your IPv4 setup.</description>
+      <description>A practical guide to running real, native IPv6 on a FreeBSD home router. Prefix delegation, rtsold, dhcp6c, rtadvd, and pf rules, without breaking your IPv4 setup.</description>
     </item>
 
     <item>
@@ -85,7 +85,7 @@
       <link>https://michaelvivirito.com/articles/kubernetes-bare-metal.html</link>
       <guid isPermaLink="true">https://michaelvivirito.com/articles/kubernetes-bare-metal.html</guid>
       <pubDate>Wed, 02 Apr 2026 07:00:00 GMT</pubDate>
-      <description>Skip the cloud. Own your stack. A real-world guide to running k8s on bare metal with Proxmox — kubeadm, Cilium, NFS storage, MetalLB, and backups.</description>
+      <description>Skip the cloud. Own your stack. A real-world guide to running k8s on bare metal with Proxmox, kubeadm, Cilium, NFS storage, MetalLB, and backups.</description>
     </item>
 
     <item>
@@ -109,7 +109,7 @@
       <link>https://michaelvivirito.com/articles/why-i-run-nixos.html</link>
       <guid isPermaLink="true">https://michaelvivirito.com/articles/why-i-run-nixos.html</guid>
       <pubDate>Wed, 02 Apr 2026 05:00:00 GMT</pubDate>
-      <description>Declarative configuration, atomic rollbacks, and reproducible builds — lessons from running NixOS in production on Proxmox and bare metal.</description>
+      <description>Declarative configuration, atomic rollbacks, and reproducible builds, lessons from running NixOS in production on Proxmox and bare metal.</description>
     </item>
 
     <item>
@@ -117,7 +117,7 @@
       <link>https://michaelvivirito.com/articles/top-10-tui-apps.html</link>
       <guid isPermaLink="true">https://michaelvivirito.com/articles/top-10-tui-apps.html</guid>
       <pubDate>Mon, 22 Jan 2024 00:00:00 GMT</pubDate>
-      <description>The best terminal user interface apps for productivity and style — from file managers to system monitors to music players.</description>
+      <description>The best terminal user interface apps for productivity and style, from file managers to system monitors to music players.</description>
     </item>
 
   </channel>

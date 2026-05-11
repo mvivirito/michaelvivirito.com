@@ -10,7 +10,7 @@
 
   <meta property="og:type" content="article">
   <meta property="og:title" content="IPv6 Prefix Delegation: A Troubleshooting Cookbook">
-  <meta property="og:description" content="When DHCPv6-PD on FreeBSD goes silent — the things to check, in the order to check them.">
+  <meta property="og:description" content="When DHCPv6-PD on FreeBSD goes silent, the things to check, in the order to check them.">
   <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
 
   <link rel="stylesheet" type="text/css" href="../style.css">
@@ -63,7 +63,7 @@
         Before you go deep, sanity-check the obvious:
       </p>
       <ol>
-        <li><code>sysctl net.inet6.ip6.forwarding</code> — should be <code>1</code>.</li>
+        <li><code>sysctl net.inet6.ip6.forwarding</code>: should be <code>1</code>.</li>
         <li><code>ifconfig $ext_if</code> shows a link-local v6 address (<code>fe80::</code>) and the <code>ACCEPT_RTADV</code> flag.</li>
         <li><code>service dhcp6c status</code> says it's running.</li>
         <li><code>service rtadvd status</code> says it's running, on the LAN-side interfaces.</li>
@@ -85,8 +85,8 @@
         configs). The fix is usually one of:
       </p>
       <ul>
-        <li><code>ifconfig $ext_if inet6 accept_rtadv -ifdisabled</code> — apply now.</li>
-        <li>Set <code>ifconfig_${ext_if}_ipv6="inet6 accept_rtadv"</code> in <code>/etc/rc.conf</code> — apply on reboot.</li>
+        <li><code>ifconfig $ext_if inet6 accept_rtadv -ifdisabled</code>: apply now.</li>
+        <li>Set <code>ifconfig_${ext_if}_ipv6="inet6 accept_rtadv"</code> in <code>/etc/rc.conf</code>: apply on reboot.</li>
         <li>Set <code>rtsold_enable="YES"</code> and <code>rtsold_flags="-aF"</code> so rtsold actively probes for RAs at boot.</li>
       </ul>
 
@@ -118,7 +118,7 @@
 
       <h2>Symptom: dhcp6c Got a Prefix, but the LAN Is Quiet</h2>
       <p>
-        dhcp6c logs say it received a /56, your <code>igc1</code> has a v6 address — and
+        dhcp6c logs say it received a /56, your <code>igc1</code> has a v6 address, and
         nothing on the LAN gets one. First, confirm the prefix actually landed:
       </p>
       <pre><code>$ ifconfig igc1 inet6
@@ -149,7 +149,7 @@ $ tcpdump -ni igc1 'icmp6 and ip6[40] == 134'</code></pre>
         <li><code>rtadvd_interfaces</code> in <code>/etc/rc.conf</code> includes the LAN interface</li>
         <li>The interface has a global v6 address (rtadvd refuses to advertise on link-local-only interfaces)</li>
         <li>If you wrote a <code>/etc/rtadvd.conf</code>, the syntax is <em>intentionally
-            cryptic</em> — see <code>rtadvd.conf(5)</code>. A typo there is a common
+            cryptic</em>, see <code>rtadvd.conf(5)</code>. A typo there is a common
             source of silence.</li>
       </ul>
 
@@ -158,8 +158,8 @@ $ tcpdump -ni igc1 'icmp6 and ip6[40] == 134'</code></pre>
         DNS over v6 has two delivery mechanisms:
       </p>
       <ul>
-        <li><strong>RDNSS</strong> — RA option that includes recursive DNS server addresses. Modern clients use this.</li>
-        <li><strong>DHCPv6 stateless</strong> — clients ask DHCPv6 for DNS info even though they SLAAC for the address.</li>
+        <li><strong>RDNSS</strong>: RA option that includes recursive DNS server addresses. Modern clients use this.</li>
+        <li><strong>DHCPv6 stateless</strong>: clients ask DHCPv6 for DNS info even though they SLAAC for the address.</li>
       </ul>
       <p>
         On rtadvd, RDNSS is enabled with a config file:
@@ -216,7 +216,7 @@ $ ping6 -s 1500 -D ipv6.google.com   # may fail with PMTU=1492 or similar</code>
         <li><strong>antispoof for inet6.</strong> The IPv4 antispoof rule doesn't cover
             v6 by default. Add <code>antispoof quick for { ... } inet6</code>.</li>
         <li><strong>NDP traffic.</strong> Don't block ICMP6 types
-            <code>neighbrsol</code> or <code>neighbradv</code> — they're v6's ARP. If
+            <code>neighbrsol</code> or <code>neighbradv</code>: they're v6's ARP. If
             you do, neighbours go silent.</li>
         <li><strong>Rule order.</strong> A blanket <code>block in</code> at the top of
             the WAN ruleset blocks ICMP6 too unless you specifically pass it. Pass v6
@@ -267,24 +267,24 @@ $ service dhcp6c  start
 $ service rtadvd start</code></pre>
       <p>
         That sequence brings everything down, clears any stuck addresses, and brings
-        things back up in the right order. It's not a real fix — but the sun's coming
+        things back up in the right order. It's not a real fix, but the sun's coming
         up, your kid wants the wifi back, and tomorrow you'll diff the configs to
         figure out what changed.
       </p>
 
       <h2>The Reading List</h2>
       <ul>
-        <li><a href="https://man.freebsd.org/cgi/man.cgi?query=rtadvd.conf&amp;sektion=5" target="_blank" rel="noopener noreferrer">rtadvd.conf(5)</a> — read the syntax notes carefully, more than once</li>
-        <li><a href="https://man.freebsd.org/cgi/man.cgi?query=dhcp6c.conf" target="_blank" rel="noopener noreferrer">dhcp6c.conf(5)</a> — the prefix-interface stanza is what most "it works on my Linux box" articles miss on FreeBSD</li>
-        <li><a href="https://datatracker.ietf.org/doc/html/rfc8415" target="_blank" rel="noopener noreferrer">RFC 8415 (DHCPv6)</a> — surprisingly readable for an RFC</li>
-        <li><a href="https://datatracker.ietf.org/doc/html/rfc4861" target="_blank" rel="noopener noreferrer">RFC 4861 (Neighbor Discovery)</a> — what the ICMP6 types in this post actually mean</li>
+        <li><a href="https://man.freebsd.org/cgi/man.cgi?query=rtadvd.conf&amp;sektion=5" target="_blank" rel="noopener noreferrer">rtadvd.conf(5)</a>: read the syntax notes carefully, more than once</li>
+        <li><a href="https://man.freebsd.org/cgi/man.cgi?query=dhcp6c.conf" target="_blank" rel="noopener noreferrer">dhcp6c.conf(5)</a>: the prefix-interface stanza is what most "it works on my Linux box" articles miss on FreeBSD</li>
+        <li><a href="https://datatracker.ietf.org/doc/html/rfc8415" target="_blank" rel="noopener noreferrer">RFC 8415 (DHCPv6)</a>: surprisingly readable for an RFC</li>
+        <li><a href="https://datatracker.ietf.org/doc/html/rfc4861" target="_blank" rel="noopener noreferrer">RFC 4861 (Neighbor Discovery)</a>: what the ICMP6 types in this post actually mean</li>
       </ul>
 
       <h2>Where to Go Next</h2>
       <ul>
-        <li><a href="freebsd-ipv6-router.html">IPv6 for Home Networks: A FreeBSD Walkthrough</a> — the happy path that this post debugs</li>
-        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a> — the v4 ruleset; pair it with the v6 must-allows above</li>
-        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a> — the host underneath all of this</li>
+        <li><a href="freebsd-ipv6-router.html">IPv6 for Home Networks: A FreeBSD Walkthrough</a>: the happy path that this post debugs</li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a>: the v4 ruleset; pair it with the v6 must-allows above</li>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a>: the host underneath all of this</li>
       </ul>
 
       <p>
@@ -298,7 +298,7 @@ $ service rtadvd start</code></pre>
     <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
       <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
       <p class="text-muted">
-        FreeBSD, pf, and SRE notes — straight to your inbox. No spam, just signal.
+        FreeBSD, pf, and SRE notes, straight to your inbox. No spam, just signal.
       </p>
       <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
       <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"

@@ -1,6 +1,6 @@
 # michaelvivirito.com
 
-Personal site for Michael Vivirito — Lead Site Reliability Engineer.
+Personal site for Michael Vivirito, Lead Site Reliability Engineer.
 
 Topics: Kubernetes, FreeBSD, networking, AWS, and self-hosted infrastructure.
 
@@ -24,8 +24,8 @@ no build step.
 /
 ├── index.html               # Homepage: hero, about, projects, homelab, blog
 ├── homelab.html             # FreeBSD pf router showcase
-├── now.html                 # /now page — current focus
-├── uses.html                # /uses page — hardware, software, tools
+├── now.html                 # /now page, current focus
+├── uses.html                # /uses page, hardware, software, tools
 ├── contact.html             # Contact links
 ├── visuals.html             # Pure-CSS visual experiments
 ├── feed.xml                 # RSS feed

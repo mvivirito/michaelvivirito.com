@@ -61,7 +61,7 @@
 
       <h2>The Init System</h2>
       <p>
-        Linux gave us systemd, which is genuinely powerful — units, timers, sockets, and
+        Linux gave us systemd, which is genuinely powerful, units, timers, sockets, and
         cgroup integration are all useful. It is also a sprawling project with surprising
         edges. The first time you write a unit file you feel productive; the fortieth time
         you find yourself reading <code>journalctl</code>'s manual page to figure out why
@@ -71,7 +71,7 @@
         FreeBSD's <code>rc.d</code> is the opposite. Each service is a shell script.
         <code>service foo start</code> calls <code>/etc/rc.d/foo start</code>, which
         sources <code>/etc/rc.subr</code> and runs the steps as written. There's no
-        message bus, no socket activation, no parallelisation. That's a real cost — boot
+        message bus, no socket activation, no parallelisation. That's a real cost, boot
         is slower, and you don't get cgroup-style resource limits for free. But every
         service is a file you can read end to end in two minutes.
       </p>
@@ -91,12 +91,12 @@
       <p>
         Linux networking, by contrast, has gone through several generations: ifconfig →
         ip; iptables → nftables; route → ip route; brctl → ip link. They mostly work, and
-        nftables is a real improvement over iptables — but the documentation lag is
+        nftables is a real improvement over iptables, but the documentation lag is
         chronic, and the ecosystem (Docker, k8s, Cilium, every cloud) layers more
         abstractions on top.
       </p>
       <p>
-        For a network device — a router, a firewall, a VPN concentrator — FreeBSD's
+        For a network device, a router, a firewall, a VPN concentrator, FreeBSD's
         stability is a feature, not a bug. The configuration I learn today will still be
         valid in five years. (See the <a href="pf-firewall-rules.html">pf.conf design
         article</a> for what that buys you in practice.)
@@ -104,7 +104,7 @@
 
       <h2>Filesystems</h2>
       <p>
-        ZFS on FreeBSD is first-class — it's part of base, the installer offers it, and
+        ZFS on FreeBSD is first-class, it's part of base, the installer offers it, and
         the kernel and userland speak it natively. ZFS on Linux is excellent these days
         too (OpenZFS shares code with FreeBSD), but the integration is one step less
         smooth: out-of-tree module, distro-specific packaging, occasional friction with
@@ -129,7 +129,7 @@
 
       <h2>Containers and Jails</h2>
       <p>
-        Linux owns containers. Docker, containerd, Kubernetes, OCI, runc — that ecosystem
+        Linux owns containers. Docker, containerd, Kubernetes, OCI, runc, that ecosystem
         is huge, well-funded, and where most server software targets first. If your job
         is to ship containerised services, run them on Linux.
       </p>
@@ -155,9 +155,9 @@
       </p>
       <p>
         Linux package management is more diverse, which is both its strength and its
-        weakness. apt, dnf, pacman, zypper, snap, flatpak, AUR helpers — each
+        weakness. apt, dnf, pacman, zypper, snap, flatpak, AUR helpers, each
         ecosystem has its own opinions and its own failure modes. NixOS is a notable
-        outlier (and one I run on Linux servers — see
+        outlier (and one I run on Linux servers, see
         <a href="why-i-run-nixos.html">Why I Run NixOS on My Servers</a>), trading the
         whole package metaphor for a declarative one.
       </p>
@@ -185,7 +185,7 @@
         <li>FreeBSD: a small base system, conservative defaults, jails as a security
             boundary, signed updates, ZFS for tamper-evident snapshots.</li>
         <li>Linux: AppArmor or SELinux for fine-grained MAC, namespaces and seccomp for
-            container isolation, kernel hardening flags everywhere — and an enormous
+            container isolation, kernel hardening flags everywhere, and an enormous
             attack surface in the most popular distributions.</li>
       </ul>
       <p>
@@ -240,10 +240,10 @@
 
       <h2>Further Reading</h2>
       <ul>
-        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a> — concrete BSD in action</li>
-        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a> — pf in depth</li>
-        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a> — jails on a router</li>
-        <li><a href="why-i-run-nixos.html">Why I Run NixOS on My Servers</a> — the Linux side of my fleet</li>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a>: concrete BSD in action</li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a>: pf in depth</li>
+        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a>: jails on a router</li>
+        <li><a href="why-i-run-nixos.html">Why I Run NixOS on My Servers</a>: the Linux side of my fleet</li>
       </ul>
 
       <p>
@@ -257,7 +257,7 @@
     <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
       <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
       <p class="text-muted">
-        FreeBSD, pf, and SRE notes — straight to your inbox. No spam, just signal.
+        FreeBSD, pf, and SRE notes, straight to your inbox. No spam, just signal.
       </p>
       <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
       <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"

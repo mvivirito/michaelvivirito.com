@@ -10,7 +10,7 @@
 
   <meta property="og:type" content="article">
   <meta property="og:title" content="WireGuard on FreeBSD: A 30-Minute Setup">
-  <meta property="og:description" content="A working WireGuard VPN on FreeBSD in under 30 minutes — server, clients, pf, and DNS.">
+  <meta property="og:description" content="A working WireGuard VPN on FreeBSD in under 30 minutes, server, clients, pf, and DNS.">
   <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
 
   <link rel="stylesheet" type="text/css" href="../style.css">
@@ -54,8 +54,8 @@
       <p>
         WireGuard fits in your head. The protocol is small enough to read in an evening,
         the userland config file is half a screen, and the Linux/FreeBSD kernel modules
-        are well-audited. Compared to OpenVPN — TLS, certificates, MTU bargaining, weeks
-        of "why does my phone disconnect every 30 seconds" — WireGuard is a relief.
+        are well-audited. Compared to OpenVPN, TLS, certificates, MTU bargaining, weeks
+        of "why does my phone disconnect every 30 seconds", WireGuard is a relief.
       </p>
       <p>
         On FreeBSD, the kernel module is in base since 13.0 (<code>if_wg(4)</code>) and
@@ -67,7 +67,7 @@
       <p>
         WireGuard is point-to-point at the protocol level: every endpoint is a "peer",
         identified by a public key. There's no client/server distinction in the
-        protocol — the labels are about who initiates and who has a static IP. A
+        protocol, the labels are about who initiates and who has a static IP. A
         "VPN server" is just a peer with a public WAN address that other peers
         connect to.
       </p>
@@ -157,7 +157,7 @@ pass out on $ext_if from 10.66.66.0/24 to any keep state
 nat on $ext_if from 10.66.66.0/24 to any -&gt; ($ext_if)</code></pre>
       <p>
         The <a href="pf-firewall-rules.html">main pf ruleset</a> already handles
-        outbound NAT for RFC1918 — if you tagged the VPN subnet into <code>$rfc1918</code>
+        outbound NAT for RFC1918, if you tagged the VPN subnet into <code>$rfc1918</code>
         or your <code>nat</code> source set, you don't need a separate rule.
       </p>
 
@@ -182,7 +182,7 @@ AllowedIPs        = 0.0.0.0/0, ::/0
 PersistentKeepalive = 25</code></pre>
       <p>
         On the client side, AllowedIPs means "send traffic for these destinations into
-        the tunnel". <code>0.0.0.0/0, ::/0</code> means "everything" — full tunnel. If
+        the tunnel". <code>0.0.0.0/0, ::/0</code> means "everything", full tunnel. If
         you want split tunnel, list only the LAN ranges you want to reach.
       </p>
 
@@ -202,7 +202,7 @@ $ qrencode -t ansiutf8 &lt; phone.conf</code></pre>
       <p>
         If you set <code>DNS = 10.10.10.1</code> in the client config (your router's
         unbound), every DNS query from the client goes through the tunnel. This is
-        usually what you want — it means the client's queries aren't visible to the
+        usually what you want, it means the client's queries aren't visible to the
         coffee shop wifi, and clients can resolve your internal hostnames.
       </p>
       <p>
@@ -225,7 +225,7 @@ $ qrencode -t ansiutf8 &lt; phone.conf</code></pre>
 
       <h2>Troubleshooting</h2>
       <ul>
-        <li><strong>Handshake never completes.</strong> Check the firewall on the WAN —
+        <li><strong>Handshake never completes.</strong> Check the firewall on the WAN,
             <code>pf</code> needs to <code>pass in</code> UDP 51820. Tcpdump on
             <code>$ext_if</code> for <code>udp port 51820</code> to confirm packets
             arrive.</li>
@@ -252,19 +252,19 @@ $ qrencode -t ansiutf8 &lt; phone.conf</code></pre>
         <li><strong>Document the AllowedIPs map.</strong> A small Markdown file mapping
             tunnel IPs to devices saves real time the next time you debug.</li>
         <li><strong>Backup the configs and keys offline.</strong> Encrypted USB,
-            paper printout, however you back up secrets — but not just on the router
+            paper printout, however you back up secrets, but not just on the router
             itself.</li>
       </ul>
 
       <h2>Going Further</h2>
       <ul>
-        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a> — the host this VPN attaches to</li>
-        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a> — pf integration in detail</li>
-        <li><a href="freebsd-ipv6-router.html">IPv6 for Home Networks</a> — once you have v6, WireGuard over v6 is the same config with different addresses</li>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a>: the host this VPN attaches to</li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a>: pf integration in detail</li>
+        <li><a href="freebsd-ipv6-router.html">IPv6 for Home Networks</a>: once you have v6, WireGuard over v6 is the same config with different addresses</li>
       </ul>
 
       <p>
-        Got a different topology — site-to-site, mesh, hub-and-spoke?
+        Got a different topology, site-to-site, mesh, hub-and-spoke?
         <a href="../contact.html">Tell me about it</a>. I'm always curious how other
         people lay out their VPN graphs.
       </p>
@@ -275,7 +275,7 @@ $ qrencode -t ansiutf8 &lt; phone.conf</code></pre>
     <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
       <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
       <p class="text-muted">
-        FreeBSD, pf, and SRE notes — straight to your inbox. No spam, just signal.
+        FreeBSD, pf, and SRE notes, straight to your inbox. No spam, just signal.
       </p>
       <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
       <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"

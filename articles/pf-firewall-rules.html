@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>pf.conf: Writing Rules That Survive a Power Outage - Michael Vivirito</title>
-  <meta name="description" content="A deep dive on FreeBSD pf rule design — macros, tables, NAT, anti-spoofing, state tracking, and a real residential gateway ruleset you can adapt.">
+  <meta name="description" content="A deep dive on FreeBSD pf rule design, macros, tables, NAT, anti-spoofing, state tracking, and a real residential gateway ruleset you can adapt.">
   <meta name="keywords" content="pf, pf.conf, FreeBSD, firewall, NAT, anti-spoofing, networking, security, packet filter">
   <meta name="author" content="Michael Vivirito">
 
   <meta property="og:type" content="article">
   <meta property="og:title" content="pf.conf: Writing Rules That Survive a Power Outage">
-  <meta property="og:description" content="A real, residential pf.conf — macros, tables, NAT, anti-spoofing, and the reasoning behind every line.">
+  <meta property="og:description" content="A real, residential pf.conf, macros, tables, NAT, anti-spoofing, and the reasoning behind every line.">
   <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
 
   <link rel="stylesheet" type="text/css" href="../style.css">
@@ -53,14 +53,14 @@
       <h2>The Rule You Actually Need to Remember</h2>
       <p>
         pf evaluates rules <strong>top to bottom</strong>, and the <strong>last matching
-        rule wins</strong> — unless a rule uses <code>quick</code>, in which case
+        rule wins</strong>, unless a rule uses <code>quick</code>, in which case
         evaluation stops at that rule. That single sentence is most of what makes pf
         rulesets behave the way they do; if you internalise it, the rest of pf.conf is
         much smaller than it looks.
       </p>
       <p>
         This post is a tour of the ruleset I run on the FreeBSD router at the edge of my
-        homelab. Nothing here is novel — it's all in pf.conf(5) — but having a real,
+        homelab. Nothing here is novel, it's all in pf.conf(5), but having a real,
         annotated example next to the manual page is what I wish I'd had when I started.
       </p>
 
@@ -69,16 +69,16 @@
         pf.conf must appear in this order. Mixing the order produces confusing errors:
       </p>
       <ol>
-        <li><strong>Macros</strong> — variable definitions</li>
-        <li><strong>Tables</strong> — IP address sets, queryable at runtime</li>
-        <li><strong>Options</strong> — <code>set</code> directives that change pf behaviour</li>
-        <li><strong>Traffic normalization</strong> — <code>scrub</code></li>
-        <li><strong>Queueing</strong> — ALTQ, optional</li>
-        <li><strong>Translation</strong> — <code>nat</code>, <code>rdr</code>, <code>binat</code></li>
-        <li><strong>Filter</strong> — <code>block</code> and <code>pass</code></li>
+        <li><strong>Macros</strong>: variable definitions</li>
+        <li><strong>Tables</strong>: IP address sets, queryable at runtime</li>
+        <li><strong>Options</strong>: <code>set</code> directives that change pf behaviour</li>
+        <li><strong>Traffic normalization</strong>: <code>scrub</code></li>
+        <li><strong>Queueing</strong>: ALTQ, optional</li>
+        <li><strong>Translation</strong>: <code>nat</code>, <code>rdr</code>, <code>binat</code></li>
+        <li><strong>Filter</strong>: <code>block</code> and <code>pass</code></li>
       </ol>
 
-      <h2>Macros and Tables — Stay DRY</h2>
+      <h2>Macros and Tables: Stay DRY</h2>
       <pre><code># /etc/pf.conf
 
 # --- macros ---
@@ -101,7 +101,7 @@ table &lt;bogons&gt;     persist file "/etc/pf.bogons"     # martian/bogon range
 table &lt;bruteforce&gt; persist                           # populated by overload
 table &lt;blocklist&gt;  persist file "/etc/pf.blocklist"  # known bad IPs</code></pre>
 
-      <h2>Options — Sensible Defaults</h2>
+      <h2>Options: Sensible Defaults</h2>
       <pre><code># --- options ---
 set skip on lo0
 set block-policy drop
@@ -131,7 +131,7 @@ nat on $ext_if inet from $rfc1918 to any -&gt; ($ext_if)
         when the WAN IP changes.
       </p>
 
-      <h2>Default Deny — Then Add Trust</h2>
+      <h2>Default Deny: Then Add Trust</h2>
       <pre><code># --- filter ---
 # Default deny everywhere, log on the WAN
 block in  log on $ext_if all
@@ -150,7 +150,7 @@ antispoof quick for { $lan_if $srv_if $iot_if }</code></pre>
         packets arriving on the wrong interface for their claimed source.
       </p>
 
-      <h2>Outbound — Trusted LANs Reach the Internet</h2>
+      <h2>Outbound: Trusted LANs Reach the Internet</h2>
       <pre><code># LAN: trusted, can reach anywhere
 pass in  on $lan_if from $lan_net to any keep state
 pass out on $ext_if from $lan_net to any keep state
@@ -168,14 +168,14 @@ pass out on $ext_if from $iot_net to any keep state</code></pre>
         another LAN. The router itself answers DHCP and DNS for them; nothing else does.
       </p>
 
-      <h2>Inbound — Just Enough</h2>
+      <h2>Inbound: Just Enough</h2>
       <pre><code># SSH only from the trusted LAN, with brute-force tarpitting
 pass in on $lan_if proto tcp from $lan_net to ($lan_if) port ssh \
   flags S/SA keep state \
   (max-src-conn 5, max-src-conn-rate 5/60, \
    overload &lt;bruteforce&gt; flush global)
 
-# DNS and DHCP — answer requests on every internal interface
+# DNS and DHCP, answer requests on every internal interface
 pass in on $int_ifs proto { tcp udp } from any to (self) port domain keep state
 pass in on $int_ifs proto udp        from any to (self) port { 67 68 } keep state
 
@@ -192,7 +192,7 @@ pass in on $ext_if proto udp from any to ($ext_if) port 51820 keep state</code><
         states they already have.
       </p>
 
-      <h2>ICMP — Allow, but Allow on Purpose</h2>
+      <h2>ICMP: Allow, but Allow on Purpose</h2>
       <pre><code># Allow useful ICMP and traceroute return paths
 pass inet  proto icmp  all icmp-type  $icmp_ok keep state
 pass inet6 proto icmp6 all icmp6-type $icmp_ok keep state</code></pre>
@@ -201,7 +201,7 @@ pass inet6 proto icmp6 all icmp6-type $icmp_ok keep state</code></pre>
         which makes future debugging harder. Allow specific types and trust state.
       </p>
 
-      <h2>Logging — pflog Is a Real Interface</h2>
+      <h2>Logging: pflog Is a Real Interface</h2>
       <p>
         Anything you tag with <code>log</code> shows up on the <code>pflog0</code>
         interface. You can tcpdump it like any other interface:
@@ -242,11 +242,11 @@ $ pfctl -t bruteforce -T show</code></pre>
             translation, filter. The parser will yell, but the message isn't always
             obvious.</li>
         <li><strong><code>quick</code> changes everything.</strong> Use it for explicit
-            blocks at the top (bogons, blocklist) and for must-match rules — but realise
+            blocks at the top (bogons, blocklist) and for must-match rules, but realise
             it short-circuits the rest of evaluation.</li>
         <li><strong>State doesn't survive ruleset reload.</strong> By default pf keeps
             existing states across <code>pfctl -f</code>. If you need to flush them,
-            <code>pfctl -F states</code> — but don't run that over SSH.</li>
+            <code>pfctl -F states</code>, but don't run that over SSH.</li>
         <li><strong>NAT requires forwarding to be on.</strong> <code>net.inet.ip.forwarding=1</code>
             and <code>gateway_enable="YES"</code> in rc.conf, or the rules pass nothing.</li>
         <li><strong>Don't share <code>pf.conf</code> between hosts blindly.</strong>
@@ -323,9 +323,9 @@ pass inet6 proto icmp6 all icmp6-type $icmp_ok keep state</code></pre>
 
       <h2>Where to Go Next</h2>
       <ul>
-        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a> — the hardware and OS install that this ruleset runs on</li>
-        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a> — once your router is solid, move services off the host</li>
-        <li><a href="freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a> — why pf and the FreeBSD networking stack feel coherent</li>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a>: the hardware and OS install that this ruleset runs on</li>
+        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a>: once your router is solid, move services off the host</li>
+        <li><a href="freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a>: why pf and the FreeBSD networking stack feel coherent</li>
       </ul>
 
       <p>
@@ -340,7 +340,7 @@ pass inet6 proto icmp6 all icmp6-type $icmp_ok keep state</code></pre>
     <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
       <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
       <p class="text-muted">
-        FreeBSD, pf, and SRE notes — straight to your inbox. No spam, just signal.
+        FreeBSD, pf, and SRE notes, straight to your inbox. No spam, just signal.
       </p>
       <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
       <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"

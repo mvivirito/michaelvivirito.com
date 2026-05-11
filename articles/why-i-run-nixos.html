@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Why I Run NixOS on My Servers - Michael Vivirito</title>
-  <meta name="description" content="A practical guide to running NixOS in production. Declarative configuration, atomic rollbacks, and reproducible builds — lessons from 3 years of NixOS on Proxmox and bare metal.">
+  <meta name="description" content="A practical guide to running NixOS in production. Declarative configuration, atomic rollbacks, and reproducible builds, lessons from 3 years of NixOS on Proxmox and bare metal.">
   <meta name="keywords" content="NixOS, Nix, Linux, server management, declarative configuration, DevOps, SRE, infrastructure">
   <meta name="author" content="Michael Vivirito">
 
   <meta property="og:type" content="article">
   <meta property="og:title" content="Why I Run NixOS on My Servers">
-  <meta property="og:description" content="Declarative configuration, atomic rollbacks, and reproducible builds — lessons from running NixOS in production.">
+  <meta property="og:description" content="Declarative configuration, atomic rollbacks, and reproducible builds, lessons from running NixOS in production.">
   <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
 
   <link rel="stylesheet" type="text/css" href="../style.css">
@@ -64,7 +64,7 @@
       <p>
         NixOS isn't just another Linux distribution. It's built on a fundamentally different
         idea: your entire system configuration is a single expression written in the Nix
-        language. Every package, every service, every firewall rule — it's all in one file.
+        language. Every package, every service, every firewall rule, it's all in one file.
       </p>
 
       <pre><code># /etc/nixos/configuration.nix (simplified)
@@ -144,7 +144,7 @@ $ nixos-rebuild build-vm --flake .#my-server</code></pre>
         <li><strong>Proxmox VM</strong> running NixOS as my main server</li>
         <li><strong>Kubernetes</strong> cluster on NixOS nodes</li>
         <li><strong>Docker Compose</strong> stacks for monitoring (Prometheus, Grafana)</li>
-        <li>A <a href="../homelab.html">FreeBSD pf router</a> at the edge — different OS, same declarative spirit</li>
+        <li>A <a href="../homelab.html">FreeBSD pf router</a> at the edge: different OS, same declarative spirit</li>
       </ul>
 
       <p>
@@ -190,8 +190,8 @@ $ nixos-rebuild build-vm --flake .#my-server</code></pre>
       <h2>Conclusion</h2>
       <p>
         NixOS transformed how I manage infrastructure. My servers are reproducible,
-        rollbacks are instant, and my configs are version-controlled. It's not perfect —
-        the learning curve is real and documentation can be sparse — but for anyone
+        rollbacks are instant, and my configs are version-controlled. It's not perfect,
+        the learning curve is real and documentation can be sparse, but for anyone
         serious about infrastructure as code, it's worth the investment.
       </p>
 
@@ -207,7 +207,7 @@ $ nixos-rebuild build-vm --flake .#my-server</code></pre>
     <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
       <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
       <p class="text-muted">
-        SRE tips, infrastructure patterns, and NixOS guides — straight to your inbox. No spam, just signal.
+        SRE tips, infrastructure patterns, and NixOS guides, straight to your inbox. No spam, just signal.
       </p>
       <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
       <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"

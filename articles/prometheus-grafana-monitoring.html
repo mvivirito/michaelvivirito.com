@@ -54,8 +54,8 @@
       <p>
         If your idea of "monitoring" is SSHing into a server and running <code>top</code>,
         this post is for you. <strong>Prometheus</strong> and <strong>Grafana</strong> give
-        you real-time visibility into your infrastructure — CPU, memory, disk, network,
-        service health — all in one dashboard.
+        you real-time visibility into your infrastructure, CPU, memory, disk, network,
+        service health, all in one dashboard.
       </p>
       <p>
         The best part? You can have it running in under 10 minutes with Docker Compose.
@@ -63,11 +63,11 @@
 
       <h2>The Stack</h2>
       <ul>
-        <li><strong>Prometheus</strong> — Collects and stores time-series metrics</li>
-        <li><strong>Grafana</strong> — Beautiful dashboards and alerting</li>
-        <li><strong>Node Exporter</strong> — Host-level metrics (CPU, RAM, disk, network)</li>
-        <li><strong>Alertmanager</strong> — Routes alerts to Slack, email, PagerDuty</li>
-        <li><strong>cAdvisor</strong> — Container-level metrics</li>
+        <li><strong>Prometheus</strong>: Collects and stores time-series metrics</li>
+        <li><strong>Grafana</strong>: Beautiful dashboards and alerting</li>
+        <li><strong>Node Exporter</strong>: Host-level metrics (CPU, RAM, disk, network)</li>
+        <li><strong>Alertmanager</strong>: Routes alerts to Slack, email, PagerDuty</li>
+        <li><strong>cAdvisor</strong>: Container-level metrics</li>
       </ul>
 
       <h2>Quick Start</h2>
@@ -141,7 +141,7 @@ scrape_configs:
 
       <h2>Alert Rules</h2>
       <p>
-        Don't just collect metrics — act on them. Here are four essential alerts:
+        Don't just collect metrics, act on them. Here are four essential alerts:
       </p>
 
       <pre><code>groups:
@@ -189,8 +189,8 @@ scrape_configs:
       <div style="background: var(--bg-surface); padding: 1rem; border: 1px solid var(--border-accent); border-left: 3px solid var(--accent-primary); margin: 1.5rem 0;">
         <p style="margin: 0;">
           <strong>Shortcut:</strong> Don't want to configure all this manually? I packaged
-          the entire monitoring stack — Docker Compose, Prometheus config, alert rules,
-          Grafana provisioning, and a pre-built dashboard — as a ready-to-deploy toolkit.
+          the entire monitoring stack, Docker Compose, Prometheus config, alert rules,
+          Grafana provisioning, and a pre-built dashboard, as a ready-to-deploy toolkit.
           Just <code>docker compose up -d</code> and you're monitoring.
         </p>
       </div>
@@ -200,11 +200,11 @@ scrape_configs:
         The Docker Compose setup is great for dev/small deployments. For production:
       </p>
       <ul>
-        <li><strong>Persistent storage</strong> — Use named volumes or cloud block storage</li>
-        <li><strong>TLS</strong> — Put Grafana behind a reverse proxy with HTTPS</li>
-        <li><strong>Alertmanager</strong> — Route alerts to Slack, PagerDuty, or email</li>
-        <li><strong>Remote write</strong> — Send metrics to Thanos or Cortex for long-term storage</li>
-        <li><strong>Kubernetes</strong> — Use the Prometheus Operator for managed deployments</li>
+        <li><strong>Persistent storage</strong>: Use named volumes or cloud block storage</li>
+        <li><strong>TLS</strong>: Put Grafana behind a reverse proxy with HTTPS</li>
+        <li><strong>Alertmanager</strong>: Route alerts to Slack, PagerDuty, or email</li>
+        <li><strong>Remote write</strong>: Send metrics to Thanos or Cortex for long-term storage</li>
+        <li><strong>Kubernetes</strong>: Use the Prometheus Operator for managed deployments</li>
       </ul>
 
       <h2>What to Monitor</h2>
@@ -240,7 +240,7 @@ scrape_configs:
     <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
       <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
       <p class="text-muted">
-        SRE tips, infrastructure patterns, and NixOS guides — straight to your inbox. No spam, just signal.
+        SRE tips, infrastructure patterns, and NixOS guides, straight to your inbox. No spam, just signal.
       </p>
       <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
       <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"

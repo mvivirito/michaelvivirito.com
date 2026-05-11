@@ -10,7 +10,7 @@
 
   <meta property="og:type" content="article">
   <meta property="og:title" content="ZFS Send/Recv: Replicating Your Homelab">
-  <meta property="og:description" content="ZFS replication done right — snapshots, incremental streams, raw encrypted send, and a real cron-based pull script.">
+  <meta property="og:description" content="ZFS replication done right, snapshots, incremental streams, raw encrypted send, and a real cron-based pull script.">
   <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
 
   <link rel="stylesheet" type="text/css" href="../style.css">
@@ -59,8 +59,8 @@
         possibly through SSH, and you have replication. That's it.
       </p>
       <p>
-        Everything else in this post — incrementals, raw send, resumable transfers,
-        cron — is just operational polish on top of those three primitives.
+        Everything else in this post, incrementals, raw send, resumable transfers,
+        cron, is just operational polish on top of those three primitives.
       </p>
 
       <h2>Snapshots First</h2>
@@ -70,7 +70,7 @@ NAME                    USED  AVAIL  REFER  MOUNTPOINT
 zroot/home@2026-05-03     0B      -   2.4G  -</code></pre>
       <p>
         Snapshots cost nothing until the data they refer to changes. The "USED" column
-        is the size of blocks that <em>only this snapshot</em> still references — for
+        is the size of blocks that <em>only this snapshot</em> still references, for
         a snapshot taken seconds ago of an idle dataset, that's zero.
       </p>
 
@@ -107,14 +107,14 @@ $ zfs send -i @2026-05-03 zroot/home@2026-05-04 \
       <p>
         If your source dataset is encrypted (<code>encryption=on</code>), you almost
         certainly want <code>-w</code> (raw mode). It sends the encrypted blocks
-        verbatim — the receiver never needs the key:
+        verbatim, the receiver never needs the key:
       </p>
       <pre><code>$ zfs send -w -i @prev zroot/home@new \
   | ssh backup-host zfs recv backup/home</code></pre>
       <p>
         The backup pool stores ciphertext. If the backup host is compromised, the
         attacker gets blocks they can't read. If you ever need the data, mount the
-        dataset on the backup host with the key — and only then.
+        dataset on the backup host with the key, and only then.
       </p>
 
       <h2>Resumable Transfers</h2>
@@ -130,7 +130,7 @@ $ zfs get -H -o value receive_resume_token backup/home
 $ zfs send -t 1-...long-token... | ssh backup-host zfs recv -s backup/home</code></pre>
       <p>
         The <code>-s</code> flag on <code>recv</code> on the original transfer is what
-        makes resumability work — set it from the start and you never lose progress.
+        makes resumability work, set it from the start and you never lose progress.
       </p>
 
       <h2>A Real Pull-Based Cron Script</h2>
@@ -141,7 +141,7 @@ $ zfs send -t 1-...long-token... | ssh backup-host zfs recv -s backup/home</code
         sides have the smaller blast radius.
       </p>
       <pre><code>#!/bin/sh
-# /usr/local/sbin/zfs-pull.sh — runs on the backup host
+# /usr/local/sbin/zfs-pull.sh, runs on the backup host
 set -eu
 
 SRC_HOST="gw.lan"
@@ -157,7 +157,7 @@ PREV=$(zfs list -H -o name -t snapshot -s creation -r "$DST_DS" \
   | awk -F@ '{print $2}' | tail -n1)
 
 if [ -z "$PREV" ]; then
-  # First run — full send
+  # First run, full send
   ssh "$SRC_HOST" "zfs send -wc ${SRC_DS}@${SNAP}" \
     | zfs recv -s "$DST_DS"
 else
@@ -185,7 +185,7 @@ zfs list -H -o name -t snapshot -r "$DST_DS" \
       <p>
         The <code>-c</code> flag (lowercase) on <code>send</code> emits compressed
         records as-is when the source dataset has compression enabled. It saves
-        bandwidth and CPU on both ends — strictly better than re-compressing after the
+        bandwidth and CPU on both ends, strictly better than re-compressing after the
         fact.
       </p>
       <p>
@@ -225,7 +225,7 @@ $ zfs send backup/home@2026-05-03 | ssh source-host zfs recv -F zroot/home
 $ zfs rollback zroot/home@2026-05-03</code></pre>
       <p>
         <code>-F</code> on the receiving side forces a rollback of the destination to
-        match the incoming stream. Use it deliberately — it discards anything newer on
+        match the incoming stream. Use it deliberately, it discards anything newer on
         the destination.
       </p>
 
@@ -254,15 +254,15 @@ $ zfs rollback zroot/home@2026-05-03</code></pre>
         Most "backup" setups are really just snapshots on the same physical device. ZFS
         snapshots are wonderful, but they don't help when the disk dies, the building
         burns, or someone runs <code>zpool destroy</code> at the wrong shell. Send/recv
-        to a separate pool — ideally on a separate machine in a separate location — is
+        to a separate pool, ideally on a separate machine in a separate location, is
         the difference between "I have backups" and "I had backups, theoretically".
       </p>
 
       <h2>Where to Go Next</h2>
       <ul>
-        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a> — context for the homelab this backs up</li>
-        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a> — one ZFS dataset per jail; replication becomes per-jail</li>
-        <li><a href="freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a> — why ZFS being first-class on FreeBSD changes how you think about storage</li>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router</a>: context for the homelab this backs up</li>
+        <li><a href="freebsd-jails-network.html">FreeBSD Jails for Network Services</a>: one ZFS dataset per jail; replication becomes per-jail</li>
+        <li><a href="freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a>: why ZFS being first-class on FreeBSD changes how you think about storage</li>
       </ul>
 
       <p>
@@ -277,7 +277,7 @@ $ zfs rollback zroot/home@2026-05-03</code></pre>
     <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
       <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
       <p class="text-muted">
-        FreeBSD, pf, and SRE notes — straight to your inbox. No spam, just signal.
+        FreeBSD, pf, and SRE notes, straight to your inbox. No spam, just signal.
       </p>
       <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
       <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"

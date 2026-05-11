@@ -51,14 +51,14 @@
 
       <h2>Why Bare Metal?</h2>
       <p>
-        "Just use EKS/GKE/AKS" is common advice. And it's good advice — for teams that need
+        "Just use EKS/GKE/AKS" is common advice. And it's good advice, for teams that need
         managed control planes and have the budget for cloud pricing. But there are legitimate
         reasons to go bare metal:
       </p>
       <ul>
         <li><strong>Cost</strong>: My 3-node k8s cluster costs $0/month beyond electricity (~$30/month). An equivalent EKS setup runs $200-400/month.</li>
         <li><strong>Performance</strong>: No hypervisor overhead, no noisy neighbors, direct hardware access for storage I/O.</li>
-        <li><strong>Learning</strong>: You understand every layer — networking, storage, DNS, load balancing. Cloud providers abstract this away, which is fine until something breaks.</li>
+        <li><strong>Learning</strong>: You understand every layer: networking, storage, DNS, load balancing. Cloud providers abstract this away, which is fine until something breaks.</li>
         <li><strong>Control</strong>: Custom kernel parameters, real-time scheduling, GPU passthrough, specialized hardware.</li>
       </ul>
 
@@ -91,7 +91,7 @@ ostype: l26</code></pre>
         Run this on all three nodes. It installs containerd, kubeadm, kubelet, and kubectl.
       </p>
       <pre><code>#!/bin/bash
-# prepare-node.sh — Run on each k8s node
+# prepare-node.sh, Run on each k8s node
 
 # Disable swap
 swapoff -a
@@ -254,7 +254,7 @@ EOF</code></pre>
       <h2>Is It Worth It?</h2>
       <p>
         If your goal is production workloads with 99.99% SLA requirements, use a managed service.
-        If your goal is learning, home lab, cost savings, or full control — bare metal k8s is
+        If your goal is learning, home lab, cost savings, or full control, bare metal k8s is
         genuinely rewarding.
       </p>
       <p>
@@ -272,7 +272,7 @@ EOF</code></pre>
     <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
       <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
       <p class="text-muted">
-        SRE tips, infrastructure patterns, and NixOS guides — straight to your inbox. No spam, just signal.
+        SRE tips, infrastructure patterns, and NixOS guides, straight to your inbox. No spam, just signal.
       </p>
       <!-- Buttondown form. Replace BUTTONDOWN_USERNAME below with your account name. -->
       <form action="https://buttondown.email/api/emails/embed-subscribe/BUTTONDOWN_USERNAME"
