@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Building a FreeBSD pf Router - Michael Vivirito</title>
-  <meta name="description" content="A practical, opinionated guide to building a FreeBSD edge router from a 4-port mini PC. ZFS root, pf, unbound, and dhcpd, from boot media to a working gateway.">
-  <meta name="keywords" content="FreeBSD, pf, router, firewall, homelab, networking, unbound, dhcpd, ZFS, igc">
+  <title>Building a FreeBSD pf Router behind XGS-PON - Michael Vivirito</title>
+  <meta name="description" content="A practical, opinionated guide to building a FreeBSD 15 edge router on a CWWK N100 mini PC, with an X-ONU-SFPP XGS-PON SFP+ module taking the AT&T fiber directly. ZFS root, pf, unbound, ISC DHCP, and a VLAN, from boot media to a working gateway.">
+  <meta name="keywords" content="FreeBSD, pf, router, firewall, homelab, networking, unbound, dhcpd, ZFS, ix, XGS-PON, X-ONU-SFPP, AT&T bypass, CWWK, N100, VLAN, Sodola">
   <meta name="author" content="Michael Vivirito">
 
   <meta property="og:type" content="article">
-  <meta property="og:title" content="Building a FreeBSD pf Router">
-  <meta property="og:description" content="From boot media to a working FreeBSD edge router with pf, unbound, and dhcpd.">
+  <meta property="og:title" content="Building a FreeBSD pf Router behind XGS-PON">
+  <meta property="og:description" content="From boot media to a working FreeBSD 15 edge router with an XGS-PON SFP+ module replacing the ISP gateway. pf, unbound, ISC DHCP, and a VLAN trunk to a Sodola switch.">
   <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
 
   <link rel="stylesheet" type="text/css" href="../style.css">
@@ -36,13 +36,14 @@
 
   <article>
     <header style="text-align: center; margin-bottom: 3rem;">
-      <h1>Building a FreeBSD pf Router</h1>
+      <h1>Building a FreeBSD pf Router behind XGS-PON</h1>
       <p class="text-muted">
-        Published on <time datetime="2026-05-03">May 3, 2026</time>
+        Published on <time datetime="2026-05-10">May 10, 2026</time>
       </p>
       <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
-        <span class="badge">FreeBSD</span>
+        <span class="badge">FreeBSD 15</span>
         <span class="badge">pf</span>
+        <span class="badge">XGS-PON</span>
         <span class="badge">Networking</span>
         <span class="badge">Homelab</span>
       </div>
@@ -67,17 +68,29 @@
 
       <h2>Hardware Pick</h2>
       <p>
-        I'm boring on purpose:
+        I'm boring on purpose, with one specific upgrade over the usual 4-port mini-PC
+        recipe: dual SFP+ 10GbE so the WAN can be an XGS-PON SFP module instead of an
+        ISP gateway.
       </p>
       <ul>
-        <li><strong>Fanless 4-port mini PC</strong>, Intel N5105 or N100 class. Search
-            for "Protectli", "Topton", or "Qotom", many vendors sell variants of the same
-            reference design.</li>
-        <li><strong>4× Intel i225/i226 2.5 GbE NICs</strong>. These use the FreeBSD
-            <code>igc(4)</code> driver, which is in base.</li>
-        <li><strong>16 GB DDR4 SODIMM</strong>. 8 GB is plenty for a router, 16 GB leaves
-            headroom for jails and ZFS ARC.</li>
-        <li><strong>256 GB NVMe</strong>. Anything reputable. Routers don't write much.</li>
+        <li><strong>CWWK Intel Alder Lake N100 mini PC</strong> (4C/4T, up to 3.4 GHz),
+            8 GB DDR5, 128 GB NVMe. The exact model has dual SFP+ 10 GbE plus four
+            Intel I226-V 2.5 GbE ports, which gives you a 10G WAN and a 10G LAN trunk
+            with copper to spare.</li>
+        <li><strong>2x Intel SFP+ 10 GbE</strong>. The FreeBSD <code>ix(4)</code> driver
+            is in base. One port is the WAN (with the XGS-PON SFP module installed),
+            the other is the LAN trunk down to a managed switch.</li>
+        <li><strong>4x Intel I226-V 2.5 GbE</strong>. The <code>igc(4)</code> driver,
+            also in base. Useful for an OOB management LAN, a separate jail network, or
+            simply spare capacity.</li>
+        <li><strong>WAN ONT</strong>:
+            <a href="https://pon.wiki/category/bgw320-500/" target="_blank" rel="noopener noreferrer">X-ONU-SFPP</a>
+            XGS-PON SFP+ module, pre-flashed with the 8311 community firmware. Takes the
+            AT&amp;T fiber directly via SC/APC, slots into <code>ix0</code>, and lets the
+            FreeBSD box pull the public DHCP lease itself. Bring a USB-C cooler; these
+            modules run hot.</li>
+        <li><strong>Downstream switch</strong>: any decent managed switch with
+            802.1Q VLANs. I run a Sodola.</li>
       </ul>
       <p>
         Avoid Realtek NICs unless you enjoy writing forum posts. Intel chips are boring
@@ -86,15 +99,15 @@
 
       <h2>Install Media</h2>
       <p>
-        Grab the latest FreeBSD 14.x memstick image and write it to a USB drive:
+        Grab the latest FreeBSD 15.x memstick image and write it to a USB drive:
       </p>
       <pre><code># From a Linux/macOS box
-curl -OL https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/14.2/FreeBSD-14.2-RELEASE-amd64-memstick.img
-sudo dd if=FreeBSD-14.2-RELEASE-amd64-memstick.img of=/dev/sdX bs=1M status=progress conv=fsync</code></pre>
+curl -OL https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/15.0/FreeBSD-15.0-RELEASE-amd64-memstick.img
+sudo dd if=FreeBSD-15.0-RELEASE-amd64-memstick.img of=/dev/sdX bs=1M status=progress conv=fsync</code></pre>
       <p>
         Plug it in, boot the mini PC, and at the loader prompt drop into a serial console
-        if your hardware supports it (most fanless boxes do, via a DB9 or RJ45 console
-        port). Working over serial means you can recover from your own mistakes later.
+        if your hardware supports it (most of these boxes do, via a console port on the
+        front). Working over serial means you can recover from your own mistakes later.
       </p>
 
       <h2>Install: ZFS Root, Auto, with One Tweak</h2>
@@ -116,55 +129,77 @@ sudo dd if=FreeBSD-14.2-RELEASE-amd64-memstick.img of=/dev/sdX bs=1M status=prog
       <p>
         Before any configuration: figure out which physical port maps to which kernel
         interface name. <code>ifconfig</code> shows you the names; the labels on the case
-        tell you which is which. Plug a workstation into one port at a time and watch
-        which interface comes up.
+        tell you which is which. With this build the SFP+ ports come up as
+        <code>ix0</code> and <code>ix1</code>, and the four 2.5G copper ports come up as
+        <code>igc0</code> through <code>igc3</code>.
       </p>
       <pre><code>$ ifconfig -l
-igc0 igc1 igc2 igc3 lo0
+ix0 ix1 igc0 igc1 igc2 igc3 lo0
 
-$ ifconfig igc0 | grep status
+$ ifconfig ix0 | grep status
         status: active</code></pre>
       <p>
-        I conventionally use:
+        Convention I use:
       </p>
       <ul>
-        <li><code>igc0</code>: WAN</li>
-        <li><code>igc1</code>: trusted LAN</li>
-        <li><code>igc2</code>: servers / homelab</li>
-        <li><code>igc3</code>: IoT / quarantine</li>
+        <li><code>ix0</code>: WAN. The X-ONU-SFPP XGS-PON module lives in this slot, with the AT&amp;T fiber going straight into its SC/APC connector.</li>
+        <li><code>ix1</code>: LAN trunk down to the Sodola switch. Untagged traffic is the main LAN; VLAN 20 is tagged for a separate SSID/subnet.</li>
+        <li><code>igc0</code>-<code>igc3</code>: spare 2.5G ports, available for an OOB management LAN or future segmentation.</li>
       </ul>
+      <p>
+        Before you cable up the WAN, make sure the X-ONU-SFPP is configured for your ISP
+        per the
+        <a href="https://pon.wiki/category/bgw320-500/" target="_blank" rel="noopener noreferrer">pon.wiki</a>
+        guide. The SFP module does the PON-side authentication; FreeBSD just sees an
+        Ethernet link with DHCP behind it.
+      </p>
 
       <h2>/etc/rc.conf: the One File Most Routers Need</h2>
-      <pre><code>hostname="gw.lan"
+      <pre><code>hostname="homefw"
 zfs_enable="YES"
 
 # Forwarding both IP versions
 gateway_enable="YES"
 ipv6_gateway_enable="YES"
 
-# Interfaces
-ifconfig_igc0="DHCP"
-ifconfig_igc1="inet 10.10.10.1/24"
-ifconfig_igc2="inet 10.10.20.1/24"
-ifconfig_igc3="inet 10.10.30.1/24"
+# WAN: SFP+ port hosting the X-ONU-SFPP XGS-PON ONT
+ifconfig_ix0="DHCP"
+ifconfig_ix0_ipv6="inet6 accept_rtadv"
+background_dhclient_ix0="YES"   # XGS-PON DHCP can be slow at boot
+
+# LAN trunk and VLAN 20 (UniWork)
+ifconfig_ix1="inet 10.0.0.1 netmask 255.255.255.0"
+vlans_ix1="20"
+ifconfig_ix1_20="inet 10.20.0.1/24"
 
 # Firewall
 pf_enable="YES"
 pflog_enable="YES"
 
-# DNS resolver (FreeBSD's built-in unbound)
-local_unbound_enable="YES"
+# DNS resolver (unbound from pkg)
+unbound_enable="YES"
 
-# DHCP server (from pkg)
+# DHCP server (from pkg) on both LAN segments
 dhcpd_enable="YES"
-dhcpd_ifaces="igc1 igc2 igc3"
+dhcpd_ifaces="ix1 ix1.20"
 
 # Time
 ntpd_enable="YES"
 ntpd_sync_on_start="YES"
 
-# SSH (limit it later in pf.conf)
+# SSH (lock it down with pf, but enable here)
 sshd_enable="YES"</code></pre>
+      <p>
+        Two lines in there are load-bearing in non-obvious ways.
+        <code>background_dhclient_ix0="YES"</code> exists because the XGS-PON ONT can
+        take a few seconds to settle and hand out a lease at boot; without backgrounding
+        the dhclient call, the boot will block waiting for it, and that delay cascades
+        into ntpd, unbound, and (via missing host keys on first boot) sshd.
+        <code>vlans_ix1="20"</code> plus <code>ifconfig_ix1_20</code> create the
+        <code>ix1.20</code> interface during boot. If that interface doesn't exist
+        before pf loads, anything in pf that references it silently breaks, and the
+        VLAN clients have no internet even though the rules look fine.
+      </p>
       <p>
         Apply piecewise:
       </p>
@@ -179,20 +214,24 @@ $ sysctl net.inet6.ip6.forwarding=1</code></pre>
         keeps SSH and the LAN working, then iterate.
       </p>
       <pre><code># /etc/pf.conf, bootstrap, replace with the real ruleset later
-ext_if = "igc0"
-int_if = "{ igc1 igc2 igc3 }"
+ext_if = "ix0"
+lan_if = "ix1"
+vlan20_if = "ix1.20"
+lan_net = "10.0.0.0/24"
+vlan20_net = "10.20.0.0/24"
 
 set skip on lo0
 scrub in all
 
-# NAT outbound from any internal LAN
-nat on $ext_if from { 10.10.10.0/24 10.10.20.0/24 10.10.30.0/24 } to any -&gt; ($ext_if)
+# NAT outbound from both internal segments
+nat on $ext_if from { $lan_net $vlan20_net } to any -&gt; ($ext_if)
 
 # Default deny inbound on the WAN
 block in log on $ext_if all
 
-# Pass everything from internal networks (we'll tighten this later)
-pass in on $int_if from any to any keep state
+# Pass internal traffic outbound, stateful
+pass in on $lan_if    from $lan_net    to any keep state
+pass in on $vlan20_if from $vlan20_net to any keep state
 pass out all keep state</code></pre>
       <p>
         Validate before you load it:
@@ -201,23 +240,32 @@ pass out all keep state</code></pre>
 $ service pf start
 $ pfctl -s rules</code></pre>
       <p>
+        Order of operations matters here: the <code>ix1.20</code> interface has to exist
+        before pf parses this file, otherwise the macros referencing it fail to resolve
+        and the rules don't load. The rc.conf above brings the VLAN up during boot, so
+        a normal boot is fine; the gotcha appears when you create the VLAN by hand later
+        and forget to bring it up before reloading pf.
+      </p>
+      <p>
         See the <a href="pf-firewall-rules.html">pf.conf design article</a> for the
         production ruleset I actually use.
       </p>
 
       <h2>unbound: Local Recursive DNS</h2>
       <p>
-        FreeBSD ships <code>unbound</code> in base under the name <em>local_unbound</em>.
-        Set it up to listen on the LANs:
+        I run the full <code>unbound</code> from <code>pkg</code> rather than the base
+        <em>local_unbound</em>, mostly so its config lives in
+        <code>/usr/local/etc/unbound/</code> next to the rest of the pkg-managed services.
+        Either works. Have it listen on the LAN and the VLAN:
       </p>
-      <pre><code># /var/unbound/unbound.conf (managed by local-unbound-setup)
+      <pre><code># /usr/local/etc/unbound/unbound.conf (excerpt)
 server:
-  interface: 10.10.10.1
-  interface: 10.10.20.1
-  interface: 10.10.30.1
-  access-control: 127.0.0.0/8 allow
-  access-control: 10.10.0.0/16 allow
-  access-control: 0.0.0.0/0 refuse
+  interface: 10.0.0.1
+  interface: 10.20.0.1
+  access-control: 127.0.0.0/8  allow
+  access-control: 10.0.0.0/24  allow
+  access-control: 10.20.0.0/24 allow
+  access-control: 0.0.0.0/0    refuse
 
   hide-identity: yes
   hide-version: yes
@@ -228,8 +276,13 @@ server:
       <p>
         Restart:
       </p>
-      <pre><code>$ service local_unbound restart
-$ drill -u google.com @10.10.10.1   # check DNSSEC validation</code></pre>
+      <pre><code>$ service unbound restart
+$ drill -u google.com @10.0.0.1   # check DNSSEC validation</code></pre>
+      <p>
+        Operational note from experience: a symptom that looks like a firewall problem
+        ("ping works, web pages don't load") is almost always DNS in disguise. Check
+        unbound first, pf second.
+      </p>
 
       <h2>dhcpd: Leases for the LANs</h2>
       <pre><code># /usr/local/etc/dhcpd.conf (excerpt)
@@ -237,23 +290,18 @@ default-lease-time 3600;
 max-lease-time     86400;
 authoritative;
 
-subnet 10.10.10.0 netmask 255.255.255.0 {
-  range 10.10.10.100 10.10.10.200;
-  option routers 10.10.10.1;
-  option domain-name-servers 10.10.10.1;
+subnet 10.0.0.0 netmask 255.255.255.0 {
+  range 10.0.0.100 10.0.0.200;
+  option routers 10.0.0.1;
+  option domain-name-servers 10.0.0.1;
   option domain-name "lan";
 }
 
-subnet 10.10.20.0 netmask 255.255.255.0 {
-  range 10.10.20.100 10.10.20.200;
-  option routers 10.10.20.1;
-  option domain-name-servers 10.10.20.1;
-}
-
-subnet 10.10.30.0 netmask 255.255.255.0 {
-  range 10.10.30.100 10.10.30.200;
-  option routers 10.10.30.1;
-  option domain-name-servers 10.10.30.1;
+subnet 10.20.0.0 netmask 255.255.255.0 {
+  range 10.20.0.100 10.20.0.200;
+  option routers 10.20.0.1;
+  option domain-name-servers 10.20.0.1;
+  option domain-name "uniwork";
 }</code></pre>
 
       <h2>SSH: Belongs on the LAN, Not the WAN</h2>
@@ -266,7 +314,7 @@ PermitRootLogin no
 PasswordAuthentication no
 ChallengeResponseAuthentication no
 AllowUsers admin
-ListenAddress 10.10.10.1</code></pre>
+ListenAddress 10.0.0.1</code></pre>
 
       <h2>ZFS Boot Environments: Cheap Insurance</h2>
       <p>
@@ -286,14 +334,21 @@ $ shutdown -r now</code></pre>
 
       <h2>Smoke Test</h2>
       <p>
-        From a workstation on <code>igc1</code>:
+        From a workstation on the main LAN (downstream of the Sodola switch on
+        <code>ix1</code>):
       </p>
-      <pre><code>$ ping -c 3 10.10.10.1            # router LAN address
+      <pre><code>$ ping -c 3 10.0.0.1              # router LAN address
 $ ping -c 3 1.1.1.1               # outbound IP routing
 $ host www.freebsd.org            # outbound DNS
 $ traceroute www.freebsd.org      # full path</code></pre>
       <p>
-        If those four things work, you have a working FreeBSD edge router.
+        Then from a device on the UniWork SSID (VLAN 20, <code>10.20.0.0/24</code>),
+        repeat. Both should reach the internet; neither should reach into the other's
+        subnet without a deliberate pass rule.
+      </p>
+      <p>
+        If all of that works, you have a working FreeBSD edge router with the AT&amp;T
+        gateway out of the path.
       </p>
 
       <div style="background: var(--bg-surface); padding: 1rem; border: 1px solid var(--border-accent); border-left: 3px solid var(--accent-primary); margin: 1.5rem 0;">

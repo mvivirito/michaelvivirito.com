@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Homelab: FreeBSD pf Router - Michael Vivirito</title>
-  <meta name="description" content="A self-built FreeBSD edge router running pf, unbound, and dhcpd on dedicated hardware. The network at the core of my homelab, hardware, topology, and software stack.">
-  <meta name="keywords" content="FreeBSD, pf, firewall, router, homelab, networking, self-hosted, unbound, dhcpd, jails, ZFS, edge router">
+  <title>Homelab: FreeBSD pf Router behind XGS-PON - Michael Vivirito</title>
+  <meta name="description" content="A self-built FreeBSD 15 edge router on a CWWK N100 mini PC, sitting behind an X-ONU-SFPP XGS-PON SFP+ module with the AT&T gateway fully bypassed. pf, unbound, ISC DHCP, VLANs, and a Sodola switch downstream.">
+  <meta name="keywords" content="FreeBSD, pf, firewall, router, homelab, networking, self-hosted, unbound, dhcpd, jails, ZFS, edge router, XGS-PON, X-ONU-SFPP, AT&T bypass, OpenWRT, CWWK, Sodola, VLAN">
   <meta name="author" content="Michael Vivirito">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://michaelvivirito.com/homelab.html">
-  <meta property="og:title" content="Homelab, FreeBSD pf Router">
-  <meta property="og:description" content="A FreeBSD router with pf as the core of my homelab network, hardware, software, and operations.">
+  <meta property="og:title" content="Homelab: FreeBSD pf Router behind XGS-PON">
+  <meta property="og:description" content="FreeBSD 15 on a CWWK N100, behind an XGS-PON SFP+ ONT. AT&T gateway out of the path. pf, unbound, VLANs, and the operational lessons that came with the build.">
   <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
 
   <link rel="stylesheet" type="text/css" href="style.css">
@@ -41,11 +41,12 @@
     <header style="text-align: center; margin-bottom: 3rem;">
       <h1>Homelab: FreeBSD pf Router</h1>
       <p class="subtitle" style="color: var(--text-secondary); font-size: 1.1rem;">
-        A custom edge router running FreeBSD, pf, unbound, and dhcpd
+        FreeBSD 15 on a CWWK N100, behind an XGS-PON SFP+ module, with the AT&amp;T gateway out of the path
       </p>
       <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
-        <span class="badge">FreeBSD</span>
+        <span class="badge">FreeBSD 15</span>
         <span class="badge">pf</span>
+        <span class="badge">XGS-PON</span>
         <span class="badge">Networking</span>
         <span class="badge">Self-Hosted</span>
       </div>
@@ -55,9 +56,12 @@
     <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
       <h2>What This Is</h2>
       <p>
-        At the edge of my homelab is a small, fanless FreeBSD box that handles every packet
-        coming into and out of my network. It's the WAN router, the firewall, the DHCP and
-        DNS server, the VPN endpoint, and the boundary that everything else sits behind.
+        At the edge of my homelab is a small FreeBSD 15 box, hostname <code>homefw</code>,
+        that handles every packet coming into and out of my network. It's the WAN router,
+        the firewall, the DHCP and DNS server, the VPN endpoint, and the boundary that
+        everything else sits behind. The AT&amp;T fiber gateway is gone; an
+        <strong>X-ONU-SFPP XGS-PON SFP+ module</strong> takes the fiber directly and slots
+        into one of the box's 10G SFP+ ports, so the FreeBSD host gets the public IP itself.
       </p>
       <p>
         I built it instead of buying a turnkey router for the same reason I run NixOS on
@@ -89,11 +93,13 @@
     <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
       <h2>Hardware</h2>
       <ul>
-        <li><strong>Chassis</strong>: Fanless 4-port mini PC (Intel N5105/N100 class)</li>
-        <li><strong>NICs</strong>: 4× Intel i225/i226 2.5GbE (the <code>igc(4)</code> driver)</li>
-        <li><strong>Memory</strong>: 16 GB DDR4 SODIMM</li>
-        <li><strong>Storage</strong>: 256 GB NVMe with ZFS root and a boot environment</li>
-        <li><strong>Power</strong>: ~10 W idle, no moving parts</li>
+        <li><strong>Chassis</strong>: CWWK Intel Alder Lake N100 mini PC (4C/4T, up to 3.4 GHz)</li>
+        <li><strong>10G uplinks</strong>: Dual Intel SFP+ 10 GbE (the FreeBSD <code>ix(4)</code> driver). One hosts the XGS-PON ONT for WAN, the other carries the LAN trunk.</li>
+        <li><strong>2.5G ports</strong>: 4x Intel I226-V 2.5 GbE (the <code>igc(4)</code> driver). Spare today, useful for an OOB management LAN or a future split.</li>
+        <li><strong>Memory</strong>: 8 GB DDR5</li>
+        <li><strong>Storage</strong>: 128 GB NVMe with ZFS root and boot environments</li>
+        <li><strong>WAN ONT</strong>: <a href="https://pon.wiki/category/bgw320-500/" target="_blank" rel="noopener noreferrer">X-ONU-SFPP</a> XGS-PON SFP+ module, pre-flashed with the 8311 community firmware and the Azores bootloader. SC/APC connector takes the AT&amp;T fiber directly. Active USB-C cooler attached because these modules run hot.</li>
+        <li><strong>Switch downstream</strong>: Sodola managed switch carrying the LAN trunk and the VLAN 20 tag out to the UniFi APs</li>
       </ul>
       <p>
         Intel NICs matter. Realtek and other budget NICs technically work, but they
@@ -104,26 +110,45 @@
     <!-- Topology -->
     <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
       <h2>Network Topology</h2>
-      <pre><code>                 ┌─────────────────────┐
-                 │      Internet       │
-                 └──────────┬──────────┘
-                            │ igc0 (WAN)
-                 ┌──────────┴──────────┐
-                 │   FreeBSD Router    │
-                 │   pf · unbound      │
-                 │   dhcpd · ntpd      │
-                 └──┬─────┬─────┬──────┘
-            igc1   │     │     │  igc3
-        (LAN trust)│igc2 │     │ (IoT / quarantine)
-                   │ (servers)│
-        ┌──────────┴───┐ ┌────┴────────┐ ┌──────────┐
-        │ Workstations │ │ Homelab     │ │ IoT VLAN │
-        │ Phones / TV  │ │ Proxmox/K8s │ │ Cameras  │
-        └──────────────┘ └─────────────┘ └──────────┘</code></pre>
+      <pre><code>        ┌────────────────────────────────┐
+        │   AT&amp;T XGS-PON Fiber            │
+        │   (SC/APC, no ISP gateway)      │
+        └───────────────┬────────────────┘
+                        │
+        ┌───────────────▼────────────────┐
+        │  X-ONU-SFPP (XGS-PON SFP+ ONT) │
+        │  8311 firmware · Azores boot   │
+        └───────────────┬────────────────┘
+                        │ ix0 (WAN, 10G SFP+)
+        ┌───────────────▼────────────────┐
+        │   FreeBSD 15 Router (homefw)   │
+        │   pf · unbound · ISC dhcpd     │
+        └───────────────┬────────────────┘
+                        │ ix1 (LAN trunk, 10G SFP+)
+        ┌───────────────▼────────────────┐
+        │      Sodola Managed Switch     │
+        └──┬─────────────────────────┬───┘
+           │ untagged                │ VLAN 20 tagged
+        ┌──▼──────────┐         ┌────▼─────────┐
+        │ UniFi APs   │         │ UniFi APs    │
+        │ SSID:       │         │ SSID:        │
+        │ UniWorld    │         │ UniWork      │
+        │ 10.0.0.0/24 │         │ 10.20.0.0/24 │
+        │ (main LAN)  │         │ (ix1.20)     │
+        └──┬──────────┘         └──────────────┘
+           │
+        ┌──▼──────────────────┐
+        │ Wired LAN           │
+        │ Workstations        │
+        │ Servers / homelab   │
+        └─────────────────────┘</code></pre>
       <p>
-        Four physical interfaces, four broadcast domains. No VLAN trunking required for
-        the common case, physical separation is the simplest defense against
-        misconfiguration. IoT and trusted LAN traffic never share a wire.
+        One trunk down to the Sodola switch, two SSIDs out at the UniFi APs.
+        <strong>UniWorld</strong> is the main LAN, untagged on
+        <code>ix1</code>. <strong>UniWork</strong> is VLAN 20, terminated on
+        <code>ix1.20</code> with its own subnet, so devices on that SSID never share a
+        broadcast domain with the rest of the house and have to traverse pf to talk to
+        anything else.
       </p>
     </div>
 
@@ -131,17 +156,18 @@
     <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
       <h2>Software Stack</h2>
       <ul>
-        <li><strong>FreeBSD 14.x</strong>: base OS, ZFS root, GENERIC kernel</li>
-        <li><strong>pf</strong>: stateful firewall, NAT, anti-spoofing, queueing</li>
+        <li><strong>FreeBSD 15.0-RELEASE</strong> (pkgbase): base OS, ZFS root, GENERIC kernel</li>
+        <li><strong>pf</strong>: stateful firewall, NAT, anti-spoofing</li>
         <li><strong>unbound</strong>: local recursive DNS, DNSSEC validation, blocklists</li>
-        <li><strong>dhcpd</strong>: leases per LAN, static reservations for servers</li>
+        <li><strong>ISC dhcpd</strong>: leases on the main LAN and VLAN 20</li>
         <li><strong>ntpd</strong>: local NTP for the network</li>
         <li><strong>WireGuard</strong>: road-warrior VPN back into the LAN</li>
         <li><strong>iocage / bastille</strong>: jails for service isolation</li>
       </ul>
       <p>
-        Everything is in base or in <code>pkg</code>. No vendor binaries, no upstream-only
-        repos, no kernel modules I didn't build from source.
+        Everything is in base or in <code>pkg</code>. Running pkgbase means base updates
+        flow through the same package manager as everything else, which keeps the
+        boot-environment story clean.
       </p>
     </div>
 
@@ -149,28 +175,41 @@
     <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
       <h2>The Configuration, in Spirit</h2>
       <pre><code># /etc/rc.conf (excerpt)
-hostname="gw.lan"
+hostname="homefw"
 zfs_enable="YES"
 
-# Enable forwarding for both IP versions
+# Forwarding for v4 and v6
 gateway_enable="YES"
 ipv6_gateway_enable="YES"
 
-# Interfaces
-ifconfig_igc0="DHCP"
-ifconfig_igc1="inet 10.10.10.1/24"
-ifconfig_igc2="inet 10.10.20.1/24"
-ifconfig_igc3="inet 10.10.30.1/24"
+# WAN: SFP+ port hosting the X-ONU-SFPP XGS-PON ONT
+ifconfig_ix0="DHCP"
+ifconfig_ix0_ipv6="inet6 accept_rtadv"
+background_dhclient_ix0="YES"   # XGS-PON DHCP can be slow at boot
+
+# LAN trunk and VLAN 20 (UniWork)
+ifconfig_ix1="inet 10.0.0.1 netmask 255.255.255.0"
+vlans_ix1="20"
+ifconfig_ix1_20="inet 10.20.0.1/24"
 
 # Services
 pf_enable="YES"
 pflog_enable="YES"
-local_unbound_enable="YES"
+unbound_enable="YES"
 dhcpd_enable="YES"
-ntpd_enable="YES"
+dhcpd_ifaces="ix1 ix1.20"
 sshd_enable="YES"</code></pre>
       <p>
-        That's the core. Most of the rest is in <code>/etc/pf.conf</code>, see the
+        Two lines worth flagging. <code>background_dhclient_ix0="YES"</code> is the line
+        that fixed a class of boot-time bugs: the XGS-PON ONT sometimes takes a few
+        seconds to settle and hand out a DHCP lease, and without backgrounding the boot
+        would hang waiting for it, dragging ntpd, unbound, and even sshd down with it.
+        The VLAN pair (<code>vlans_ix1</code> plus <code>ifconfig_ix1_20</code>) is what
+        creates the <code>ix1.20</code> interface; if that interface doesn't exist before
+        pf loads, anything in pf that references it silently breaks.
+      </p>
+      <p>
+        Most of the rest is in <code>/etc/pf.conf</code>, see the
         <a href="articles/pf-firewall-rules.html">pf rules deep dive</a> for the full
         ruleset and the reasoning behind it.
       </p>

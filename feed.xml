@@ -17,11 +17,11 @@
     </item>
 
     <item>
-      <title>Building a FreeBSD pf Router</title>
+      <title>Building a FreeBSD pf Router behind XGS-PON</title>
       <link>https://michaelvivirito.com/articles/freebsd-pf-router.html</link>
       <guid isPermaLink="true">https://michaelvivirito.com/articles/freebsd-pf-router.html</guid>
-      <pubDate>Sun, 03 May 2026 14:00:00 GMT</pubDate>
-      <description>A practical, opinionated guide to building a FreeBSD edge router from a 4-port mini PC. ZFS root, pf, unbound, and dhcpd, from boot media to a working gateway.</description>
+      <pubDate>Sun, 10 May 2026 14:00:00 GMT</pubDate>
+      <description>A practical, opinionated guide to building a FreeBSD 15 edge router on a CWWK N100 mini PC, with an X-ONU-SFPP XGS-PON SFP+ module taking the AT&amp;T fiber directly. ZFS root, pf, unbound, ISC DHCP, and a VLAN, from boot media to a working gateway.</description>
     </item>
 
     <item>
