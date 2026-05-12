@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bypassing the AT&T Fiber Gateway with an XGS-PON SFP+ Module - Michael Vivirito</title>
+  <meta name="description" content="A practical write-up of replacing the AT&T BGW320-500 fiber gateway with an X-ONU-SFPP XGS-PON SFP+ module plugged directly into a FreeBSD 15 router. Hardware, prep, FreeBSD-side configuration, boot-timing gotchas, and rollback notes.">
+  <meta name="keywords" content="XGS-PON, X-ONU-SFPP, AT&T, BGW320, BGW320-500, fiber bypass, ONT, 8311, Azores, pon.wiki, FreeBSD, ix, SFP+, CWWK, homelab, DHCP">
+  <meta name="author" content="Michael Vivirito">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Bypassing the AT&T Fiber Gateway with an XGS-PON SFP+ Module">
+  <meta property="og:description" content="The X-ONU-SFPP took the AT&T fiber straight into a 10G SFP+ port on the FreeBSD edge router. Here is the build, the prep, and the FreeBSD-side configuration.">
+  <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <nav>
+    <ul>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../openworld.html">OpenWorld</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../resume.html">Resume</a></li>
+      <li><a href="../index.html#projects">Projects</a></li>
+      <li><a href="../index.html#blog">Blog</a></li>
+      <li><a href="../homelab.html">Homelab</a></li>
+      <li><a href="../now.html">Now</a></li>
+      <li><a href="../uses.html">Uses</a></li>
+      <li><a href="../visuals.html">Visuals</a></li>
+      <li><a href="../contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+  <article>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>Bypassing the AT&amp;T Fiber Gateway with an XGS-PON SFP+ Module</h1>
+      <p class="text-muted">
+        Published on <time datetime="2026-05-10">May 10, 2026</time>
+      </p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+        <span class="badge">XGS-PON</span>
+        <span class="badge">AT&amp;T</span>
+        <span class="badge">FreeBSD</span>
+        <span class="badge">Networking</span>
+        <span class="badge">Homelab</span>
+      </div>
+    </header>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <h2>The Goal</h2>
+      <p>
+        Take the AT&amp;T BGW320-500 fiber gateway out of the path entirely, and let
+        the FreeBSD edge router pull the public DHCP lease itself. No passthrough mode,
+        no double NAT, no extra hop, no vendor box quietly running its own software
+        between me and the wire. Just fiber, an SFP+ ONT, and FreeBSD.
+      </p>
+      <p>
+        The hardware that makes this practical is the
+        <a href="https://pon.wiki/category/bgw320-500/" target="_blank" rel="noopener noreferrer">X-ONU-SFPP</a>,
+        an XGS-PON SFP+ module (a WAS-110 alternative) sold pre-flashed with the
+        8311 community firmware and the Azores bootloader. It speaks XGS-PON on the
+        fiber side and presents itself as a 10G Ethernet link on the SFP+ side. Drop
+        it into a 10G port on a router or switch and the host gets the WAN. That's it.
+      </p>
+
+      <h2>Before and After</h2>
+      <pre><code>Before
+======
+AT&amp;T fiber  ->  BGW320-500 (gateway)  ->  Ethernet  ->  FreeBSD (LAN-side IP)
+                  ^ vendor NAT, vendor firewall, vendor admin UI
+                  ^ public IP lives here
+
+After
+=====
+AT&amp;T fiber  ->  X-ONU-SFPP  ->  ix0 SFP+ on FreeBSD (homefw)
+                                  ^ FreeBSD pulls the public DHCP lease itself
+                                  ^ pf is the only firewall in the path</code></pre>
+
+      <h2>Bill of Materials</h2>
+      <ul>
+        <li><strong><a href="https://pon.wiki/category/bgw320-500/" target="_blank" rel="noopener noreferrer">X-ONU-SFPP</a></strong> XGS-PON SFP+ ONT module, SC/APC connector, 1270nm up / 1577nm down, pre-flashed with the 8311 community firmware and the Azores bootloader. PRX126 SoC, 1 GB RAM, 128 MB NAND. WAS-110 compatible.</li>
+        <li><strong>USB-C active cooler for the SFP module.</strong> Both the WAS-110 and the X-ONU-SFPP run hot. The pon.wiki shop sells a clip-on cooler; community DIY options exist. Skip cooling at your own risk.</li>
+        <li><strong>10G SFP+ host.</strong> Anything with an SFP+ port that accepts the module: a router, a managed switch, or a NIC. In my case it's the SFP+ port on a CWWK Intel N100 mini PC running FreeBSD 15.</li>
+        <li><strong>SC/APC fiber to whatever you currently have on the wall</strong>. AT&amp;T's drop is SC/APC, and the X-ONU-SFPP takes SC/APC directly. If you have an existing patch you may need an APC-to-APC coupler.</li>
+        <li><strong>The AT&amp;T gateway you're about to retire.</strong> You still need it for the prep step.</li>
+      </ul>
+
+      <h2>The Prep: What to Pull Off the AT&amp;T Gateway</h2>
+      <p>
+        AT&amp;T's PON authentication needs three things tied to your BGW320-500:
+        the GPON / XGS-PON serial number, the MAC address it advertises, and an
+        EAP-TLS certificate / private key pair. Without those, OLT-side
+        authentication will quietly refuse the new module and you'll see no link.
+      </p>
+      <p>
+        The 8311 community has built up a thorough, regularly updated set of guides
+        for extracting these from the BGW320-500. Rather than re-paste a procedure
+        that changes with each AT&amp;T firmware push, I'll point at the source:
+      </p>
+      <ul>
+        <li><a href="https://pon.wiki/category/bgw320-500/" target="_blank" rel="noopener noreferrer">pon.wiki, BGW320-500 category</a>: the canonical guides for cert and serial extraction.</li>
+        <li><a href="https://github.com/8311-Community" target="_blank" rel="noopener noreferrer">8311-Community on GitHub</a>: tooling, firmware, and discussion.</li>
+      </ul>
+      <p>
+        The exact button-mash sequence on the BGW depends on its current firmware
+        version, so check the latest pon.wiki post for your specific case. What you'll
+        come away with is a small bundle of files and identifiers that get loaded
+        onto the X-ONU-SFPP via its 8311 web UI.
+      </p>
+
+      <h2>Configuring the SFP Module</h2>
+      <p>
+        The X-ONU-SFPP boots into an OpenWRT-derived environment with a 8311 web UI.
+        Once it's powered up (an SFP+ slot supplies enough power; the USB-C cooler
+        fan needs its own cable) you reach the UI by setting your laptop or
+        workstation to the same management subnet (the module ships with
+        <code>192.168.11.1</code> by default) and opening a browser.
+      </p>
+      <p>
+        Inside the UI, paste in the cert/key pair, the PON serial, and the MAC
+        address you pulled from the BGW. The 8311 firmware exposes the right fields
+        directly; pon.wiki's screenshots make this hard to mess up. Save, reboot the
+        module, and confirm in the UI logs that authentication succeeds and a PON
+        link comes up.
+      </p>
+      <p>
+        At this point you can already cable the SFP module to the fiber and watch
+        for an OLT-authenticated link, before involving FreeBSD at all. That's the
+        single best test point in the whole project.
+      </p>
+
+      <h2>Wiring It In</h2>
+      <p>
+        Pull the BGW320 out of the path:
+      </p>
+      <ol>
+        <li>Disconnect the fiber drop from the BGW.</li>
+        <li>Plug the X-ONU-SFPP into the SFP+ port on the FreeBSD box (in my case <code>ix0</code>).</li>
+        <li>Plug the fiber drop into the X-ONU-SFPP's SC/APC port.</li>
+        <li>Power the USB-C cooler.</li>
+      </ol>
+      <p>
+        The order matters: the module should be in the host before the fiber goes
+        in, so you can watch the link come up on the host and aren't squinting at
+        the module's LEDs in a closet.
+      </p>
+
+      <h2>FreeBSD-Side Config</h2>
+      <p>
+        With the module installed in <code>ix0</code>, the FreeBSD config to pull a
+        public DHCP lease is small. The pieces below are the WAN-relevant lines from
+        my <code>/etc/rc.conf</code>; the rest of the
+        <a href="freebsd-pf-router.html">router build</a> is unchanged.
+      </p>
+      <pre><code># /etc/rc.conf, WAN-side excerpt
+
+# WAN: SFP+ port hosting the X-ONU-SFPP
+ifconfig_ix0="DHCP"
+ifconfig_ix0_ipv6="inet6 accept_rtadv"
+background_dhclient_ix0="YES"   # XGS-PON DHCP can be slow at boot</code></pre>
+      <p>
+        The <code>background_dhclient_ix0="YES"</code> line is the one that fixed
+        a class of boot-time bugs for me, and it's worth its own paragraph. The
+        X-ONU-SFPP doesn't always finish PON authentication and DHCP in the second
+        or two between when the kernel brings <code>ix0</code> up and when rc.d
+        wants to start the rest of the network-dependent services. Without
+        backgrounding the dhclient call, boot blocks waiting for a lease that's
+        about to arrive, and the wait takes long enough that ntpd, unbound, and
+        even sshd all try to come up against a half-configured stack. Backgrounding
+        the WAN dhclient lets boot continue normally; the lease lands a beat later
+        and everything settles.
+      </p>
+
+      <h2>Bringing the Link Up</h2>
+      <pre><code>$ service netif restart
+$ ifconfig ix0
+ix0: flags=8943&lt;UP,BROADCAST,RUNNING,...,MULTICAST&gt; metric 0 mtu 1500
+        inet 104.10.x.y netmask 0xfffffc00 broadcast 104.10.x.255
+        inet6 fe80::%ix0 prefixlen 64 scopeid 0x1
+        ...
+        media: Ethernet autoselect (10Gbase-LR &lt;full-duplex&gt;)
+        status: active
+
+$ netstat -rn | head -5
+Routing tables
+
+Internet:
+Destination        Gateway            Flags     Netif Expire
+default            104.10.x.1         UGS         ix0</code></pre>
+      <p>
+        That's a working WAN. From here, every other piece of the
+        <a href="homelab.html">homelab tour</a> is the same as it was when the BGW
+        was upstream: pf rules, DHCP server on the LAN side, unbound, IPv6 RA
+        acceptance.
+      </p>
+
+      <h2>What Could Go Wrong (and Where to Look)</h2>
+      <ul>
+        <li><strong>No PON link on the module.</strong> Check the 8311 web UI logs
+            for authentication errors. The most common cause is a mismatch between
+            the cert/key bundle and the serial number / MAC. Re-extract from the
+            BGW if in doubt.</li>
+        <li><strong>PON link up but no DHCP lease on the host.</strong>
+            <code>tcpdump -ni ix0 'udp port 67 or udp port 68'</code> to see whether
+            DISCOVER packets are leaving and OFFERs are coming back. If DISCOVER
+            is silent, suspect the host (interface up?
+            <code>net.inet.ip.forwarding</code> set?). If OFFER never arrives,
+            that's an OLT-side issue, usually authentication.</li>
+        <li><strong>Lease arrives, internet doesn't.</strong> Confirm the default
+            route lands on <code>ix0</code>, then check pf isn't blocking outbound
+            (the XGS-PON swap shouldn't change that, but it's worth ruling out).
+            <code>pfctl -s rules | head</code> and
+            <code>ping -S &lt;ix0-ip&gt; 1.1.1.1</code> are the two fastest tests.</li>
+        <li><strong>Slow boot, ntpd / unbound / sshd unhappy.</strong> You forgot
+            <code>background_dhclient_ix0="YES"</code>. Add it, reboot, watch the
+            problem evaporate.</li>
+        <li><strong>Module getting hot.</strong> If the module starts dropping the
+            link after it's been up for a while, check the cooler fan. The X-ONU-SFPP
+            is the densest piece of silicon in the build by a long way.</li>
+      </ul>
+
+      <h2>Rollback Plan</h2>
+      <p>
+        Keep the BGW320 in the closet, untouched, until you've been on the bypass
+        for a couple of weeks. Reverting is just: power down the FreeBSD box, pull
+        the X-ONU-SFPP, plug the fiber back into the BGW, power the BGW. The whole
+        round-trip is on the order of five minutes. The new setup is reliable, but
+        nothing about a residential ISP is friendly to "I broke the WAN at 11pm",
+        so the safety net is cheap.
+      </p>
+
+      <h2>Why It's Worth It</h2>
+      <p>
+        The replacement isn't about saving money (the X-ONU-SFPP costs more than
+        the BGW does to rent for a year), and it isn't about throughput (XGS-PON
+        was already 10G capable behind the BGW). It's about removing a piece of
+        opaque vendor software from the data path on my own home network, and
+        putting the public IP, the firewall, and the routing in one place I
+        actually control. After the swap, every packet between my LAN and the
+        internet crosses exactly one box I built, and that's the whole point.
+      </p>
+
+      <h2>Where to Go Next</h2>
+      <ul>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router behind XGS-PON</a>: the host this WAN attaches to, including the rc.conf and pf.conf in full.</li>
+        <li><a href="../homelab.html">Homelab Tour</a>: the rest of the network downstream of <code>ix0</code>.</li>
+        <li><a href="freebsd-ipv6-router.html">IPv6 for Home Networks</a>: native v6 once the bypass is in.</li>
+        <li><a href="https://pon.wiki/category/bgw320-500/" target="_blank" rel="noopener noreferrer">pon.wiki, BGW320-500 category</a>: the canonical reference for the module-side prep.</li>
+      </ul>
+
+      <p>
+        Running the same module on a different ISP, or doing the same kind of
+        bypass on a different gateway? <a href="../contact.html">Drop me a note</a>;
+        I want to hear how the FreeBSD-side story changes.
+      </p>
+
+    </div>
+
+    <!-- Newsletter CTA -->
+    <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
+      <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
+      <p class="text-muted">
+        FreeBSD, pf, and SRE notes, straight to your inbox. No spam, just signal.
+      </p>
+      <form action="https://buttondown.email/api/emails/embed-subscribe/mvivirito"
+            method="post" target="popupwindow"
+            onsubmit="window.open('https://buttondown.email/mvivirito', 'popupwindow')"
+            style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+        <input type="email" name="email" placeholder="you@example.com" required
+               style="flex: 1; min-width: 200px; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
+        <button type="submit" class="btn btn-primary" style="cursor: pointer;">Subscribe</button>
+      </form>
+      <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 0; margin-top: 0.5rem;">
+        Powered by <a href="https://buttondown.email" target="_blank" rel="noopener noreferrer">Buttondown</a>. Unsubscribe anytime. ~2 emails/month. Or grab the <a href="../feed.xml">RSS feed</a>.
+      </p>
+    </div>
+
+    <!-- Related -->
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <h3>Related Posts</h3>
+      <ul>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router behind XGS-PON</a></li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a></li>
+        <li><a href="freebsd-ipv6-router.html">IPv6 for Home Networks: A FreeBSD Walkthrough</a></li>
+        <li><a href="ipv6-prefix-delegation-troubleshooting.html">IPv6 Prefix Delegation: A Troubleshooting Cookbook</a></li>
+      </ul>
+    </div>
+
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <p class="text-center">
+        <a href="../index.html#blog" class="btn btn-secondary">← Back to Blog</a>
+      </p>
+    </div>
+
+  </article>
+
+  <footer>
+    <p>
+      <a href="../index.html">Home</a> •
+      <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a> •
+      <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </p>
+    <p class="text-muted" style="margin-top: 1rem; font-size: 0.875rem;">
+      © 2026 Michael Vivirito
+    </p>
+  </footer>
+
+</body>
+</html>

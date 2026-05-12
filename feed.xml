@@ -5,8 +5,16 @@
     <link>https://michaelvivirito.com</link>
     <description>OpenWorld, civic action, FreeBSD, networking, and SRE writing. Building tools and writing about infrastructure.</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 06 May 2026 12:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 10 May 2026 15:00:00 GMT</lastBuildDate>
     <atom:link href="https://michaelvivirito.com/feed.xml" rel="self" type="application/rss+xml"/>
+
+    <item>
+      <title>Bypassing the AT&amp;T Fiber Gateway with an XGS-PON SFP+ Module</title>
+      <link>https://michaelvivirito.com/articles/xgs-pon-bypass-att-gateway.html</link>
+      <guid isPermaLink="true">https://michaelvivirito.com/articles/xgs-pon-bypass-att-gateway.html</guid>
+      <pubDate>Sun, 10 May 2026 15:00:00 GMT</pubDate>
+      <description>A practical write-up of replacing the AT&amp;T BGW320-500 fiber gateway with an X-ONU-SFPP XGS-PON SFP+ module plugged directly into a FreeBSD 15 router. Hardware, prep, FreeBSD-side configuration, boot-timing gotchas, and rollback notes.</description>
+    </item>
 
     <item>
       <title>Truly Open-Sourcing the World</title>

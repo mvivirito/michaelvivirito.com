@@ -65,18 +65,11 @@ git push -u origin <branch-name>
 
 ## Newsletter
 
-The newsletter form across the site is wired to [Buttondown](https://buttondown.email).
-Before it works in production, replace the placeholder username:
-
-```bash
-# Replace BUTTONDOWN_USERNAME with your actual Buttondown account name
-grep -rl BUTTONDOWN_USERNAME --include="*.html" .
-# Then sed/edit those files to substitute the real username
-```
-
-Until that's done, submitting the form will hit a 404 on Buttondown's API, so
-either swap the username or drop the form entirely if you don't intend to run
-a newsletter.
+The newsletter form across the site is wired to
+[Buttondown](https://buttondown.email/mvivirito) under the `mvivirito` account.
+The same snippet (form + `~2 emails/month` blurb) is embedded on `index.html`,
+in `articles/_template.html`, and in every published article so new posts
+inherit it automatically.
 
 ## ✍️ Adding New Articles
 

@@ -99,7 +99,7 @@
         <li><strong>Memory</strong>: 8 GB DDR5</li>
         <li><strong>Storage</strong>: 128 GB NVMe with ZFS root and boot environments</li>
         <li><strong>WAN ONT</strong>: <a href="https://pon.wiki/category/bgw320-500/" target="_blank" rel="noopener noreferrer">X-ONU-SFPP</a> XGS-PON SFP+ module, pre-flashed with the 8311 community firmware and the Azores bootloader. SC/APC connector takes the AT&amp;T fiber directly. Active USB-C cooler attached because these modules run hot.</li>
-        <li><strong>Switch downstream</strong>: Sodola managed switch carrying the LAN trunk and the VLAN 20 tag out to the UniFi APs</li>
+        <li><strong>Switch downstream</strong>: <a href="https://a.co/d/0bHmg42w" target="_blank" rel="noopener noreferrer">Sodola 12-port 10G managed switch</a> (8x SFP+ / 4x 10GBase-T, 1U), carrying the LAN trunk and the VLAN 20 tag out to the UniFi APs</li>
       </ul>
       <p>
         Intel NICs matter. Realtek and other budget NICs technically work, but they
@@ -238,7 +238,8 @@ sshd_enable="YES"</code></pre>
     <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
       <h2>Articles in This Series</h2>
       <ul>
-        <li><a href="articles/freebsd-pf-router.html">Building a FreeBSD pf Router</a>: hardware, install, and first-boot configuration</li>
+        <li><a href="articles/xgs-pon-bypass-att-gateway.html">Bypassing the AT&amp;T Fiber Gateway with an XGS-PON SFP+ Module</a>: how the AT&amp;T BGW320-500 came out of the path and the X-ONU-SFPP went into <code>ix0</code></li>
+        <li><a href="articles/freebsd-pf-router.html">Building a FreeBSD pf Router behind XGS-PON</a>: hardware, install, and first-boot configuration on the host this WAN attaches to</li>
         <li><a href="articles/pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a>: rule design, NAT, anti-spoofing, and a real config</li>
         <li><a href="articles/freebsd-jails-network.html">FreeBSD Jails for Network Services</a>: using VNET jails to isolate DNS, monitoring, and VPN</li>
         <li><a href="articles/freebsd-ipv6-router.html">IPv6 for Home Networks: A FreeBSD Walkthrough</a>: DHCPv6-PD, rtadvd, and v6-aware pf rules</li>
