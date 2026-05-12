@@ -4,22 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- EDIT THIS: Article title -->
+  <!-- EDIT: Article title (also update <h1>, og:title, twitter:title below) -->
   <title>Your Article Title - Michael Vivirito</title>
 
-  <!-- EDIT THIS: Article description for SEO -->
-  <meta name="description" content="Brief description of your article for search engines and social media.">
+  <!-- EDIT: One sentence description for SEO and social cards -->
+  <meta name="description" content="One-sentence description of what this article covers and who it's for.">
 
-  <!-- EDIT THIS: Article keywords -->
+  <!-- EDIT: Comma-separated keywords -->
   <meta name="keywords" content="keyword1, keyword2, keyword3">
 
   <meta name="author" content="Michael Vivirito">
 
-  <!-- Open Graph / Social Media -->
+  <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:title" content="Your Article Title">
-  <meta property="og:description" content="Brief description of your article.">
+  <meta property="og:description" content="One-sentence description for social sharing.">
   <meta property="og:image" content="https://michaelvivirito.com/pix/portrait.jpg">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@mvivirito">
+  <meta name="twitter:creator" content="@mvivirito">
+  <meta name="twitter:title" content="Your Article Title">
+  <meta name="twitter:description" content="One-sentence description for social sharing.">
+  <meta name="twitter:image" content="https://michaelvivirito.com/pix/portrait.jpg">
 
   <link rel="stylesheet" type="text/css" href="../style.css">
   <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
@@ -43,115 +51,146 @@
     </ul>
   </nav>
 
-  <!-- Article Header -->
   <article>
+
+    <!-- =============================================================== -->
+    <!-- Header: title, date, badges                                     -->
+    <!-- =============================================================== -->
     <header style="text-align: center; margin-bottom: 3rem;">
-      <!-- EDIT THIS: Article title -->
+      <!-- EDIT: H1 should match <title> -->
       <h1>Your Article Title Here</h1>
 
-      <!-- EDIT THIS: Publication date -->
+      <!-- EDIT: Publication date (datetime is YYYY-MM-DD; visible text is human-readable) -->
       <p class="text-muted">
-        Published on <time datetime="2024-01-01">January 1, 2024</time>
+        Published on <time datetime="2026-05-10">May 10, 2026</time>
       </p>
 
-      <!-- OPTIONAL: Tags/categories -->
+      <!-- EDIT: 3-5 badges. Common palette:
+           FreeBSD · pf · Networking · Homelab · Self-Hosted · IPv6 ·
+           ZFS · WireGuard · Kubernetes · NixOS · AWS · DevOps · Tutorial -->
       <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
-        <span class="badge">Tutorial</span>
-        <span class="badge">Linux</span>
-        <span class="badge">AWS</span>
+        <span class="badge">FreeBSD</span>
+        <span class="badge">Networking</span>
+        <span class="badge">Homelab</span>
       </div>
     </header>
 
-    <!-- Article Content -->
+    <!-- =============================================================== -->
+    <!-- Article body                                                    -->
+    <!-- Section structure follows the build/howto pattern used across   -->
+    <!-- the site. Keep, drop, or reorder sections as the post needs.    -->
+    <!-- =============================================================== -->
     <div class="card" style="max-width: 800px; margin: 0 auto;">
 
-      <!-- EDIT BELOW: Your article content starts here -->
-
-      <h2>Introduction</h2>
+      <!-- 1. Hook: What This Is / The Goal / Why You're Reading -->
+      <h2>What This Is</h2>
       <p>
-        Start your article with an engaging introduction. Explain what the reader will learn
-        and why this topic is important or interesting.
+        Open with a single short paragraph that says what the post covers and
+        what problem it solves. The reader should know inside two sentences
+        whether to keep reading.
       </p>
 
-      <h2>Main Section</h2>
+      <!-- 2. Why: motivation, context, prior art -->
+      <h2>Why Bother</h2>
       <p>
-        This is where you write the main content of your article. You can use various HTML elements:
+        One or two paragraphs on motivation. Often this is "the obvious commercial
+        option doesn't fit my constraints" or "the standard guide skips the part I
+        kept getting stuck on". Be specific; vague motivation reads like filler.
       </p>
 
-      <h3>Subsection Example</h3>
-      <p>
-        Break down complex topics into digestible subsections. Use headings to organize your content.
-      </p>
-
-      <h3>Code Examples</h3>
-      <p>
-        When sharing code, use the <code>&lt;pre&gt;</code> and <code>&lt;code&gt;</code> tags:
-      </p>
-
-      <pre><code># Example bash command
-echo "Hello, World!"
-
-# Multi-line code example
-for i in {1..5}; do
-  echo "Number: $i"
-done</code></pre>
-
-      <p>
-        For inline code, use the <code>&lt;code&gt;</code> tag: <code>sudo apt update</code>
-      </p>
-
-      <h3>Lists</h3>
-      <p>You can create ordered or unordered lists:</p>
-
+      <!-- 3. Bill of Materials / Hardware / Prerequisites
+           Drop this section for software-only or pure-opinion posts. -->
+      <h2>Bill of Materials</h2>
       <ul>
-        <li>First bullet point</li>
-        <li>Second bullet point</li>
-        <li>Third bullet point with <strong>emphasis</strong></li>
+        <li><strong>Item one</strong>: what it is and why this specific one.</li>
+        <li><strong>Item two</strong>: same.</li>
+        <li><strong>Item three</strong>: same.</li>
       </ul>
 
-      <ol>
-        <li>First numbered step</li>
-        <li>Second numbered step</li>
-        <li>Third numbered step</li>
-      </ol>
-
-      <h3>Images</h3>
-      <p>Add images to your articles (place images in the <code>articles/pix/</code> directory):</p>
-
-      <figure>
-        <img src="pix/portrait.jpg" alt="Descriptive alt text">
-        <figcaption>Caption describing the image</figcaption>
-      </figure>
-
-      <h3>Important Notes</h3>
+      <!-- 4. Step-by-step. One <h2> per phase, narrative inside.
+           Code blocks are <pre><code>...</code></pre>. Inline code uses <code>. -->
+      <h2>Step One: First Phase</h2>
       <p>
-        Use <strong>strong tags</strong> for emphasis and <em>em tags</em> for italics.
-        You can also create blockquotes:
+        Explain the intent of the step before the commands, not after. The reader
+        is going to run these in a terminal in 30 seconds; they need the why
+        first so they can decide whether your situation matches theirs.
       </p>
+      <pre><code># Comments explain non-obvious flags
+$ command --flag value
+$ another-command | piped-thing</code></pre>
 
+      <h2>Step Two: Second Phase</h2>
+      <p>
+        Same shape. If a step has a single load-bearing line ("this one knob is
+        the whole post"), call it out in its own paragraph after the code block
+        rather than burying it in a list.
+      </p>
+      <pre><code>$ short snippet
+$ another snippet</code></pre>
+
+      <h2>Step Three: Configuration File</h2>
+      <p>
+        For full config files, name the path in a comment at the top so a reader
+        skimming the post can identify where the snippet belongs.
+      </p>
+      <pre><code># /etc/example.conf
+key = "value"
+another_key = "another value"</code></pre>
+
+      <!-- 5. Smoke test / Verification: how the reader knows it worked -->
+      <h2>Smoke Test</h2>
+      <p>
+        Three or four commands the reader can run to confirm the setup works.
+        Show expected output where it adds clarity.
+      </p>
+      <pre><code>$ test-command
+expected output here
+$ another-test
+expected output here</code></pre>
+
+      <!-- 6. Common Pitfalls / Troubleshooting
+           A bullet list of "if you see X, the cause is usually Y". -->
+      <h2>Common Pitfalls</h2>
+      <ul>
+        <li><strong>Symptom one.</strong> Cause and fix in one sentence.</li>
+        <li><strong>Symptom two.</strong> Cause and fix in one sentence.</li>
+        <li><strong>Symptom three.</strong> Cause and fix in one sentence.</li>
+      </ul>
+
+      <!-- 7. Optional callout box for an important warning or insight -->
       <div style="background: var(--bg-surface); padding: 1rem; border: 1px solid var(--border-accent); border-left: 3px solid var(--accent-primary); margin: 1.5rem 0;">
         <p style="margin: 0;">
-          <strong>NOTE:</strong> Use styled divs like this for callouts, tips, or important notes that should stand out from regular content.
+          <strong>Heads-up:</strong> Use a callout like this for the one thing the
+          reader will regret missing. Don't overuse callouts; they stop being
+          load-bearing the moment they're decoration.
         </p>
       </div>
 
-      <h2>Conclusion</h2>
-      <p>
-        Wrap up your article with a conclusion. Summarize the key points and provide
-        next steps or additional resources if applicable.
-      </p>
+      <!-- 8. Where to Go Next: 3-5 internal links to the next logical reads -->
+      <h2>Where to Go Next</h2>
+      <ul>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router behind XGS-PON</a>: example link to a related build post.</li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a>: example link to a deeper-dive companion.</li>
+        <li><a href="../homelab.html">Homelab Tour</a>: example link back to the broader context.</li>
+      </ul>
 
-      <!-- EDIT ABOVE: Your article content ends here -->
+      <!-- 9. Closing line + invitation to contact -->
+      <p>
+        Closing one-liner. If the post invites reader configs or stories,
+        <a href="../contact.html">point at the contact page</a> in the last line.
+      </p>
 
     </div>
 
-    <!-- Newsletter CTA -->
+    <!-- =============================================================== -->
+    <!-- Newsletter CTA (already wired to Buttondown @mvivirito).        -->
+    <!-- Leave as-is unless redesigning the form.                        -->
+    <!-- =============================================================== -->
     <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
       <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
       <p class="text-muted">
         FreeBSD, pf, and SRE notes, straight to your inbox. No spam, just signal.
       </p>
-      <!-- Buttondown form. Replace mvivirito below with your account name. -->
       <form action="https://buttondown.email/api/emails/embed-subscribe/mvivirito"
             method="post" target="popupwindow"
             onsubmit="window.open('https://buttondown.email/mvivirito', 'popupwindow')"
@@ -165,19 +204,31 @@ done</code></pre>
       </p>
     </div>
 
-    <!-- Article Footer -->
+    <!-- =============================================================== -->
+    <!-- Related Posts: 3-4 internal article links                       -->
+    <!-- =============================================================== -->
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <h3>Related Posts</h3>
+      <ul>
+        <li><a href="freebsd-pf-router.html">Building a FreeBSD pf Router behind XGS-PON</a></li>
+        <li><a href="pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a></li>
+        <li><a href="freebsd-ipv6-router.html">IPv6 for Home Networks: A FreeBSD Walkthrough</a></li>
+        <li><a href="freebsd-wireguard.html">WireGuard on FreeBSD: A 30-Minute Setup</a></li>
+      </ul>
+    </div>
+
+    <!-- =============================================================== -->
+    <!-- Article footer: back-to-blog link                               -->
+    <!-- =============================================================== -->
     <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
       <p class="text-center">
         <a href="../index.html#blog" class="btn btn-secondary">← Back to Blog</a>
-      </p>
-      <p class="text-center text-muted" style="margin-top: 2rem; font-size: 0.875rem;">
-        Have questions or feedback? <a href="../contact.html">Get in touch</a>
       </p>
     </div>
 
   </article>
 
-  <!-- Footer -->
+  <!-- Site footer -->
   <footer>
     <p>
       <a href="../index.html">Home</a> •
@@ -188,6 +239,27 @@ done</code></pre>
       © 2026 Michael Vivirito
     </p>
   </footer>
+
+  <!-- =================================================================== -->
+  <!-- AUTHORING CHECKLIST (delete this comment block before publishing)   -->
+  <!--                                                                     -->
+  <!-- 1. <title>, og:title, twitter:title, and <h1> all match             -->
+  <!-- 2. <meta name="description">, og:description, twitter:description   -->
+  <!--    are the same one-sentence summary                                -->
+  <!-- 3. <meta name="keywords"> is comma-separated, lowercase-ish         -->
+  <!-- 4. <time datetime="..."> is YYYY-MM-DD; visible date is human       -->
+  <!-- 5. Badges match the article topic (drop / add as needed)            -->
+  <!-- 6. Sections that don't apply (e.g. Bill of Materials for an         -->
+  <!--    opinion piece) are removed, not left empty                       -->
+  <!-- 7. "Where to Go Next" and "Related Posts" link to real articles     -->
+  <!-- 8. No em dashes in the body. Commas, colons, parens instead.        -->
+  <!-- 9. Add the new article to:                                          -->
+  <!--      - sitemap.xml (with today's lastmod)                           -->
+  <!--      - feed.xml    (new <item> at the top, bump lastBuildDate)      -->
+  <!--      - index.html  blog-ls block (with today's date)                -->
+  <!--      - homelab.html "Articles in This Series" (if it fits)          -->
+  <!-- 10. Delete this checklist comment                                   -->
+  <!-- =================================================================== -->
 
 </body>
 </html>
