@@ -38,7 +38,7 @@
     <header style="text-align: center; margin-bottom: 3rem;">
       <h1>FreeBSD Jails for Network Services</h1>
       <p class="text-muted">
-        Published on <time datetime="2026-05-03">May 3, 2026</time>
+        Published on <time datetime="2026-05-10">May 10, 2026</time>
       </p>
       <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
         <span class="badge">FreeBSD</span>
@@ -94,7 +94,7 @@
         <li><strong>VNET</strong> (virtualised network stack): the jail gets its own
             network stack, its own interfaces, its own routes, its own pf state. It
             costs you a kernel option (<code>options VIMAGE</code>, on by default in
-            14.x <code>GENERIC</code>) and a tiny bit more memory per jail, and it gives
+            15.x <code>GENERIC</code>) and a tiny bit more memory per jail, and it gives
             you near-VM isolation at near-jail cost.</li>
       </ul>
       <p>
@@ -121,7 +121,7 @@ $ zfs create zroot/jails/monitor</code></pre>
       <p>
         Drop a base userland into each jail. The lazy way:
       </p>
-      <pre><code>$ fetch https://download.freebsd.org/releases/amd64/14.2-RELEASE/base.txz
+      <pre><code>$ fetch https://download.freebsd.org/releases/amd64/15.0-RELEASE/base.txz
 $ tar -C /jails/unbound -xpf base.txz
 $ cp /etc/resolv.conf /jails/unbound/etc/
 $ cp /etc/localtime   /jails/unbound/etc/</code></pre>
@@ -175,12 +175,12 @@ wireguard {
       <h2>Inside the unbound Jail</h2>
       <pre><code># /jails/unbound/etc/rc.conf
 hostname="unbound.lan"
-ifconfig_epair0b="inet 10.10.10.53/24"
-defaultrouter="10.10.10.1"
+ifconfig_epair0b="inet 10.0.0.53/24"
+defaultrouter="10.0.0.1"
 local_unbound_enable="YES"
 syslogd_flags="-ss"</code></pre>
       <p>
-        Now the resolver listens on <code>10.10.10.53</code>, and the host's DHCP server
+        Now the resolver listens on <code>10.0.0.53</code>, and the host's DHCP server
         hands that out to clients. The router itself is no longer a DNS resolver, that's
         a feature.
       </p>
@@ -193,10 +193,10 @@ syslogd_flags="-ss"</code></pre>
       </p>
       <pre><code># Allow LAN clients to reach the unbound jail's IP on port 53
 pass in on $lan_if proto { tcp udp } \
-  from $lan_net to 10.10.10.53 port domain keep state
+  from $lan_net to 10.0.0.53 port domain keep state
 
 # Allow the unbound jail outbound to root servers
-pass out on $ext_if from 10.10.10.53 to any port domain keep state</code></pre>
+pass out on $ext_if from 10.0.0.53 to any port domain keep state</code></pre>
 
       <h2>Resource Limits</h2>
       <p>

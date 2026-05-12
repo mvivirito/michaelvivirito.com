@@ -38,7 +38,7 @@
     <header style="text-align: center; margin-bottom: 3rem;">
       <h1>pf.conf: Writing Rules That Survive a Power Outage</h1>
       <p class="text-muted">
-        Published on <time datetime="2026-05-03">May 3, 2026</time>
+        Published on <time datetime="2026-05-10">May 10, 2026</time>
       </p>
       <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
         <span class="badge">FreeBSD</span>
@@ -82,24 +82,29 @@
       <pre><code># /etc/pf.conf
 
 # --- macros ---
-ext_if    = "igc0"
-lan_if    = "igc1"
-srv_if    = "igc2"
-iot_if    = "igc3"
-int_ifs   = "{ " $lan_if " " $srv_if " " $iot_if " }"
+ext_if      = "ix0"          # WAN: SFP+ port hosting the X-ONU-SFPP XGS-PON ONT
+lan_if      = "ix1"          # LAN trunk: SFP+ down to the Sodola switch
+vlan20_if   = "ix1.20"       # VLAN 20 (UniWork) terminated on the trunk
+int_ifs     = "{ " $lan_if " " $vlan20_if " }"
 
-lan_net   = "10.10.10.0/24"
-srv_net   = "10.10.20.0/24"
-iot_net   = "10.10.30.0/24"
-rfc1918   = "{ 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 }"
+lan_net     = "10.0.0.0/24"
+vlan20_net  = "10.20.0.0/24"
+rfc1918     = "{ 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 }"
 
-icmp_ok   = "{ echoreq unreach time-exceeded }"
-tcp_svc   = "{ ssh http https }"
+icmp_ok     = "{ echoreq unreach time-exceeded }"
+tcp_svc     = "{ ssh http https }"
 
 # --- tables ---
 table &lt;bogons&gt;     persist file "/etc/pf.bogons"     # martian/bogon ranges
 table &lt;bruteforce&gt; persist                           # populated by overload
 table &lt;blocklist&gt;  persist file "/etc/pf.blocklist"  # known bad IPs</code></pre>
+      <p>
+        The CWWK chassis has four spare 2.5G <code>igc</code> ports next to the SFP+
+        slots. If you want a physically separate IoT or camera segment, drop one of
+        those into the macros (<code>iot_if = "igc0"</code>, etc.) and follow the same
+        shape of rules below. The version on disk just hasn't needed it yet, the VLAN
+        already gives the work-network isolation I care about.
+      </p>
 
       <h2>Options: Sensible Defaults</h2>
       <pre><code># --- options ---
@@ -124,11 +129,12 @@ nat on $ext_if inet from $rfc1918 to any -&gt; ($ext_if)
 
 # Optional: redirect inbound HTTPS to a server on the trusted LAN
 # rdr on $ext_if inet proto tcp from any to ($ext_if) port 443 \
-#   -&gt; 10.10.20.20 port 443</code></pre>
+#   -&gt; 10.0.0.20 port 443</code></pre>
       <p>
         Note <code>($ext_if)</code> in parentheses: that resolves the address at packet
-        time, not at load time. On a DHCP WAN, this means pf doesn't have to be reloaded
-        when the WAN IP changes.
+        time, not at load time. With the X-ONU-SFPP terminating PON on
+        <code>ix0</code> and pulling DHCP from the ISP, this matters, the WAN address
+        does change, and pf doesn't need to be reloaded when it does.
       </p>
 
       <h2>Default Deny: Then Add Trust</h2>
@@ -144,28 +150,26 @@ block in quick on $ext_if from { &lt;bogons&gt; &lt;blocklist&gt; } to any
 block in quick on $ext_if from any to { &lt;bogons&gt; }
 
 # Anti-spoofing: a packet arriving on $ext_if claiming a LAN source is bogus
-antispoof quick for { $lan_if $srv_if $iot_if }</code></pre>
+antispoof quick for { $lan_if $vlan20_if }</code></pre>
       <p>
         The <code>antispoof</code> macro expands to a small set of rules that drop
         packets arriving on the wrong interface for their claimed source.
       </p>
 
-      <h2>Outbound: Trusted LANs Reach the Internet</h2>
-      <pre><code># LAN: trusted, can reach anywhere
+      <h2>Outbound: Trusted LAN and the Work VLAN Reach the Internet</h2>
+      <pre><code># Main LAN (UniWorld): trusted, can reach anywhere
 pass in  on $lan_if from $lan_net to any keep state
 pass out on $ext_if from $lan_net to any keep state
 
-# Servers: can reach anywhere, plus reach trusted LAN
-pass in  on $srv_if from $srv_net to any keep state
-pass out on $ext_if from $srv_net to any keep state
-
-# IoT: can reach the internet ONLY. Cannot talk to LAN or servers.
-pass in  on $iot_if proto { tcp udp } from $iot_net to !$rfc1918 keep state
-pass out on $ext_if from $iot_net to any keep state</code></pre>
+# VLAN 20 (UniWork): reach the internet ONLY. Cannot reach the main LAN.
+pass in  on $vlan20_if proto { tcp udp } from $vlan20_net to !$rfc1918 keep state
+pass out on $ext_if              from $vlan20_net to any keep state</code></pre>
       <p>
-        That <code>!$rfc1918</code> is the entire reason IoT lives on its own NIC: an
-        Internet-connected camera or smart bulb cannot, by rule, talk to anything on
-        another LAN. The router itself answers DHCP and DNS for them; nothing else does.
+        That <code>!$rfc1918</code> on the VLAN 20 ingress rule is the whole point of
+        having UniWork on its own segment: a work device cannot, by rule, reach into
+        the main LAN's address space. The router itself answers DHCP and DNS for the
+        VLAN; nothing on the trusted LAN side does. The same pattern extends naturally
+        if you split out a third segment on a spare igc port later.
       </p>
 
       <h2>Inbound: Just Enough</h2>
@@ -207,7 +211,7 @@ pass inet6 proto icmp6 all icmp6-type $icmp_ok keep state</code></pre>
         interface. You can tcpdump it like any other interface:
       </p>
       <pre><code>$ tcpdump -n -e -ttt -i pflog0
-$ tcpdump -n -e -ttt -i pflog0 'host 10.10.10.42'</code></pre>
+$ tcpdump -n -e -ttt -i pflog0 'host 10.0.0.42'</code></pre>
       <p>
         Pair this with a small log shipper to feed pf decisions into the same monitoring
         stack as everything else. (See the
@@ -262,18 +266,16 @@ $ pfctl -t bruteforce -T show</code></pre>
       <pre><code># /etc/pf.conf
 
 # --- macros ---
-ext_if    = "igc0"
-lan_if    = "igc1"
-srv_if    = "igc2"
-iot_if    = "igc3"
-int_ifs   = "{ " $lan_if " " $srv_if " " $iot_if " }"
+ext_if      = "ix0"
+lan_if      = "ix1"
+vlan20_if   = "ix1.20"
+int_ifs     = "{ " $lan_if " " $vlan20_if " }"
 
-lan_net   = "10.10.10.0/24"
-srv_net   = "10.10.20.0/24"
-iot_net   = "10.10.30.0/24"
-rfc1918   = "{ 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 }"
+lan_net     = "10.0.0.0/24"
+vlan20_net  = "10.20.0.0/24"
+rfc1918     = "{ 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 }"
 
-icmp_ok   = "{ echoreq unreach time-exceeded }"
+icmp_ok     = "{ echoreq unreach time-exceeded }"
 
 # --- tables ---
 table &lt;bogons&gt;     persist file "/etc/pf.bogons"
@@ -298,16 +300,13 @@ block out on $ext_if all
 
 block in quick on $ext_if from { &lt;bogons&gt; &lt;blocklist&gt; &lt;bruteforce&gt; } to any
 block in quick on $ext_if from any to &lt;bogons&gt;
-antispoof quick for { $lan_if $srv_if $iot_if }
+antispoof quick for { $lan_if $vlan20_if }
 
-pass in  on $lan_if from $lan_net to any keep state
-pass out on $ext_if from $lan_net to any keep state
+pass in  on $lan_if    from $lan_net    to any keep state
+pass out on $ext_if    from $lan_net    to any keep state
 
-pass in  on $srv_if from $srv_net to any keep state
-pass out on $ext_if from $srv_net to any keep state
-
-pass in  on $iot_if proto { tcp udp } from $iot_net to !$rfc1918 keep state
-pass out on $ext_if from $iot_net to any keep state
+pass in  on $vlan20_if proto { tcp udp } from $vlan20_net to !$rfc1918 keep state
+pass out on $ext_if              from $vlan20_net to any keep state
 
 pass in on $lan_if proto tcp from $lan_net to ($lan_if) port ssh \
   flags S/SA keep state \

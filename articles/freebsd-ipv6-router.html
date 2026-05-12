@@ -38,7 +38,7 @@
     <header style="text-align: center; margin-bottom: 3rem;">
       <h1>IPv6 for Home Networks: A FreeBSD Walkthrough</h1>
       <p class="text-muted">
-        Published on <time datetime="2026-05-03">May 3, 2026</time>
+        Published on <time datetime="2026-05-10">May 10, 2026</time>
       </p>
       <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
         <span class="badge">FreeBSD</span>
@@ -90,19 +90,19 @@ gateway_enable="YES"
 
 # IPv6 forwarding and accept-RA on the WAN
 ipv6_gateway_enable="YES"
-ipv6_cpe_wanif="igc0"
+ipv6_cpe_wanif="ix0"
 
-# Accept RAs only on the WAN; advertise on the LAN sides
-ifconfig_igc0_ipv6="inet6 accept_rtadv -ifdisabled"
-ifconfig_igc1_ipv6="inet6 -ifdisabled"
-ifconfig_igc2_ipv6="inet6 -ifdisabled"
-ifconfig_igc3_ipv6="inet6 -ifdisabled"
+# Accept RAs only on the WAN (the SFP+ port hosting the XGS-PON ONT);
+# advertise on the LAN trunk and the VLAN.
+ifconfig_ix0_ipv6="inet6 accept_rtadv -ifdisabled"
+ifconfig_ix1_ipv6="inet6 -ifdisabled"
+ifconfig_ix1_20_ipv6="inet6 -ifdisabled"
 
 # Daemons
 rtsold_enable="YES"
 rtsold_flags="-aF"
 rtadvd_enable="YES"
-rtadvd_interfaces="igc1 igc2 igc3"</code></pre>
+rtadvd_interfaces="ix1 ix1.20"</code></pre>
       <p>
         <code>ipv6_cpe_wanif</code> is the magic switch that flips a FreeBSD box into
         "I am the customer-premises router for v6" mode. It tightens up forwarding and
@@ -115,7 +115,7 @@ rtadvd_interfaces="igc1 igc2 igc3"</code></pre>
       </p>
       <pre><code>$ pkg install dhcp6</code></pre>
       <pre><code># /usr/local/etc/dhcp6c.conf
-interface igc0 {
+interface ix0 {
     send ia-pd 0;
     send ia-na 0;
     request domain-name-servers;
@@ -123,16 +123,12 @@ interface igc0 {
 };
 
 id-assoc pd 0 {
-    prefix-interface igc1 {
+    prefix-interface ix1 {
         sla-id  1;
         sla-len 8;
     };
-    prefix-interface igc2 {
+    prefix-interface ix1.20 {
         sla-id  2;
-        sla-len 8;
-    };
-    prefix-interface igc3 {
-        sla-id  3;
         sla-len 8;
     };
 };
@@ -140,12 +136,13 @@ id-assoc pd 0 {
 id-assoc na 0 { };</code></pre>
       <p>
         If your ISP delegates a /56, <code>sla-len 8</code> carves it into 256
-        independent /64s, one per LAN, with 253 to spare. <code>sla-id</code> picks
-        which slice each LAN gets.
+        independent /64s, one per LAN, with 254 to spare. <code>sla-id</code> picks
+        which slice each LAN gets, here the main LAN takes the first /64 and VLAN 20
+        takes the second.
       </p>
       <pre><code># /etc/rc.conf (continued)
 dhcp6c_enable="YES"
-dhcp6c_interfaces="igc0"</code></pre>
+dhcp6c_interfaces="ix0"</code></pre>
 
       <h2>Step 3: rtadvd: Tell the LAN What Its Prefix Is</h2>
       <p>
@@ -153,14 +150,14 @@ dhcp6c_interfaces="igc0"</code></pre>
         in rc.conf. If you want to override things explicitly, drop a config:
       </p>
       <pre><code># /etc/rtadvd.conf  (optional, defaults are usually fine)
-igc1:\
+ix1:\
     :raflags="mo":\
     :rltime#1800:\
     :addrs#1: \
     :addr="auto":\
     :pltime#600:vltime#1200:
 
-igc2:\
+ix1.20:\
     :raflags="mo":\
     :rltime#1800:</code></pre>
       <p>
@@ -187,7 +184,7 @@ pass in  on $ext_if inet6 proto udp from any to any port { 546 547 } keep state
 pass out on $ext_if inet6 proto udp from any to any port { 546 547 } keep state
 
 # Anti-spoofing for v6 (covers v4 with the same antispoof you already have)
-antispoof quick for { $lan_if $srv_if $iot_if } inet6</code></pre>
+antispoof quick for { $lan_if $vlan20_if } inet6</code></pre>
       <p>
         <strong>Do not blanket-block ICMPv6.</strong> v6 depends on it for neighbour
         discovery (the v6 equivalent of ARP), Path MTU, and RA, block it and your
@@ -196,8 +193,8 @@ antispoof quick for { $lan_if $srv_if $iot_if } inet6</code></pre>
 
       <h2>Step 5: Smoke Test</h2>
       <pre><code># On the router
-$ ifconfig igc1 inet6
-        inet6 fe80::1%igc1 prefixlen 64 scopeid 0x2
+$ ifconfig ix1 inet6
+        inet6 fe80::1%ix1 prefixlen 64 scopeid 0x2
         inet6 2001:db8:cafe:1::1 prefixlen 64
 
 $ ndp -an              # neighbour table
@@ -233,7 +230,7 @@ pass in on $ext_if inet6 proto tcp \
             <code>net.inet6.ip6.use_tempaddr=0</code>.</li>
         <li><strong>Link-local vs global.</strong> <code>fe80::/10</code> is link-local
             and never routable. If you copy-paste a v6 address that starts with
-            <code>fe80:</code>, you also need a scope ID like <code>%igc1</code>.</li>
+            <code>fe80:</code>, you also need a scope ID like <code>%ix1</code>.</li>
         <li><strong>RA flapping.</strong> If you accidentally have two devices sending
             RAs on the same LAN (an ISP router still attached, plus your FreeBSD box),
             clients will flip between prefixes. Pick one source of truth.</li>

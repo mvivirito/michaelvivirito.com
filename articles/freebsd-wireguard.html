@@ -38,7 +38,7 @@
     <header style="text-align: center; margin-bottom: 3rem;">
       <h1>WireGuard on FreeBSD: A 30-Minute Setup</h1>
       <p class="text-muted">
-        Published on <time datetime="2026-05-03">May 3, 2026</time>
+        Published on <time datetime="2026-05-10">May 10, 2026</time>
       </p>
       <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
         <span class="badge">FreeBSD</span>
@@ -173,7 +173,7 @@ nat on $ext_if from 10.66.66.0/24 to any -&gt; ($ext_if)</code></pre>
 [Interface]
 PrivateKey = &lt;laptop privatekey&gt;
 Address    = 10.66.66.10/32
-DNS        = 10.10.10.1
+DNS        = 10.0.0.1
 
 [Peer]
 PublicKey         = &lt;router public key&gt;
@@ -200,7 +200,7 @@ $ qrencode -t ansiutf8 &lt; phone.conf</code></pre>
 
       <h2>DNS Through the Tunnel</h2>
       <p>
-        If you set <code>DNS = 10.10.10.1</code> in the client config (your router's
+        If you set <code>DNS = 10.0.0.1</code> in the client config (your router's
         unbound), every DNS query from the client goes through the tunnel. This is
         usually what you want, it means the client's queries aren't visible to the
         coffee shop wifi, and clients can resolve your internal hostnames.

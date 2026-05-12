@@ -297,30 +297,41 @@ timer   · beach cleanup · 2026-05-23 09:00</code></pre>
 
   <!-- Homelab Section -->
   <section id="homelab">
-    <h2>Homelab: FreeBSD pf Router</h2>
+    <h2>Homelab: FreeBSD pf Router behind XGS-PON</h2>
     <div class="card" style="max-width: 800px; margin: 0 auto;">
       <p>
-        At the edge of my homelab is a fanless FreeBSD box that handles every packet
-        coming into and out of the network, WAN router, stateful <code>pf</code>
-        firewall, recursive DNS, DHCP, NTP, and a WireGuard endpoint. No vendor GUI, no
-        shadow configs. Just <code>/etc/rc.conf</code>, <code>/etc/pf.conf</code>, and
-        a git repo.
+        At the edge of my homelab is a FreeBSD 15 box (hostname <code>homefw</code>)
+        that handles every packet coming into and out of the network: WAN router,
+        stateful <code>pf</code> firewall, recursive DNS, DHCP, NTP, and a WireGuard
+        endpoint. The AT&amp;T fiber gateway is gone; an X-ONU-SFPP XGS-PON SFP+
+        module takes the fiber directly and slots into one of the box's 10G SFP+ ports,
+        so FreeBSD pulls the public IP itself. No vendor GUI, no shadow configs. Just
+        <code>/etc/rc.conf</code>, <code>/etc/pf.conf</code>, and a git repo.
       </p>
-      <pre><code>            ┌─────────────────────┐
-            │      Internet       │
-            └──────────┬──────────┘
-                       │ igc0 (WAN)
-            ┌──────────┴──────────┐
-            │   FreeBSD Router    │
-            │   pf · unbound      │
-            │   dhcpd · ntpd      │
-            └──┬──────┬──────┬────┘
-        igc1   │   igc2  │   igc3
-       (LAN)   │ (servers)   (IoT)</code></pre>
+      <pre><code>      ┌────────────────────────────┐
+      │  AT&amp;T XGS-PON Fiber         │
+      │  (SC/APC, no ISP gateway)  │
+      └─────────────┬──────────────┘
+                    │
+      ┌─────────────▼──────────────┐
+      │ X-ONU-SFPP (XGS-PON SFP+)  │
+      └─────────────┬──────────────┘
+                    │ ix0 (WAN, 10G SFP+)
+      ┌─────────────▼──────────────┐
+      │  FreeBSD 15 (homefw)       │
+      │  pf · unbound · dhcpd      │
+      └─────────────┬──────────────┘
+                    │ ix1 (LAN trunk, 10G SFP+)
+      ┌─────────────▼──────────────┐
+      │     Sodola Switch          │
+      └──┬──────────────────┬──────┘
+         │ untagged         │ VLAN 20
+      UniWorld           UniWork
+      10.0.0.0/24        10.20.0.0/24</code></pre>
       <p>
-        Four physical interfaces, four broadcast domains, default-deny everywhere. IoT
-        traffic is rule-prevented from talking to anything but the internet. Boot
-        environments via ZFS make every change reversible with a reboot.
+        One LAN trunk down to a managed switch, two SSIDs out at the UniFi APs, with
+        VLAN 20 (UniWork) firewalled away from the main LAN by rule. ZFS boot
+        environments make every change reversible with a reboot.
       </p>
       <div style="margin-top: 1.5rem;">
         <a href="homelab.html" class="btn btn-primary">Tour the Setup →</a>

@@ -38,7 +38,7 @@
     <header style="text-align: center; margin-bottom: 3rem;">
       <h1>ZFS Send/Recv: Replicating Your Homelab</h1>
       <p class="text-muted">
-        Published on <time datetime="2026-05-03">May 3, 2026</time>
+        Published on <time datetime="2026-05-10">May 10, 2026</time>
       </p>
       <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
         <span class="badge">ZFS</span>
@@ -144,7 +144,7 @@ $ zfs send -t 1-...long-token... | ssh backup-host zfs recv -s backup/home</code
 # /usr/local/sbin/zfs-pull.sh, runs on the backup host
 set -eu
 
-SRC_HOST="gw.lan"
+SRC_HOST="homefw"
 SRC_DS="zroot/home"
 DST_DS="backup/home"
 

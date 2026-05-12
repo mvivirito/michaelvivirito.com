@@ -37,19 +37,19 @@
     <div class="card" style="max-width: 800px; margin: 0 auto;">
 
       <pre><code>$ cat ~/.status
-Last updated: 2026-05-03
+Last updated: 2026-05-10
 Location:  Vermont, USA</code></pre>
 
       <h2>Building</h2>
       <ul>
-        <li><strong>FreeBSD pf router</strong>: A self-built edge router and firewall at the heart of my homelab. ZFS root, pf, unbound, dhcpd, and WireGuard, all on a fanless 4-port mini PC. <a href="homelab.html">Tour the setup</a>.</li>
+        <li><strong>FreeBSD pf router</strong>: A self-built edge router and firewall at the heart of my homelab. FreeBSD 15 on a CWWK N100 mini PC (hostname <code>homefw</code>), with an X-ONU-SFPP XGS-PON SFP+ module replacing the AT&amp;T fiber gateway entirely. ZFS root, pf, unbound, ISC DHCP, WireGuard, and a Sodola switch downstream of the LAN trunk. <a href="homelab.html">Tour the setup</a>.</li>
         <li><strong>Jail-isolated services</strong>: Moving DNS, monitoring, and VPN out of the router host and into VNET jails. One service, one dataset, one ZFS snapshot before every change.</li>
         <li><strong>NixOS + K8s lab</strong>: A 3-node bare-metal Kubernetes cluster on Proxmox, configured declaratively in a private nix-config flake.</li>
       </ul>
 
       <h2>Running</h2>
       <ul>
-        <li>FreeBSD 14.x edge router with pf, unbound, dhcpd, ntpd</li>
+        <li>FreeBSD 15 edge router (<code>homefw</code>) behind XGS-PON, with pf, unbound, ISC dhcpd, ntpd</li>
         <li>NixOS on Proxmox: 3-node Kubernetes cluster, bare metal</li>
         <li>Monitoring: Prometheus, Grafana, Alertmanager</li>
         <li>WireGuard for road-warrior VPN back into the LAN</li>
@@ -76,7 +76,7 @@ Location:  Vermont, USA</code></pre>
 
       <h2>Stack</h2>
       <pre><code>$ cat ~/.stack
-Edge:      FreeBSD 14.x + pf + unbound
+Edge:      FreeBSD 15 (homefw) + pf + unbound + XGS-PON SFP
 Servers:   NixOS 24.11 (declarative)
 Cluster:   kubeadm + Cilium
 Hypervisor: Proxmox + ZFS

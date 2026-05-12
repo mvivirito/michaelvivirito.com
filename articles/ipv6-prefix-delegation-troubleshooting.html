@@ -38,7 +38,7 @@
     <header style="text-align: center; margin-bottom: 3rem;">
       <h1>IPv6 Prefix Delegation: A Troubleshooting Cookbook</h1>
       <p class="text-muted">
-        Published on <time datetime="2026-05-03">May 3, 2026</time>
+        Published on <time datetime="2026-05-10">May 10, 2026</time>
       </p>
       <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
         <span class="badge">FreeBSD</span>
@@ -118,14 +118,14 @@
 
       <h2>Symptom: dhcp6c Got a Prefix, but the LAN Is Quiet</h2>
       <p>
-        dhcp6c logs say it received a /56, your <code>igc1</code> has a v6 address, and
+        dhcp6c logs say it received a /56, your <code>ix1</code> has a v6 address, and
         nothing on the LAN gets one. First, confirm the prefix actually landed:
       </p>
-      <pre><code>$ ifconfig igc1 inet6
-        inet6 fe80::1%igc1 prefixlen 64 scopeid 0x2
+      <pre><code>$ ifconfig ix1 inet6
+        inet6 fe80::1%ix1 prefixlen 64 scopeid 0x2
         inet6 2001:db8:cafe:1::1 prefixlen 64
 
-$ netstat -rn -f inet6 | grep igc1</code></pre>
+$ netstat -rn -f inet6 | grep ix1</code></pre>
       <p>
         If the global address isn't there, dhcp6c's script didn't apply it to the LAN
         interface. Check <code>/usr/local/etc/dhcp6c.conf</code> for the
@@ -139,7 +139,7 @@ $ netstat -rn -f inet6 | grep igc1</code></pre>
         Even with the LAN address present, clients don't see RAs:
       </p>
       <pre><code># From the router, look at what rtadvd is sending
-$ tcpdump -ni igc1 'icmp6 and ip6[40] == 134'</code></pre>
+$ tcpdump -ni ix1 'icmp6 and ip6[40] == 134'</code></pre>
       <p>
         ICMP6 type 134 is <em>Router Advertisement</em>. If you see no traffic, rtadvd
         isn't running or isn't bound to that interface. Check:
@@ -165,7 +165,7 @@ $ tcpdump -ni igc1 'icmp6 and ip6[40] == 134'</code></pre>
         On rtadvd, RDNSS is enabled with a config file:
       </p>
       <pre><code># /etc/rtadvd.conf
-igc1:\
+ix1:\
     :rdnss="2001:db8:cafe:1::1":\
     :dnssl="lan":</code></pre>
       <p>
@@ -228,16 +228,16 @@ $ ping6 -s 1500 -D ipv6.google.com   # may fail with PMTU=1492 or similar</code>
 $ tcpdump -ni $ext_if -vv 'udp port 546 or udp port 547'
 
 # Router solicitations and advertisements on the LAN
-$ tcpdump -ni igc1 'icmp6 and (ip6[40] == 133 or ip6[40] == 134)'
+$ tcpdump -ni ix1 'icmp6 and (ip6[40] == 133 or ip6[40] == 134)'
 
 # Neighbour solicitations / advertisements
-$ tcpdump -ni igc1 'icmp6 and (ip6[40] == 135 or ip6[40] == 136)'
+$ tcpdump -ni ix1 'icmp6 and (ip6[40] == 135 or ip6[40] == 136)'
 
 # Anything ICMPv6 on a given interface
-$ tcpdump -ni igc1 'icmp6'
+$ tcpdump -ni ix1 'icmp6'
 
 # Watch only multicast (RAs, NDP)
-$ tcpdump -ni igc1 'ip6 multicast'
+$ tcpdump -ni ix1 'ip6 multicast'
 
 # Pflog for v6 specifically
 $ tcpdump -ni pflog0 'inet6'</code></pre>
@@ -261,8 +261,8 @@ net.inet6.ip6.no_radr                # 1 to ignore default routes from RAs (don'
       </p>
       <pre><code>$ service rtadvd stop
 $ service dhcp6c  stop
-$ ifconfig igc1 inet6 -alias 2001:db8:cafe:1::1
-$ ifconfig igc0 down up
+$ ifconfig ix1 inet6 -alias 2001:db8:cafe:1::1
+$ ifconfig ix0 down up
 $ service dhcp6c  start
 $ service rtadvd start</code></pre>
       <p>
