@@ -108,7 +108,6 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--space-xl);
-  padding-top: 4.5rem;
   border-left: 1px solid var(--border);
   border-right: 1px solid var(--border);
   position: relative;
@@ -243,14 +242,10 @@ nav {
   background: rgba(4,8,6,0.97);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
   padding: var(--space-md) var(--space-lg);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  transform: translateZ(0);
+  margin-bottom: var(--space-2xl);
 }
 
 nav::before { content: none; }
@@ -840,10 +835,7 @@ summary::marker { color: var(--green); }
 
 @media (max-width: 768px) {
   html { font-size: 15px; }
-  body {
-    padding: var(--space-md);
-    padding-top: 3.5rem;
-  }
+  body { padding: var(--space-md); }
   nav { padding: var(--space-sm) var(--space-md); }
   nav ul { gap: 0.15rem; }
   nav a {
