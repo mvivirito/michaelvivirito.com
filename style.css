@@ -1,284 +1,354 @@
-/* ============================================
-   Terminal TUI Theme - Catppuccin Mocha
-   ============================================ */
+/* ============================================================
+   michaelvivirito.com — graphifylabs-inspired theme
+   ============================================================
+   Dark cyberpunk-editorial. Green primary, amber + violet accents.
+   Noise + scanlines + green grid + glass cards + glow buttons.
+   No build step. Fonts via @import. No JS required.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  /* Catppuccin Mocha Color Palette */
-  --ctp-base: #1e1e2e;
-  --ctp-mantle: #181825;
-  --ctp-crust: #11111b;
-  --ctp-surface0: #313244;
-  --ctp-surface1: #45475a;
-  --ctp-surface2: #585b70;
-  --ctp-overlay0: #6c7086;
-  --ctp-overlay1: #7f849c;
-  --ctp-overlay2: #9399b2;
-  --ctp-subtext0: #a6adc8;
-  --ctp-subtext1: #bac2de;
-  --ctp-text: #cdd6f4;
+  /* Primary palette */
+  --bg:        #040806;
+  --bg2:       #060d08;
+  --bg3:       #0a1308;
+  --green:     #22c55e;
+  --green2:    #4ade80;
+  --green3:    #86efac;
+  --green-deep:#15803d;
+  --amber:     #f59e0b;
+  --amber2:    #fbbf24;
+  --violet:    #7c3aed;
+  --border:    rgba(34,197,94,0.13);
+  --border-hi: rgba(34,197,94,0.30);
+  --glass:     rgba(34,197,94,0.04);
 
-  --ctp-lavender: #b4befe;
-  --ctp-blue: #89b4fa;
-  --ctp-sapphire: #74c7ec;
-  --ctp-sky: #89dceb;
-  --ctp-teal: #94e2d5;
-  --ctp-green: #a6e3a1;
-  --ctp-yellow: #f9e2af;
-  --ctp-peach: #fab387;
-  --ctp-maroon: #eba0ac;
-  --ctp-red: #f38ba8;
-  --ctp-mauve: #cba6f7;
-  --ctp-pink: #f5c2e7;
-  --ctp-flamingo: #f2cdcd;
-  --ctp-rosewater: #f5e0dc;
+  --t1: rgba(220,255,220,0.92);
+  --t2: rgba(220,255,220,0.55);
+  --t3: rgba(220,255,220,0.30);
 
-  /* Theme Variables */
-  --bg-primary: var(--ctp-crust);
-  --bg-secondary: var(--ctp-base);
-  --bg-tertiary: var(--ctp-mantle);
-  --bg-surface: var(--ctp-surface0);
+  /* Legacy aliases — preserve existing inline styles + class hooks */
+  --bg-primary:   var(--bg);
+  --bg-secondary: var(--bg2);
+  --bg-tertiary:  var(--bg2);
+  --bg-surface:   var(--bg3);
+  --text-primary:   var(--t1);
+  --text-secondary: var(--t2);
+  --text-muted:     var(--t3);
+  --accent-primary:   var(--green);
+  --accent-secondary: var(--green2);
+  --accent-green:  var(--green);
+  --accent-yellow: var(--amber);
+  --accent-red:    var(--violet);
+  --accent-teal:   var(--green2);
+  --border-color:  var(--border);
+  --border-accent: var(--green);
 
-  --text-primary: var(--ctp-text);
-  --text-secondary: var(--ctp-subtext1);
-  --text-muted: var(--ctp-overlay2);
+  /* Catppuccin aliases for visuals.html CSS art — retune to graphify palette */
+  --ctp-base:    var(--bg);
+  --ctp-mantle:  var(--bg2);
+  --ctp-crust:   var(--bg);
+  --ctp-surface0: var(--bg2);
+  --ctp-surface1: rgba(34,197,94,0.13);
+  --ctp-surface2: rgba(34,197,94,0.2);
+  --ctp-overlay0: var(--t3);
+  --ctp-overlay1: var(--t3);
+  --ctp-overlay2: var(--t2);
+  --ctp-subtext0: var(--t2);
+  --ctp-subtext1: var(--t2);
+  --ctp-text:     var(--t1);
+  --ctp-blue:     var(--green2);
+  --ctp-sapphire: var(--green);
+  --ctp-sky:      var(--green3);
+  --ctp-teal:     var(--green2);
+  --ctp-green:    var(--green);
+  --ctp-yellow:   var(--amber2);
+  --ctp-peach:    var(--amber);
+  --ctp-maroon:   var(--violet);
+  --ctp-red:      var(--violet);
+  --ctp-mauve:    var(--violet);
+  --ctp-pink:     var(--amber2);
+  --ctp-flamingo: var(--amber);
+  --ctp-rosewater: var(--green3);
+  --ctp-lavender: var(--violet);
 
-  --accent-primary: var(--ctp-blue);
-  --accent-secondary: var(--ctp-mauve);
-  --accent-green: var(--ctp-green);
-  --accent-yellow: var(--ctp-yellow);
-  --accent-red: var(--ctp-red);
-  --accent-teal: var(--ctp-teal);
+  /* Typography */
+  --font-display: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+  --font-serif:   'Cormorant Garamond', Georgia, serif;
 
-  --border-color: var(--ctp-surface1);
-  --border-accent: var(--ctp-blue);
-
-  /* Typography - Monospace only for TUI feel */
-  --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", "Cascadia Code", "Roboto Mono", Consolas, monospace;
-
-  /* Spacing - More compact for TUI */
+  /* Spacing */
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
   --space-md: 0.75rem;
   --space-lg: 1rem;
   --space-xl: 1.5rem;
-  --space-2xl: 2rem;
+  --space-2xl: 2.5rem;
 
-  /* TUI Borders */
   --border-width: 1px;
   --border-style: solid;
 }
 
-/* ============================================
-   Base Reset & TUI Styling
-   ============================================ */
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 html {
-  font-size: 14px;
-  background: var(--bg-primary);
+  font-size: 16px;
+  background: var(--bg);
   min-height: 100vh;
 }
 
 body {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 1rem;
-  line-height: 1.6;
-  color: var(--text-primary);
+  line-height: 1.65;
+  color: var(--t1);
+  background: var(--bg);
   max-width: 1200px;
   margin: 0 auto;
-  padding: var(--space-lg);
-  background: var(--bg-secondary);
-  border-left: var(--border-width) var(--border-style) var(--border-color);
-  border-right: var(--border-width) var(--border-style) var(--border-color);
+  padding: var(--space-xl);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  position: relative;
+  overflow-x: hidden;
+  min-height: 100vh;
 }
 
-/* ============================================
+/* Noise overlay — full screen, low opacity, on top */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.025;
+}
+
+/* Scanlines — CRT vibe */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.025) 2px,
+    rgba(0,0,0,0.025) 4px
+  );
+}
+
+/* ============================================================
    Typography
-   ============================================ */
+   ============================================================ */
 
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 700;
-  line-height: 1.2;
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--t1);
   margin-bottom: var(--space-md);
-  color: var(--accent-primary);
-  font-family: var(--font-mono);
 }
 
 h1 {
-  font-size: 2rem;
-  color: var(--ctp-blue);
-  border-bottom: var(--border-width) var(--border-style) var(--border-accent);
+  font-size: clamp(2.25rem, 5vw + 0.5rem, 3.75rem);
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+  background: linear-gradient(135deg, #86efac 0%, #4ade80 40%, #22c55e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: var(--green2); /* fallback */
+  border: none;
   padding-bottom: var(--space-sm);
 }
 
 h2 {
-  font-size: 1.5rem;
-  color: var(--ctp-mauve);
-  margin-top: var(--space-xl);
+  font-size: clamp(1.5rem, 2.5vw + 0.5rem, 2.25rem);
+  margin-top: var(--space-2xl);
+  color: var(--t1);
+  letter-spacing: -0.035em;
 }
 
-h2::before {
-  content: "// ";
-  color: var(--ctp-overlay1);
-}
+h2::before { content: none; }
 
 h3 {
-  font-size: 1.25rem;
-  color: var(--ctp-teal);
+  font-size: clamp(1.15rem, 1.5vw + 0.5rem, 1.5rem);
+  color: var(--t1);
+  letter-spacing: -0.025em;
 }
 
-h3::before {
-  content: "» ";
-  color: var(--ctp-overlay1);
-}
+h3::before { content: none; }
 
 h4 {
-  font-size: 1.1rem;
-  color: var(--ctp-green);
+  font-size: 1.125rem;
+  color: var(--green2);
+  letter-spacing: -0.02em;
 }
 
 p {
   margin-bottom: var(--space-md);
-  color: var(--text-secondary);
+  color: var(--t2);
+  line-height: 1.7;
+  font-family: var(--font-body);
 }
 
 strong {
-  color: var(--text-primary);
-  font-weight: 700;
+  color: var(--t1);
+  font-weight: 600;
 }
 
 em {
-  color: var(--accent-yellow);
+  color: var(--green3);
   font-style: italic;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 1.05em;
 }
 
-/* ============================================
+/* ============================================================
    Links
-   ============================================ */
+   ============================================================ */
 
 a {
-  color: var(--accent-primary);
+  color: var(--green2);
   text-decoration: none;
-  transition: color 150ms;
-  position: relative;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
 }
 
 a:hover {
-  color: var(--ctp-sapphire);
+  color: var(--green3);
   text-decoration: underline;
+  text-decoration-color: rgba(34,197,94,0.5);
+  text-underline-offset: 4px;
 }
 
-a:focus {
-  outline: 1px solid var(--accent-primary);
-  outline-offset: 2px;
+a:focus-visible {
+  outline: 1px solid var(--green);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
-/* ============================================
-   Navigation - TUI Style
-   ============================================ */
+/* ============================================================
+   Navigation
+   ============================================================ */
 
 nav {
-  background: var(--bg-tertiary);
-  padding: var(--space-md);
-  padding-top: calc(var(--space-md) + 0.5rem);
-  margin-bottom: var(--space-xl);
+  background: rgba(4,8,6,0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-2xl);
   position: sticky;
   top: var(--space-lg);
   z-index: 1000;
-  border: var(--border-width) var(--border-style) var(--border-color);
-  position: relative;
+  transform: translateZ(0);
 }
 
-nav::before {
-  content: " Navigation ";
-  position: absolute;
-  top: -0.6em;
-  left: var(--space-md);
-  background: var(--bg-tertiary);
-  padding: 0 var(--space-xs);
-  color: var(--border-color);
-  font-size: 0.875rem;
-}
+nav::before { content: none; }
 
 nav ul {
   list-style: none;
   display: flex;
-  gap: var(--space-lg);
+  gap: 0.25rem;
   justify-content: center;
   flex-wrap: wrap;
+  margin: 0;
 }
 
 nav a {
+  font-family: var(--font-mono);
   font-weight: 500;
-  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.4rem 0.75rem;
+  color: var(--t2);
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 nav a:hover {
-  background: var(--bg-surface);
+  background: rgba(34,197,94,0.08);
+  color: var(--green2);
   text-decoration: none;
 }
 
-nav a::before {
-  content: "[";
-  color: var(--border-color);
+nav a::before { content: none; }
+nav a::after { content: none; }
+
+.new::after {
+  content: 'NEW';
+  display: inline-block;
+  margin-left: 0.4em;
+  padding: 1px 5px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  background: var(--amber);
+  color: #000;
+  border-radius: 3px;
+  letter-spacing: 0.06em;
+  vertical-align: middle;
 }
 
-nav a::after {
-  content: "]";
-  color: var(--border-color);
-}
-
-/* ============================================
-   Hero Section - Terminal Style
-   ============================================ */
+/* ============================================================
+   Hero
+   ============================================================ */
 
 .hero {
-  padding: var(--space-xl) 0;
+  padding: var(--space-2xl) var(--space-xl);
   margin-bottom: var(--space-2xl);
-  border: var(--border-width) var(--border-style) var(--border-accent);
-  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(34,197,94,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,197,94,.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .hero-content {
+  position: relative;
+  z-index: 1;
   padding: var(--space-lg);
 }
 
 .hero h1 {
-  font-size: 2.5rem;
-  margin-bottom: var(--space-sm);
-  border: none;
   text-align: center;
+  margin-bottom: var(--space-md);
+  font-size: clamp(2.5rem, 6vw, 4rem);
 }
 
-.hero h1::before {
-  content: "$ whoami\A> ";
-  display: block;
-  font-size: 1rem;
-  color: var(--ctp-green);
-  margin-bottom: var(--space-sm);
-  white-space: pre;
-}
+.hero h1::before { content: none; }
 
 .hero .subtitle {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-md);
+  font-size: 1.15rem;
+  color: var(--t2);
   text-align: center;
+  margin-bottom: var(--space-lg);
+  font-family: var(--font-body);
 }
 
-.hero .subtitle::before {
-  content: "$ cat role.txt\A> ";
-  display: block;
-  font-size: 0.875rem;
-  color: var(--ctp-green);
-  margin-bottom: var(--space-xs);
-  white-space: pre;
-}
+.hero .subtitle::before { content: none; }
 
 .hero-cta {
   display: flex;
@@ -288,9 +358,9 @@ nav a::after {
   margin-top: var(--space-xl);
 }
 
-/* ============================================
+/* ============================================================
    Sections
-   ============================================ */
+   ============================================================ */
 
 section {
   margin-bottom: var(--space-2xl);
@@ -302,34 +372,35 @@ section h2 {
   margin-bottom: var(--space-lg);
 }
 
-/* ============================================
-   TUI Boxes & Cards
-   ============================================ */
+/* ============================================================
+   Cards / Boxes — Glass surfaces
+   ============================================================ */
 
-.box {
-  border: var(--border-width) var(--border-style) var(--border-color);
-  background: var(--bg-tertiary);
-  padding: var(--space-lg);
+.box, .card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: var(--space-xl);
   margin-bottom: var(--space-lg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.box:hover, .card:hover {
+  border-color: var(--border-hi);
+  transform: translateY(-2px);
 }
 
 .box-title {
-  color: var(--accent-primary);
+  color: var(--green2);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   margin-bottom: var(--space-md);
   padding-bottom: var(--space-sm);
-  border-bottom: var(--border-width) var(--border-style) var(--border-color);
-}
-
-.card {
-  background: var(--bg-tertiary);
-  border: var(--border-width) var(--border-style) var(--border-color);
-  padding: var(--space-lg);
-  transition: border-color 150ms, transform 150ms;
-}
-
-.card:hover {
-  border-color: var(--border-accent);
-  transform: translateX(4px);
+  border-bottom: 1px solid var(--border);
 }
 
 .grid {
@@ -339,32 +410,24 @@ section h2 {
 }
 
 @media (min-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .grid.grid-3 {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .grid.grid-3 { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* ============================================
-   Project Cards
-   ============================================ */
+/* ============================================================
+   Project cards
+   ============================================================ */
 
 .project-card h3 {
   font-size: 1.1rem;
   margin-bottom: var(--space-sm);
 }
 
-.project-card h3::before {
-  content: "├─ ";
-}
+.project-card h3::before { content: none; }
 
 .project-card p {
-  color: var(--text-secondary);
-  margin-bottom: var(--space-md);
-  font-size: 0.9rem;
+  color: var(--t2);
+  font-size: 0.95rem;
 }
 
 .project-meta {
@@ -373,34 +436,31 @@ section h2 {
   align-items: center;
   margin-top: var(--space-md);
   padding-top: var(--space-md);
-  border-top: var(--border-width) var(--border-style) var(--border-color);
-  font-size: 0.875rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
 }
 
 .project-language {
   display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
-  color: var(--text-muted);
+  color: var(--t3);
 }
 
-.language-dot {
-  content: "●";
-  color: var(--accent-primary);
-}
+.language-dot { color: var(--green); }
 
 .project-link {
   margin-left: auto;
-  color: var(--accent-green);
+  color: var(--green2);
+  font-size: 0.85rem;
 }
 
-.project-link::before {
-  content: "→ ";
-}
+.project-link::before { content: '\2192  '; }
 
-/* ============================================
-   About Section
-   ============================================ */
+/* ============================================================
+   About / Resume
+   ============================================================ */
 
 .about-content {
   display: grid;
@@ -409,16 +469,15 @@ section h2 {
 }
 
 @media (min-width: 768px) {
-  .about-content {
-    grid-template-columns: 2fr 1fr;
-  }
+  .about-content { grid-template-columns: 2fr 1fr; }
 }
 
 .profile-image {
   max-width: 100%;
   height: auto;
-  border: var(--border-width) var(--border-style) var(--border-accent);
-  filter: grayscale(20%);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  filter: none;
 }
 
 .certifications {
@@ -429,117 +488,149 @@ section h2 {
 }
 
 .badge {
-  display: inline-block;
-  padding: var(--space-xs) var(--space-md);
-  background: var(--bg-surface);
-  border: var(--border-width) var(--border-style) var(--border-color);
-  font-size: 0.875rem;
-  color: var(--accent-yellow);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.22);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--green2);
+  text-transform: uppercase;
 }
 
-.badge::before {
-  content: "[";
-  color: var(--border-color);
-}
+.badge::before { content: none; }
+.badge::after { content: none; }
 
-.badge::after {
-  content: "]";
-  color: var(--border-color);
-}
-
-/* ============================================
+/* ============================================================
    Buttons
-   ============================================ */
+   ============================================================ */
 
 .btn {
-  display: inline-block;
-  padding: var(--space-sm) var(--space-lg);
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.95rem;
   text-align: center;
   cursor: pointer;
-  transition: all 150ms;
-  border: var(--border-width) var(--border-style) var(--border-color);
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  background: var(--bg-surface);
+  transition: all 0.25s ease;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 1px solid transparent;
 }
 
 .btn-primary {
-  border-color: var(--accent-primary);
-  color: var(--accent-primary);
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  border-color: var(--green);
+  color: #fff;
+  box-shadow: 0 0 24px rgba(34,197,94,0.3), 0 4px 16px rgba(0,0,0,0.5);
 }
 
 .btn-primary:hover {
-  background: var(--accent-primary);
-  color: var(--bg-primary);
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  box-shadow: 0 0 40px rgba(34,197,94,0.45), 0 4px 24px rgba(0,0,0,0.6);
+  transform: translateY(-2px);
   text-decoration: none;
+  color: #fff;
 }
 
 .btn-secondary {
-  border-color: var(--border-color);
-  color: var(--text-secondary);
+  background: transparent;
+  border-color: rgba(34,197,94,0.22);
+  color: rgba(74,222,128,0.75);
 }
 
 .btn-secondary:hover {
-  border-color: var(--accent-secondary);
-  color: var(--accent-secondary);
+  border-color: rgba(34,197,94,0.45);
+  color: rgba(74,222,128,0.95);
+  transform: translateY(-2px);
   text-decoration: none;
 }
 
-/* ============================================
-   Code Blocks
-   ============================================ */
+/* ============================================================
+   Code & pre
+   ============================================================ */
 
 code {
   font-family: var(--font-mono);
-  font-size: 0.9rem;
-  background: var(--bg-surface);
-  color: var(--accent-green);
-  padding: var(--space-xs) var(--space-sm);
-  border: var(--border-width) var(--border-style) var(--border-color);
+  font-size: 0.875em;
+  background: rgba(34,197,94,0.08);
+  color: var(--green2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(34,197,94,0.13);
 }
 
 pre {
-  background: var(--bg-tertiary);
-  border: var(--border-width) var(--border-style) var(--border-accent);
-  padding: var(--space-lg);
+  background: rgba(4,10,6,0.9);
+  border-radius: 12px;
+  padding: var(--space-xl);
   margin: var(--space-lg) 0;
   overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: var(--t1);
+  position: relative;
+}
+
+pre::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(34,197,94,0.4), rgba(245,158,11,0.2), rgba(34,197,94,0.08));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 pre code {
   background: transparent;
   border: none;
   padding: 0;
+  color: inherit;
 }
 
 #cryptoaddr {
   overflow-wrap: break-word;
-  font-size: 0.875rem;
-  background: var(--bg-surface);
+  font-size: 0.85rem;
+  background: rgba(34,197,94,0.06);
   padding: var(--space-md);
   margin: var(--space-md) 0;
   display: block;
-  border: var(--border-width) var(--border-style) var(--border-color);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  color: var(--green2);
 }
 
-/* ============================================
+/* ============================================================
    Lists
-   ============================================ */
+   ============================================================ */
 
 ul, ol {
   margin-left: var(--space-xl);
   margin-bottom: var(--space-md);
+  color: var(--t2);
 }
 
 li {
   margin-bottom: var(--space-xs);
-  color: var(--text-secondary);
+  color: var(--t2);
+  line-height: 1.7;
 }
 
-li::marker {
-  color: var(--accent-primary);
-}
+li::marker { color: var(--green); }
 
 .list-unstyled {
   list-style: none;
@@ -547,57 +638,52 @@ li::marker {
 }
 
 .list-unstyled li::before {
-  content: "• ";
-  color: var(--accent-primary);
+  content: '\203A  ';
+  color: var(--green2);
+  font-weight: 600;
 }
 
-/* ============================================
+/* ============================================================
    Footer
-   ============================================ */
+   ============================================================ */
 
 footer {
   text-align: center;
-  padding: var(--space-xl) var(--space-md);
+  padding: var(--space-2xl) var(--space-md) var(--space-lg);
   margin-top: var(--space-2xl);
-  border-top: var(--border-width) var(--border-style) var(--border-color);
-  color: var(--text-muted);
-  font-size: 0.875rem;
+  border-top: 1px solid var(--border);
+  color: var(--t3);
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
 }
 
-footer::before {
-  content: "─────────────────────────────────────────────────────────────";
-  display: block;
-  color: var(--border-color);
-  margin-bottom: var(--space-md);
-}
+footer::before { content: none; }
 
 footer a {
   margin: 0 var(--space-sm);
+  color: var(--green2);
 }
 
-/* ============================================
-   Utility Classes
-   ============================================ */
+footer p { color: var(--t3); }
+
+/* ============================================================
+   Utilities
+   ============================================================ */
 
 .text-center { text-align: center; }
-.text-muted { color: var(--text-muted); }
-.mb-0 { margin-bottom: 0; }
-.mt-2 { margin-top: var(--space-lg); }
+.text-muted  { color: var(--t3); }
+.mb-0        { margin-bottom: 0; }
+.mt-2        { margin-top: var(--space-lg); }
 
-.new::after {
-  content: " [NEW]";
-  color: var(--accent-yellow);
-  font-size: 0.75rem;
-}
-
-/* ============================================
+/* ============================================================
    Images
-   ============================================ */
+   ============================================================ */
 
 img {
   max-width: 100%;
   height: auto;
   display: block;
+  border-radius: 8px;
 }
 
 p img, li img, h1 img, h2 img, h3 img, h4 img {
@@ -605,6 +691,7 @@ p img, li img, h1 img, h2 img, h3 img, h4 img {
   max-width: 1em;
   display: inline-block;
   vertical-align: middle;
+  border-radius: 0;
 }
 
 .qr {
@@ -615,80 +702,91 @@ p img, li img, h1 img, h2 img, h3 img, h4 img {
 figure {
   margin: var(--space-xl) 0;
   text-align: center;
-  border: var(--border-width) var(--border-style) var(--border-color);
-  padding: var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: var(--space-lg);
+  background: var(--glass);
+  backdrop-filter: blur(12px);
 }
 
 figcaption {
-  font-style: italic;
-  font-size: 0.875rem;
-  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--t3);
   margin-top: var(--space-sm);
+  letter-spacing: 0.04em;
 }
 
-figcaption::before {
-  content: "└─ ";
-  color: var(--border-color);
-}
+figcaption::before { content: none; }
 
-/* ============================================
-   Blog - ls style listing
-   ============================================ */
+/* ============================================================
+   Blog ls-style listing
+   ============================================================ */
 
 .blog-ls {
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 }
 
 .blog-ls-header {
-  color: var(--ctp-green);
+  color: var(--green2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
   margin-bottom: var(--space-md);
   padding-bottom: var(--space-sm);
-  border-bottom: var(--border-width) var(--border-style) var(--border-color);
+  border-bottom: 1px solid var(--border);
 }
 
 .blog-ls-item {
   display: flex;
   gap: var(--space-md);
-  padding: var(--space-xs) 0;
+  padding: var(--space-sm) var(--space-md);
+  margin: 2px 0;
   align-items: baseline;
+  border-radius: 6px;
+  transition: background 0.2s ease;
 }
 
 .blog-ls-item:hover {
-  background: var(--bg-surface);
+  background: rgba(34,197,94,0.06);
 }
 
 .blog-ls-perms {
-  color: var(--ctp-yellow);
+  color: var(--amber);
   min-width: 80px;
-  font-size: 0.875rem;
+  font-size: 0.72rem;
 }
 
 .blog-ls-date {
-  color: var(--ctp-blue);
+  color: var(--t3);
   min-width: 100px;
-  font-size: 0.875rem;
+  font-size: 0.72rem;
 }
 
 .blog-ls-link {
-  color: var(--ctp-mauve);
+  color: var(--t1);
   flex: 1;
 }
 
 .blog-ls-link:hover {
-  color: var(--ctp-pink);
+  color: var(--green2);
+  text-decoration: none;
 }
 
-/* ============================================
-   Contact Page
-   ============================================ */
+/* ============================================================
+   Contact
+   ============================================================ */
 
 .contact-info {
-  background: var(--bg-tertiary);
-  border: var(--border-width) var(--border-style) var(--border-color);
-  padding: var(--space-xl);
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: var(--space-2xl);
   max-width: 800px;
   margin: 0 auto;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 details {
@@ -698,95 +796,75 @@ details {
 
 summary {
   cursor: pointer;
-  color: var(--accent-primary);
+  color: var(--green2);
   font-weight: 500;
+  font-family: var(--font-body);
 }
 
-summary::marker {
-  color: var(--accent-primary);
-}
+summary:hover { color: var(--green3); }
 
-summary:hover {
-  color: var(--ctp-sapphire);
-}
+summary::marker { color: var(--green); }
 
-/* ============================================
-   Responsive Adjustments
-   ============================================ */
-
-@media (max-width: 768px) {
-  html {
-    font-size: 13px;
-  }
-
-  body {
-    padding: var(--space-sm);
-  }
-
-  .hero h1 {
-    font-size: 1.75rem;
-  }
-
-  nav::before {
-    font-size: 0.75rem;
-  }
-
-  nav ul {
-    gap: var(--space-sm);
-  }
-}
-
-/* ============================================
-   Terminal Prompt Styling
-   ============================================ */
+/* ============================================================
+   Prompt / output (preserved)
+   ============================================================ */
 
 .prompt::before {
-  content: "$ ";
-  color: var(--accent-green);
+  content: '$ ';
+  color: var(--green);
+  font-family: var(--font-mono);
 }
 
 .output::before {
-  content: "> ";
-  color: var(--accent-primary);
+  content: '> ';
+  color: var(--green2);
+  font-family: var(--font-mono);
 }
 
-/* ============================================
-   Scrollbar - TUI Style
-   ============================================ */
+/* ============================================================
+   Scrollbar
+   ============================================================ */
 
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
-}
-
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
+  background: rgba(34,197,94,0.18);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(34,197,94,0.35); }
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media (max-width: 768px) {
+  html { font-size: 15px; }
+  body { padding: var(--space-md); }
+  nav { padding: var(--space-sm) var(--space-md); }
+  nav ul { gap: 0.15rem; }
+  nav a {
+    font-size: 0.72rem;
+    padding: 0.3rem 0.55rem;
+    letter-spacing: 0.06em;
+  }
+  .hero { padding: var(--space-xl) var(--space-md); }
+  .box, .card { padding: var(--space-lg); }
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--ctp-surface1);
-}
+/* ============================================================
+   Visuals page — CSS art (preserved structure, retuned palette)
+   ============================================================ */
 
-/* ============================================
-   Visuals Page - CSS Art
-   ============================================ */
-
-.visual-container {
-  margin-bottom: var(--space-2xl);
-}
+.visual-container { margin-bottom: var(--space-2xl); }
 
 .visual-box {
   width: 100%;
   max-width: 600px;
   height: 400px;
   margin: 2rem auto;
-  border: var(--border-width) var(--border-style) var(--border-accent);
-  background: var(--bg-tertiary);
+  border: 1px solid rgba(34,197,94,0.25);
+  border-radius: 12px;
+  background: var(--bg2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -794,7 +872,6 @@ summary:hover {
   position: relative;
 }
 
-/* Visual 1: Impossible Cube */
 .impossible-cube {
   width: 200px;
   height: 200px;
@@ -804,7 +881,7 @@ summary:hover {
 }
 
 @keyframes rotateCube {
-  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+  0%   { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
   100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
 }
 
@@ -816,37 +893,13 @@ summary:hover {
   opacity: 0.8;
 }
 
-.cube-front {
-  background: linear-gradient(135deg, var(--ctp-blue), var(--ctp-mauve));
-  transform: translateZ(100px);
-}
+.cube-front  { background: linear-gradient(135deg, var(--ctp-blue),  var(--ctp-mauve));  transform: translateZ(100px); }
+.cube-back   { background: linear-gradient(135deg, var(--ctp-mauve), var(--ctp-pink));   transform: translateZ(-100px) rotateY(180deg); }
+.cube-right  { background: linear-gradient(135deg, var(--ctp-pink),  var(--ctp-red));    transform: rotateY(90deg) translateZ(100px); }
+.cube-left   { background: linear-gradient(135deg, var(--ctp-red),   var(--ctp-peach));  transform: rotateY(-90deg) translateZ(100px); }
+.cube-top    { background: linear-gradient(135deg, var(--ctp-peach), var(--ctp-yellow)); transform: rotateX(90deg) translateZ(100px); }
+.cube-bottom { background: linear-gradient(135deg, var(--ctp-yellow),var(--ctp-green));  transform: rotateX(-90deg) translateZ(100px); }
 
-.cube-back {
-  background: linear-gradient(135deg, var(--ctp-mauve), var(--ctp-pink));
-  transform: translateZ(-100px) rotateY(180deg);
-}
-
-.cube-right {
-  background: linear-gradient(135deg, var(--ctp-pink), var(--ctp-red));
-  transform: rotateY(90deg) translateZ(100px);
-}
-
-.cube-left {
-  background: linear-gradient(135deg, var(--ctp-red), var(--ctp-peach));
-  transform: rotateY(-90deg) translateZ(100px);
-}
-
-.cube-top {
-  background: linear-gradient(135deg, var(--ctp-peach), var(--ctp-yellow));
-  transform: rotateX(90deg) translateZ(100px);
-}
-
-.cube-bottom {
-  background: linear-gradient(135deg, var(--ctp-yellow), var(--ctp-green));
-  transform: rotateX(-90deg) translateZ(100px);
-}
-
-/* Visual 2: Psychedelic Spiral */
 .psychedelic-spiral {
   width: 400px;
   height: 400px;
@@ -862,74 +915,41 @@ summary:hover {
 }
 
 .spiral-1 {
-  background: conic-gradient(
-    from 0deg,
-    var(--ctp-red),
-    var(--ctp-pink),
-    var(--ctp-mauve),
-    var(--ctp-blue),
-    var(--ctp-teal),
-    var(--ctp-green),
-    var(--ctp-yellow),
-    var(--ctp-red)
-  );
+  background: conic-gradient(from 0deg,
+    var(--ctp-red), var(--ctp-pink), var(--ctp-mauve), var(--ctp-blue),
+    var(--ctp-teal), var(--ctp-green), var(--ctp-yellow), var(--ctp-red));
   animation: spiralRotate 8s infinite linear;
 }
 
 .spiral-2 {
-  background: conic-gradient(
-    from 90deg,
-    var(--ctp-blue),
-    var(--ctp-teal),
-    var(--ctp-green),
-    var(--ctp-yellow),
-    var(--ctp-red),
-    var(--ctp-pink),
-    var(--ctp-mauve),
-    var(--ctp-blue)
-  );
+  background: conic-gradient(from 90deg,
+    var(--ctp-blue), var(--ctp-teal), var(--ctp-green), var(--ctp-yellow),
+    var(--ctp-red), var(--ctp-pink), var(--ctp-mauve), var(--ctp-blue));
   animation: spiralRotate 6s infinite linear reverse;
   transform: scale(0.8);
 }
 
 .spiral-3 {
-  background: conic-gradient(
-    from 180deg,
-    var(--ctp-green),
-    var(--ctp-yellow),
-    var(--ctp-red),
-    var(--ctp-pink),
-    var(--ctp-mauve),
-    var(--ctp-blue),
-    var(--ctp-teal),
-    var(--ctp-green)
-  );
+  background: conic-gradient(from 180deg,
+    var(--ctp-green), var(--ctp-yellow), var(--ctp-red), var(--ctp-pink),
+    var(--ctp-mauve), var(--ctp-blue), var(--ctp-teal), var(--ctp-green));
   animation: spiralRotate 10s infinite linear;
   transform: scale(0.6);
 }
 
 .spiral-4 {
-  background: conic-gradient(
-    from 270deg,
-    var(--ctp-yellow),
-    var(--ctp-red),
-    var(--ctp-pink),
-    var(--ctp-mauve),
-    var(--ctp-blue),
-    var(--ctp-teal),
-    var(--ctp-green),
-    var(--ctp-yellow)
-  );
+  background: conic-gradient(from 270deg,
+    var(--ctp-yellow), var(--ctp-red), var(--ctp-pink), var(--ctp-mauve),
+    var(--ctp-blue), var(--ctp-teal), var(--ctp-green), var(--ctp-yellow));
   animation: spiralRotate 4s infinite linear reverse;
   transform: scale(0.4);
 }
 
 @keyframes spiralRotate {
   from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  to   { transform: rotate(360deg); }
 }
 
-/* Visual 3: 3D Corridor */
 .corridor-3d {
   width: 500px;
   height: 350px;
@@ -943,49 +963,11 @@ summary:hover {
   animation: corridorPulse 3s infinite ease-in-out;
 }
 
-.corridor-1 {
-  width: 400px;
-  height: 300px;
-  top: 25px;
-  left: 50px;
-  background: linear-gradient(135deg, transparent, rgba(137, 180, 250, 0.1));
-}
-
-.corridor-2 {
-  width: 320px;
-  height: 240px;
-  top: 55px;
-  left: 90px;
-  background: linear-gradient(135deg, transparent, rgba(137, 180, 250, 0.15));
-  animation-delay: 0.3s;
-}
-
-.corridor-3 {
-  width: 240px;
-  height: 180px;
-  top: 85px;
-  left: 130px;
-  background: linear-gradient(135deg, transparent, rgba(137, 180, 250, 0.2));
-  animation-delay: 0.6s;
-}
-
-.corridor-4 {
-  width: 160px;
-  height: 120px;
-  top: 115px;
-  left: 170px;
-  background: linear-gradient(135deg, transparent, rgba(137, 180, 250, 0.25));
-  animation-delay: 0.9s;
-}
-
-.corridor-5 {
-  width: 80px;
-  height: 60px;
-  top: 145px;
-  left: 210px;
-  background: linear-gradient(135deg, transparent, rgba(137, 180, 250, 0.3));
-  animation-delay: 1.2s;
-}
+.corridor-1 { width: 400px; height: 300px; top:  25px; left:  50px; background: linear-gradient(135deg, transparent, rgba(74,222,128,0.10)); }
+.corridor-2 { width: 320px; height: 240px; top:  55px; left:  90px; background: linear-gradient(135deg, transparent, rgba(74,222,128,0.15)); animation-delay: 0.3s; }
+.corridor-3 { width: 240px; height: 180px; top:  85px; left: 130px; background: linear-gradient(135deg, transparent, rgba(74,222,128,0.20)); animation-delay: 0.6s; }
+.corridor-4 { width: 160px; height: 120px; top: 115px; left: 170px; background: linear-gradient(135deg, transparent, rgba(74,222,128,0.25)); animation-delay: 0.9s; }
+.corridor-5 { width:  80px; height:  60px; top: 145px; left: 210px; background: linear-gradient(135deg, transparent, rgba(74,222,128,0.30)); animation-delay: 1.2s; }
 
 .corridor-vanish {
   position: absolute;
@@ -993,62 +975,50 @@ summary:hover {
   height: 20px;
   top: 165px;
   left: 240px;
-  background: radial-gradient(circle, var(--ctp-blue), transparent);
+  background: radial-gradient(circle, var(--green), transparent);
   animation: vanishPulse 2s infinite ease-in-out;
 }
 
 @keyframes corridorPulse {
   0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.02); }
+  50%      { opacity: 1;   transform: scale(1.02); }
 }
 
 @keyframes vanishPulse {
   0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
+  50%      { opacity: 1; }
 }
 
-/* Visual 4: Tessellation Grid */
 .tessellation-grid {
   width: 500px;
   height: 400px;
   background-image:
-    repeating-linear-gradient(
-      45deg,
-      var(--ctp-blue) 0px,
-      var(--ctp-blue) 20px,
-      var(--ctp-mauve) 20px,
-      var(--ctp-mauve) 40px,
-      var(--ctp-pink) 40px,
-      var(--ctp-pink) 60px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      var(--ctp-teal) 0px,
-      var(--ctp-teal) 20px,
-      var(--ctp-green) 20px,
-      var(--ctp-green) 40px,
-      var(--ctp-yellow) 40px,
-      var(--ctp-yellow) 60px
-    );
+    repeating-linear-gradient(45deg,
+      var(--ctp-blue) 0px,  var(--ctp-blue) 20px,
+      var(--ctp-mauve) 20px,var(--ctp-mauve) 40px,
+      var(--ctp-pink) 40px, var(--ctp-pink) 60px),
+    repeating-linear-gradient(-45deg,
+      var(--ctp-teal) 0px,  var(--ctp-teal) 20px,
+      var(--ctp-green) 20px,var(--ctp-green) 40px,
+      var(--ctp-yellow) 40px,var(--ctp-yellow) 60px);
   background-blend-mode: multiply;
   animation: tessellationShift 15s infinite linear;
   opacity: 0.8;
 }
 
 @keyframes tessellationShift {
-  0% { background-position: 0 0, 0 0; }
+  0%   { background-position: 0 0, 0 0; }
   100% { background-position: 200px 200px, -200px -200px; }
 }
 
-/* Visual 5: Magic Eye Pattern */
 .magic-eye-pattern {
   width: 500px;
   height: 400px;
   background:
-    radial-gradient(circle at 20% 50%, var(--ctp-blue) 5px, transparent 5px),
-    radial-gradient(circle at 40% 30%, var(--ctp-mauve) 5px, transparent 5px),
-    radial-gradient(circle at 60% 70%, var(--ctp-pink) 5px, transparent 5px),
-    radial-gradient(circle at 80% 50%, var(--ctp-teal) 5px, transparent 5px),
+    radial-gradient(circle at 20% 50%,  var(--ctp-blue)  5px, transparent 5px),
+    radial-gradient(circle at 40% 30%,  var(--ctp-mauve) 5px, transparent 5px),
+    radial-gradient(circle at 60% 70%,  var(--ctp-pink)  5px, transparent 5px),
+    radial-gradient(circle at 80% 50%,  var(--ctp-teal)  5px, transparent 5px),
     radial-gradient(circle at 100% 30%, var(--ctp-green) 5px, transparent 5px);
   background-size: 60px 80px;
   background-position: 0 0, 15px 20px, 30px 40px, 45px 60px, 60px 80px;
@@ -1056,53 +1026,27 @@ summary:hover {
 }
 
 @keyframes magicEyeMove {
-  0% { background-position: 0 0, 15px 20px, 30px 40px, 45px 60px, 60px 80px; }
+  0%   { background-position: 0 0,    15px 20px,  30px 40px,  45px 60px,  60px 80px;  }
   100% { background-position: 60px 80px, 75px 100px, 90px 120px, 105px 140px, 120px 160px; }
 }
 
-/* Responsive adjustments for visuals */
 @media (max-width: 768px) {
-  .visual-box {
-    height: 300px;
-  }
-
-  .impossible-cube {
-    width: 150px;
-    height: 150px;
-  }
-
-  .cube-face {
-    width: 150px;
-    height: 150px;
-  }
-
-  .cube-front { transform: translateZ(75px); }
-  .cube-back { transform: translateZ(-75px) rotateY(180deg); }
-  .cube-right { transform: rotateY(90deg) translateZ(75px); }
-  .cube-left { transform: rotateY(-90deg) translateZ(75px); }
-  .cube-top { transform: rotateX(90deg) translateZ(75px); }
+  .visual-box { height: 300px; }
+  .impossible-cube { width: 150px; height: 150px; }
+  .cube-face { width: 150px; height: 150px; }
+  .cube-front  { transform: translateZ(75px); }
+  .cube-back   { transform: translateZ(-75px) rotateY(180deg); }
+  .cube-right  { transform: rotateY(90deg) translateZ(75px); }
+  .cube-left   { transform: rotateY(-90deg) translateZ(75px); }
+  .cube-top    { transform: rotateX(90deg) translateZ(75px); }
   .cube-bottom { transform: rotateX(-90deg) translateZ(75px); }
-
-  .psychedelic-spiral {
-    width: 280px;
-    height: 280px;
-  }
-
-  .corridor-3d {
-    width: 350px;
-    height: 250px;
-  }
-
-  .corridor-1 { width: 280px; height: 210px; top: 20px; left: 35px; }
-  .corridor-2 { width: 224px; height: 168px; top: 41px; left: 63px; }
-  .corridor-3 { width: 168px; height: 126px; top: 62px; left: 91px; }
-  .corridor-4 { width: 112px; height: 84px; top: 83px; left: 119px; }
-  .corridor-5 { width: 56px; height: 42px; top: 104px; left: 147px; }
+  .psychedelic-spiral { width: 280px; height: 280px; }
+  .corridor-3d { width: 350px; height: 250px; }
+  .corridor-1 { width: 280px; height: 210px; top:  20px; left:  35px; }
+  .corridor-2 { width: 224px; height: 168px; top:  41px; left:  63px; }
+  .corridor-3 { width: 168px; height: 126px; top:  62px; left:  91px; }
+  .corridor-4 { width: 112px; height:  84px; top:  83px; left: 119px; }
+  .corridor-5 { width:  56px; height:  42px; top: 104px; left: 147px; }
   .corridor-vanish { width: 15px; height: 15px; top: 117px; left: 167px; }
-
-  .tessellation-grid,
-  .magic-eye-pattern {
-    width: 350px;
-    height: 280px;
-  }
+  .tessellation-grid, .magic-eye-pattern { width: 350px; height: 280px; }
 }
