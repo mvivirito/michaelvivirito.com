@@ -243,11 +243,12 @@ nav {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
   padding: var(--space-md) var(--space-lg);
-  margin-bottom: var(--space-2xl);
+  margin: calc(-1 * var(--space-xl)) calc(-1 * var(--space-xl)) var(--space-2xl);
   position: sticky;
-  top: var(--space-lg);
+  top: 0;
   z-index: 1000;
   transform: translateZ(0);
 }
@@ -840,7 +841,10 @@ summary::marker { color: var(--green); }
 @media (max-width: 768px) {
   html { font-size: 15px; }
   body { padding: var(--space-md); }
-  nav { padding: var(--space-sm) var(--space-md); }
+  nav {
+    padding: var(--space-sm) var(--space-md);
+    margin: calc(-1 * var(--space-md)) calc(-1 * var(--space-md)) var(--space-xl);
+  }
   nav ul { gap: 0.15rem; }
   nav a {
     font-size: 0.72rem;
