@@ -10,7 +10,7 @@ related: ["freebsd-ipv6-router", "pf-firewall-rules", "freebsd-pf-router", "free
 ---
 ## Why This Post Exists
 
-The [main IPv6 setup post](freebsd-ipv6-router.html) shows you the happy path. This post is everything you reach for when the happy path doesn't happen. Most of these are things I've broken, sometimes more than once, on my own router.
+The [main IPv6 setup post](freebsd-ipv6-router) shows you the happy path. This post is everything you reach for when the happy path doesn't happen. Most of these are things I've broken, sometimes more than once, on my own router.
 
 ## The 60-Second Checklist
 
@@ -196,8 +196,8 @@ That sequence brings everything down, clears any stuck addresses, and brings thi
 
 ## Where to Go Next
 
--   [IPv6 for Home Networks: A FreeBSD Walkthrough](freebsd-ipv6-router.html): the happy path that this post debugs
--   [pf.conf: Writing Rules That Survive a Power Outage](pf-firewall-rules.html): the v4 ruleset; pair it with the v6 must-allows above
--   [Building a FreeBSD pf Router](freebsd-pf-router.html): the host underneath all of this
+-   [IPv6 for Home Networks: A FreeBSD Walkthrough](freebsd-ipv6-router): the happy path that this post debugs
+-   [pf.conf: Writing Rules That Survive a Power Outage](pf-firewall-rules): the v4 ruleset; pair it with the v6 must-allows above
+-   [Building a FreeBSD pf Router](freebsd-pf-router): the host underneath all of this
 
-Stuck on a symptom I haven't covered? [Mail me a tcpdump capture](../contact.html) and I'll happily add it to the post.
+Stuck on a symptom I haven't covered? [Mail me a tcpdump capture](../contact) and I'll happily add it to the post.

@@ -156,7 +156,7 @@ $ tcpdump -n -e -ttt -i pflog0
 $ tcpdump -n -e -ttt -i pflog0 'host 10.0.0.42'
 ```
 
-Pair this with a small log shipper to feed pf decisions into the same monitoring stack as everything else. (See the [Prometheus and Grafana setup](prometheus-grafana-monitoring.html).)
+Pair this with a small log shipper to feed pf decisions into the same monitoring stack as everything else. (See the [Prometheus and Grafana setup](prometheus-grafana-monitoring).)
 
 ## Loading Safely
 
@@ -251,8 +251,8 @@ pass inet6 proto icmp6 all icmp6-type $icmp_ok keep state
 
 ## Where to Go Next
 
--   [Building a FreeBSD pf Router](freebsd-pf-router.html): the hardware and OS install that this ruleset runs on
--   [FreeBSD Jails for Network Services](freebsd-jails-network.html): once your router is solid, move services off the host
--   [FreeBSD vs Linux: An SRE's Take](freebsd-vs-linux-sre.html): why pf and the FreeBSD networking stack feel coherent
+-   [Building a FreeBSD pf Router](freebsd-pf-router): the hardware and OS install that this ruleset runs on
+-   [FreeBSD Jails for Network Services](freebsd-jails-network): once your router is solid, move services off the host
+-   [FreeBSD vs Linux: An SRE's Take](freebsd-vs-linux-sre): why pf and the FreeBSD networking stack feel coherent
 
-If you've spotted something I should tighten, please [tell me](../contact.html). Firewalls get better with every honest pair of eyes.
+If you've spotted something I should tighten, please [tell me](../contact). Firewalls get better with every honest pair of eyes.

@@ -114,7 +114,7 @@ pass out on $ext_if from 10.66.66.0/24 to any keep state
 nat on $ext_if from 10.66.66.0/24 to any -> ($ext_if)
 ```
 
-The [main pf ruleset](pf-firewall-rules.html) already handles outbound NAT for RFC1918, if you tagged the VPN subnet into `$rfc1918` or your `nat` source set, you don't need a separate rule.
+The [main pf ruleset](pf-firewall-rules) already handles outbound NAT for RFC1918, if you tagged the VPN subnet into `$rfc1918` or your `nat` source set, you don't need a separate rule.
 
 ## Client Configs
 
@@ -185,8 +185,8 @@ Don't set keepalive on the server side. Servers with public IPs don't need it, a
 
 ## Going Further
 
--   [Building a FreeBSD pf Router](freebsd-pf-router.html): the host this VPN attaches to
--   [pf.conf: Writing Rules That Survive a Power Outage](pf-firewall-rules.html): pf integration in detail
--   [IPv6 for Home Networks](freebsd-ipv6-router.html): once you have v6, WireGuard over v6 is the same config with different addresses
+-   [Building a FreeBSD pf Router](freebsd-pf-router): the host this VPN attaches to
+-   [pf.conf: Writing Rules That Survive a Power Outage](pf-firewall-rules): pf integration in detail
+-   [IPv6 for Home Networks](freebsd-ipv6-router): once you have v6, WireGuard over v6 is the same config with different addresses
 
-Got a different topology, site-to-site, mesh, hub-and-spoke? [Tell me about it](../contact.html). I'm always curious how other people lay out their VPN graphs.
+Got a different topology, site-to-site, mesh, hub-and-spoke? [Tell me about it](../contact). I'm always curious how other people lay out their VPN graphs.

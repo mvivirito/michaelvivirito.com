@@ -4,7 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <BaseLayout
   title="Now: Michael Vivirito"
   description="What Michael Vivirito is focused on right now. SRE work, FreeBSD networking, NixOS, and the rest of the homelab."
-  canonical="/now.html"
+  canonical="/now"
 >
 
   <section>
@@ -22,7 +22,7 @@ Location:  Los Angeles, CA</code></pre>
 
       <h2>Building</h2>
       <ul>
-        <li><strong>FreeBSD pf router</strong>: A self-built edge router and firewall at the heart of my homelab. FreeBSD 15 on a CWWK N100 mini PC (hostname <code>homefw</code>), with an X-ONU-SFPP XGS-PON SFP+ module replacing the AT&amp;T fiber gateway entirely. ZFS root, pf, unbound, ISC DHCP, WireGuard, and a <a href="https://a.co/d/0bHmg42w" target="_blank" rel="noopener noreferrer">Sodola 12-port 10G managed switch</a> downstream of the LAN trunk. <a href="homelab.html">Tour the setup</a>.</li>
+        <li><strong>FreeBSD pf router</strong>: A self-built edge router and firewall at the heart of my homelab. FreeBSD 15 on a CWWK N100 mini PC (hostname <code>homefw</code>), with an X-ONU-SFPP XGS-PON SFP+ module replacing the AT&amp;T fiber gateway entirely. ZFS root, pf, unbound, ISC DHCP, WireGuard, and a <a href="https://a.co/d/0bHmg42w" target="_blank" rel="noopener noreferrer">Sodola 12-port 10G managed switch</a> downstream of the LAN trunk. <a href="homelab">Tour the setup</a>.</li>
         <li><strong>Jail-isolated services</strong>: Moving DNS, monitoring, and VPN out of the router host and into VNET jails. One service, one dataset, one ZFS snapshot before every change.</li>
         <li><strong>NixOS + K8s lab</strong>: A 3-node bare-metal Kubernetes cluster on Proxmox, configured declaratively in a private nix-config flake.</li>
       </ul>
@@ -88,9 +88,9 @@ Monitoring: Prometheus + Grafana</code></pre>
         Inspired by <a href="https://sive.rs/nowff" target="_blank" rel="noopener">Derek Sivers' /now page movement</a>.
       </p>
       <p>
-        <a href="index.html" class="btn btn-secondary">← Home</a>
-        <a href="index.html#blog" class="btn btn-secondary">Blog</a>
-        <a href="contact.html" class="btn btn-primary">Get in Touch</a>
+        <a href="/" class="btn btn-secondary">← Home</a>
+        <a href="/#blog" class="btn btn-secondary">Blog</a>
+        <a href="contact" class="btn btn-primary">Get in Touch</a>
       </p>
     </div>
 

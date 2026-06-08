@@ -164,4 +164,4 @@ Monitoring isn't optional. It's the difference between finding out about a probl
 
 Start with the Docker Compose setup, get comfortable with the basics, then scale up as your needs grow. Your future self (and your on-call rotation) will thank you.
 
-Questions? [Get in touch](../contact.html).
+Questions? [Get in touch](../contact).

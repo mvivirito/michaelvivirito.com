@@ -173,8 +173,8 @@ Most "backup" setups are really just snapshots on the same physical device. ZFS 
 
 ## Where to Go Next
 
--   [Building a FreeBSD pf Router](freebsd-pf-router.html): context for the homelab this backs up
--   [FreeBSD Jails for Network Services](freebsd-jails-network.html): one ZFS dataset per jail; replication becomes per-jail
--   [FreeBSD vs Linux: An SRE's Take](freebsd-vs-linux-sre.html): why ZFS being first-class on FreeBSD changes how you think about storage
+-   [Building a FreeBSD pf Router](freebsd-pf-router): context for the homelab this backs up
+-   [FreeBSD Jails for Network Services](freebsd-jails-network): one ZFS dataset per jail; replication becomes per-jail
+-   [FreeBSD vs Linux: An SRE's Take](freebsd-vs-linux-sre): why ZFS being first-class on FreeBSD changes how you think about storage
 
-Replicating your own pools? [I'd love to compare scripts](../contact.html). Everyone writes their own zfs-pull.sh; everyone learns something from someone else's.
+Replicating your own pools? [I'd love to compare scripts](../contact). Everyone writes their own zfs-pull.sh; everyone learns something from someone else's.

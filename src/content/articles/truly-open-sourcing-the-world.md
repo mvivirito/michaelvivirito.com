@@ -90,7 +90,7 @@ That's the bar. Anything less and I'll keep grinding. Anything more and we'll ha
 
 ## If Any of This Resonates
 
-**Download [OpenWorld: Pin & Improve](https://apps.apple.com/us/app/openworld-pin-improve/id6762533990) on the App Store** if you're on iOS. Visit [www.openworld.run](https://www.openworld.run) for the marketing page. Try the [web app](https://app.openworld.run) at any desk. [Email me](../contact.html) to get added to the Android closed-testing group while we wait on Google review. If you're a politician, organizer, journalist, or community leader and you'd want something specific from a platform like this, I especially want to hear from you, whatever I'm building probably needs your eyes.
+**Download [OpenWorld: Pin & Improve](https://apps.apple.com/us/app/openworld-pin-improve/id6762533990) on the App Store** if you're on iOS. Visit [www.openworld.run](https://www.openworld.run) for the marketing page. Try the [web app](https://app.openworld.run) at any desk. [Email me](../contact) to get added to the Android closed-testing group while we wait on Google review. If you're a politician, organizer, journalist, or community leader and you'd want something specific from a platform like this, I especially want to hear from you, whatever I'm building probably needs your eyes.
 
 And if you're someone who walks past a problem in your city every day and thinks *I wish someone would fix this*: that's why this exists. You're the someone. OpenWorld is the place to put it.
 

@@ -70,7 +70,7 @@ The order matters: the module should be in the host before the fiber goes in, so
 
 ## FreeBSD-Side Config
 
-With the module installed in `ix0`, the FreeBSD config to pull a public DHCP lease is small. The pieces below are the WAN-relevant lines from my `/etc/rc.conf`; the rest of the [router build](freebsd-pf-router.html) is unchanged.
+With the module installed in `ix0`, the FreeBSD config to pull a public DHCP lease is small. The pieces below are the WAN-relevant lines from my `/etc/rc.conf`; the rest of the [router build](freebsd-pf-router) is unchanged.
 
 ```
 # /etc/rc.conf, WAN-side excerpt
@@ -103,7 +103,7 @@ Destination        Gateway            Flags     Netif Expire
 default            104.10.x.1         UGS         ix0
 ```
 
-That's a working WAN. From here, every other piece of the [homelab tour](homelab.html) is the same as it was when the BGW was upstream: pf rules, DHCP server on the LAN side, unbound, IPv6 RA acceptance.
+That's a working WAN. From here, every other piece of the [homelab tour](homelab) is the same as it was when the BGW was upstream: pf rules, DHCP server on the LAN side, unbound, IPv6 RA acceptance.
 
 ## What Could Go Wrong (and Where to Look)
 
@@ -123,9 +123,9 @@ The replacement isn't about saving money (the X-ONU-SFPP costs more than the BGW
 
 ## Where to Go Next
 
--   [Building a FreeBSD pf Router behind XGS-PON](freebsd-pf-router.html): the host this WAN attaches to, including the rc.conf and pf.conf in full.
--   [Homelab Tour](../homelab.html): the rest of the network downstream of `ix0`.
--   [IPv6 for Home Networks](freebsd-ipv6-router.html): native v6 once the bypass is in.
+-   [Building a FreeBSD pf Router behind XGS-PON](freebsd-pf-router): the host this WAN attaches to, including the rc.conf and pf.conf in full.
+-   [Homelab Tour](../homelab): the rest of the network downstream of `ix0`.
+-   [IPv6 for Home Networks](freebsd-ipv6-router): native v6 once the bypass is in.
 -   [pon.wiki, BGW320-500 category](https://pon.wiki/category/bgw320-500/): the canonical reference for the module-side prep.
 
-Running the same module on a different ISP, or doing the same kind of bypass on a different gateway? [Drop me a note](../contact.html); I want to hear how the FreeBSD-side story changes.
+Running the same module on a different ISP, or doing the same kind of bypass on a different gateway? [Drop me a note](../contact); I want to hear how the FreeBSD-side story changes.

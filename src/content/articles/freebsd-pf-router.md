@@ -155,7 +155,7 @@ $ pfctl -s rules
 
 Order of operations matters here: the `ix1.20` interface has to exist before pf parses this file, otherwise the macros referencing it fail to resolve and the rules don't load. The rc.conf above brings the VLAN up during boot, so a normal boot is fine; the gotcha appears when you create the VLAN by hand later and forget to bring it up before reloading pf.
 
-See the [pf.conf design article](pf-firewall-rules.html) for the production ruleset I actually use.
+See the [pf.conf design article](pf-firewall-rules) for the production ruleset I actually use.
 
 ## unbound: Local Recursive DNS
 
@@ -258,12 +258,12 @@ Then from a device on the UniWork SSID (VLAN 20, `10.20.0.0/24`), repeat. Both s
 
 If all of that works, you have a working FreeBSD edge router with the AT&T gateway out of the path.
 
-<div style="background: var(--bg-surface); padding: 1rem; border: 1px solid var(--border-accent); border-left: 3px solid var(--accent-primary); margin: 1.5rem 0;"><p style="margin: 0;"><strong>Heads-up:</strong> This is the bare metal. The real work, clean pf rules, jails for services, monitoring, IPv6, lives in the <a href="../homelab.html">homelab tour</a> and the rest of this series.</p></div>
+<div style="background: var(--bg-surface); padding: 1rem; border: 1px solid var(--border-accent); border-left: 3px solid var(--accent-primary); margin: 1.5rem 0;"><p style="margin: 0;"><strong>Heads-up:</strong> This is the bare metal. The real work, clean pf rules, jails for services, monitoring, IPv6, lives in the <a href="../homelab">homelab tour</a> and the rest of this series.</p></div>
 
 ## Next Steps
 
--   [pf.conf: Writing Rules That Survive a Power Outage](pf-firewall-rules.html): replace the bootstrap ruleset with something deliberate
--   [FreeBSD Jails for Network Services](freebsd-jails-network.html): move DNS and monitoring out of the host
--   [FreeBSD vs Linux: An SRE's Take](freebsd-vs-linux-sre.html): context for why this stack pays off
+-   [pf.conf: Writing Rules That Survive a Power Outage](pf-firewall-rules): replace the bootstrap ruleset with something deliberate
+-   [FreeBSD Jails for Network Services](freebsd-jails-network): move DNS and monitoring out of the host
+-   [FreeBSD vs Linux: An SRE's Take](freebsd-vs-linux-sre): context for why this stack pays off
 
-Building a router along with this guide? [Send me your rc.conf](../contact.html). I always learn from how other people draw the lines.
+Building a router along with this guide? [Send me your rc.conf](../contact). I always learn from how other people draw the lines.

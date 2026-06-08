@@ -67,4 +67,4 @@ For anyone working with Kubernetes, `k9s` is indispensable. It provides a full-f
 
 TUI applications prove that you don't need to sacrifice usability for the efficiency of the terminal. These tools have become essential parts of my daily workflow, and I encourage you to try them out. Start with one or two that solve problems you currently face, and gradually build your terminal toolkit. Your productivity, and your appreciation for well-crafted software, will thank you.
 
-What are your favorite TUI applications? Have I missed any must-haves? [Let me know](../contact.html)!
+What are your favorite TUI applications? Have I missed any must-haves? [Let me know](../contact)!

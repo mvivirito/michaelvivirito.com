@@ -159,4 +159,4 @@ Savings: $1,000/month (36%)
 
 Cost optimization isn't a one-time project. It's an ongoing discipline. Start with the biggest wins (right-sizing + Spot), then layer on the refinements.
 
-Questions about your AWS bill? [Get in touch](../contact.html).
+Questions about your AWS bill? [Get in touch](../contact).

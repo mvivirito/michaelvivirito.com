@@ -83,7 +83,7 @@ Here's what I actually run:
 -   **Proxmox VM** running NixOS as my main server
 -   **Kubernetes** cluster on NixOS nodes
 -   **Docker Compose** stacks for monitoring (Prometheus, Grafana)
--   A [FreeBSD pf router](../homelab.html) at the edge: different OS, same declarative spirit
+-   A [FreeBSD pf router](../homelab) at the edge: different OS, same declarative spirit
 
 All NixOS pieces are configured in one flake. One `git push` and a rebuild deploys everything consistently. The FreeBSD router has its own git repo for `/etc`; together they cover the whole network from packets to pods.
 
@@ -95,7 +95,7 @@ I won't sugarcoat it: NixOS has a steep learning curve. The Nix language is func
 
 Resources that helped me:
 
--   [Official Nix tutorials](https://nixos.org/learn.html)
+-   [Official Nix tutorials](https://nixos.org/learn)
 -   [NixOS Wiki](https://nixos.wiki)
 -   [Home Manager](https://github.com/nix-community/home-manager) for user-space config
 -   [nixos-generators](https://github.com/nix-community/nixos-generators) for images
@@ -108,4 +108,4 @@ NixOS isn't for everyone. If your team is deeply invested in Ansible/Puppet and 
 
 NixOS transformed how I manage infrastructure. My servers are reproducible, rollbacks are instant, and my configs are version-controlled. It's not perfect, the learning curve is real and documentation can be sparse, but for anyone serious about infrastructure as code, it's worth the investment.
 
-Got questions about NixOS? [Drop me a line](../contact.html). Or check out my [nix-config on GitHub](https://github.com/mvivirito/nix-config) for a working example.
+Got questions about NixOS? [Drop me a line](../contact). Or check out my [nix-config on GitHub](https://github.com/mvivirito/nix-config) for a working example.

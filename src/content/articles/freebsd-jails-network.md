@@ -113,7 +113,7 @@ Now the resolver listens on `10.0.0.53`, and the host's DHCP server hands that o
 
 ## pf and Jails Get Along
 
-With VNET, the host's pf rules don't see traffic that stays inside a jail. They do see traffic that crosses bridges. A small addition to the [main ruleset](pf-firewall-rules.html) covers the new flow:
+With VNET, the host's pf rules don't see traffic that stays inside a jail. They do see traffic that crosses bridges. A small addition to the [main ruleset](pf-firewall-rules) covers the new flow:
 
 ```
 # Allow LAN clients to reach the unbound jail's IP on port 53
@@ -184,8 +184,8 @@ Once you have one service in a jail, the next ten get easier. The router's host 
 
 ## Where to Go Next
 
--   [Building a FreeBSD pf Router](freebsd-pf-router.html): the host this all runs on
--   [pf.conf: Writing Rules That Survive a Power Outage](pf-firewall-rules.html): what to add when jails join the network
--   [FreeBSD vs Linux: An SRE's Take](freebsd-vs-linux-sre.html): context for why this is so much nicer than the Linux equivalent
+-   [Building a FreeBSD pf Router](freebsd-pf-router): the host this all runs on
+-   [pf.conf: Writing Rules That Survive a Power Outage](pf-firewall-rules): what to add when jails join the network
+-   [FreeBSD vs Linux: An SRE's Take](freebsd-vs-linux-sre): context for why this is so much nicer than the Linux equivalent
 
-Running services in jails of your own? [I'd love to compare notes](../contact.html).
+Running services in jails of your own? [I'd love to compare notes](../contact).

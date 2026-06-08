@@ -7,7 +7,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   keywords="uses, dotfiles, FreeBSD, NixOS, Neovim, Wezterm, Glove80, Advantage360, homelab, Proxmox, mvivirito"
   ogTitle="Uses, Michael Vivirito"
   ogDescription="What I use every day, hardware, OS, editor, network, and homelab."
-  canonical="/uses.html"
+  canonical="/uses"
 >
 
   <section>
@@ -53,8 +53,8 @@ keys:    glove80</code></pre>
 
       <h2>Operating Systems</h2>
       <ul>
-        <li><strong>FreeBSD 15.0-RELEASE</strong> (pkgbase) on the <a href="homelab.html">edge router</a> and on a small fleet of long-uptime hosts. ZFS root, base-system everything.</li>
-        <li><strong>NixOS 24.11</strong> on workstations and Kubernetes nodes. Declarative, reproducible, and the closest thing to "it just works" once you've climbed the learning curve. (See <a href="articles/why-i-run-nixos.html">why</a>.)</li>
+        <li><strong>FreeBSD 15.0-RELEASE</strong> (pkgbase) on the <a href="homelab">edge router</a> and on a small fleet of long-uptime hosts. ZFS root, base-system everything.</li>
+        <li><strong>NixOS 24.11</strong> on workstations and Kubernetes nodes. Declarative, reproducible, and the closest thing to "it just works" once you've climbed the learning curve. (See <a href="articles/why-i-run-nixos">why</a>.)</li>
         <li><strong>Proxmox VE</strong> as the hypervisor under most of it.</li>
       </ul>
 
@@ -72,15 +72,15 @@ keys:    glove80</code></pre>
         <li><strong>ripgrep</strong>, <strong>fd</strong>, <strong>fzf</strong>, <strong>bat</strong>, <strong>jq</strong>, <strong>sd</strong>, <strong>delta</strong>. The boring-modern stack of grep/find/sed/diff replacements.</li>
         <li><strong>direnv</strong> for per-project environments.</li>
         <li><strong>git</strong>, of course. Plus <strong>lazygit</strong> for the moments my hands want a TUI.</li>
-        <li><strong>htop</strong>, <strong>btop</strong>, and <strong>iftop</strong> for "what is this box doing right now": see also the <a href="articles/top-10-tui-apps.html">TUI apps post</a>.</li>
+        <li><strong>htop</strong>, <strong>btop</strong>, and <strong>iftop</strong> for "what is this box doing right now": see also the <a href="articles/top-10-tui-apps">TUI apps post</a>.</li>
       </ul>
 
       <h2>Network &amp; Homelab</h2>
       <ul>
-        <li><strong>FreeBSD pf router</strong> at the edge: the heart of the network. <a href="homelab.html">Tour the setup</a>.</li>
+        <li><strong>FreeBSD pf router</strong> at the edge: the heart of the network. <a href="homelab">Tour the setup</a>.</li>
         <li><strong>unbound</strong> for recursive DNS, with DNSSEC validation and a small blocklist.</li>
-        <li><strong>WireGuard</strong> for road-warrior VPN back into the LAN. (<a href="articles/freebsd-wireguard.html">Setup post</a>.)</li>
-        <li><strong>Real, native IPv6</strong> via DHCPv6-PD from the ISP. (<a href="articles/freebsd-ipv6-router.html">How</a>.)</li>
+        <li><strong>WireGuard</strong> for road-warrior VPN back into the LAN. (<a href="articles/freebsd-wireguard">Setup post</a>.)</li>
+        <li><strong>Real, native IPv6</strong> via DHCPv6-PD from the ISP. (<a href="articles/freebsd-ipv6-router">How</a>.)</li>
         <li><strong>Managed L2 switch</strong> for VLANs to the IoT and quarantine networks.</li>
       </ul>
 
@@ -88,9 +88,9 @@ keys:    glove80</code></pre>
       <ul>
         <li><strong>Proxmox VE</strong> on a single homelab box hosting most of the VMs.</li>
         <li><strong>NixOS VMs</strong> for everything that runs more than a handful of services.</li>
-        <li><strong>kubeadm + Cilium</strong> for the Kubernetes cluster, on bare-metal-ish VMs. (<a href="articles/kubernetes-bare-metal.html">Build notes</a>.)</li>
+        <li><strong>kubeadm + Cilium</strong> for the Kubernetes cluster, on bare-metal-ish VMs. (<a href="articles/kubernetes-bare-metal">Build notes</a>.)</li>
         <li><strong>ZFS</strong> everywhere: for the boot environments alone.</li>
-        <li><strong>ZFS send/recv</strong> to a remote pool for offsite backups. (<a href="articles/zfs-send-recv-replication.html">Replication script</a>.)</li>
+        <li><strong>ZFS send/recv</strong> to a remote pool for offsite backups. (<a href="articles/zfs-send-recv-replication">Replication script</a>.)</li>
         <li><strong>Prometheus + Grafana + Alertmanager</strong> for monitoring.</li>
       </ul>
 
@@ -123,7 +123,7 @@ keys:    glove80</code></pre>
         <li><a href="https://www.tedunangst.com/flak/" target="_blank" rel="noopener noreferrer">Ted Unangst's writing</a>: clear thinking about systems.</li>
         <li>The <a href="https://www.freebsd.org/doc/handbook/" target="_blank" rel="noopener noreferrer">FreeBSD Handbook</a>: what good documentation looks like.</li>
         <li>Brendan Gregg's performance work: methodologies that survive vendor cycles.</li>
-        <li>Derek Sivers' <a href="https://sive.rs/nowff" target="_blank" rel="noopener noreferrer">/now movement</a>: the inspiration for my <a href="now.html">/now page</a>.</li>
+        <li>Derek Sivers' <a href="https://sive.rs/nowff" target="_blank" rel="noopener noreferrer">/now movement</a>: the inspiration for my <a href="now">/now page</a>.</li>
       </ul>
 
       <pre><code>$ echo "Boring tools, sharp habits, written down."</code></pre>
@@ -135,9 +135,9 @@ keys:    glove80</code></pre>
         Inspired by <a href="https://uses.tech" target="_blank" rel="noopener noreferrer">uses.tech</a>.
       </p>
       <p>
-        <a href="index.html" class="btn btn-secondary">← Home</a>
-        <a href="now.html" class="btn btn-secondary">/now</a>
-        <a href="homelab.html" class="btn btn-primary">Homelab tour</a>
+        <a href="/" class="btn btn-secondary">← Home</a>
+        <a href="now" class="btn btn-secondary">/now</a>
+        <a href="homelab" class="btn btn-primary">Homelab tour</a>
       </p>
     </div>
 

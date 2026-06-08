@@ -26,7 +26,7 @@ This is where FreeBSD's coherence shines. `ifconfig`, `route`, and `netstat` hav
 
 Linux networking, by contrast, has gone through several generations: ifconfig → ip; iptables → nftables; route → ip route; brctl → ip link. They mostly work, and nftables is a real improvement over iptables, but the documentation lag is chronic, and the ecosystem (Docker, k8s, Cilium, every cloud) layers more abstractions on top.
 
-For a network device, a router, a firewall, a VPN concentrator, FreeBSD's stability is a feature, not a bug. The configuration I learn today will still be valid in five years. (See the [pf.conf design article](pf-firewall-rules.html) for what that buys you in practice.)
+For a network device, a router, a firewall, a VPN concentrator, FreeBSD's stability is a feature, not a bug. The configuration I learn today will still be valid in five years. (See the [pf.conf design article](pf-firewall-rules) for what that buys you in practice.)
 
 ## Filesystems
 
@@ -45,7 +45,7 @@ For storage-heavy hosts I'll pick FreeBSD purely for the boot environment story.
 
 Linux owns containers. Docker, containerd, Kubernetes, OCI, runc, that ecosystem is huge, well-funded, and where most server software targets first. If your job is to ship containerised services, run them on Linux.
 
-FreeBSD's jails predate Docker by years and have a different shape. A jail is a partition of the kernel's userspace, not a packaged image. There's no registry, no `jail run nginx:latest`, no kubectl. There is a single, well-defined primitive that's been in the kernel since 2000, and a userland that rarely surprises you. (See [FreeBSD Jails for Network Services](freebsd-jails-network.html) for what that looks like in practice.)
+FreeBSD's jails predate Docker by years and have a different shape. A jail is a partition of the kernel's userspace, not a packaged image. There's no registry, no `jail run nginx:latest`, no kubectl. There is a single, well-defined primitive that's been in the kernel since 2000, and a userland that rarely surprises you. (See [FreeBSD Jails for Network Services](freebsd-jails-network) for what that looks like in practice.)
 
 Different problems, different shapes. I run jails on the router and Kubernetes on a Linux cluster, and both teams are happy.
 
@@ -53,7 +53,7 @@ Different problems, different shapes. I run jails on the router and Kubernetes o
 
 FreeBSD's split between `pkg` (binary packages) and `ports` (build from source) is unusual and good. `pkg install nginx` works like `apt install`; `cd /usr/ports/www/nginx && make install` rebuilds with whatever options you want. You can mix and match.
 
-Linux package management is more diverse, which is both its strength and its weakness. apt, dnf, pacman, zypper, snap, flatpak, AUR helpers, each ecosystem has its own opinions and its own failure modes. NixOS is a notable outlier (and one I run on Linux servers, see [Why I Run NixOS on My Servers](why-i-run-nixos.html)), trading the whole package metaphor for a declarative one.
+Linux package management is more diverse, which is both its strength and its weakness. apt, dnf, pacman, zypper, snap, flatpak, AUR helpers, each ecosystem has its own opinions and its own failure modes. NixOS is a notable outlier (and one I run on Linux servers, see [Why I Run NixOS on My Servers](why-i-run-nixos)), trading the whole package metaphor for a declarative one.
 
 ## Documentation
 
@@ -94,9 +94,9 @@ If you've been Linux-only for a decade, spinning up a FreeBSD VM and walking thr
 
 ## Further Reading
 
--   [Building a FreeBSD pf Router](freebsd-pf-router.html): concrete BSD in action
--   [pf.conf: Writing Rules That Survive a Power Outage](pf-firewall-rules.html): pf in depth
--   [FreeBSD Jails for Network Services](freebsd-jails-network.html): jails on a router
--   [Why I Run NixOS on My Servers](why-i-run-nixos.html): the Linux side of my fleet
+-   [Building a FreeBSD pf Router](freebsd-pf-router): concrete BSD in action
+-   [pf.conf: Writing Rules That Survive a Power Outage](pf-firewall-rules): pf in depth
+-   [FreeBSD Jails for Network Services](freebsd-jails-network): jails on a router
+-   [Why I Run NixOS on My Servers](why-i-run-nixos): the Linux side of my fleet
 
-Disagree? [I'd genuinely like to hear it](../contact.html). The best feedback I get on these posts comes from people who run the other way.
+Disagree? [I'd genuinely like to hear it](../contact). The best feedback I get on these posts comes from people who run the other way.

@@ -111,7 +111,7 @@ ix1.20:\
 
 ## Step 4: pf, but for v6
 
-Most of your existing [pf ruleset](pf-firewall-rules.html) handles both families if you wrote `inet`\-agnostic rules. But IPv6 needs a few specific rules to behave:
+Most of your existing [pf ruleset](pf-firewall-rules) handles both families if you wrote `inet`\-agnostic rules. But IPv6 needs a few specific rules to behave:
 
 ```
 # --- IPv6 must-allow ---
@@ -178,9 +178,9 @@ You gain a working internet. Real addresses, real routing, no more games of port
 
 ## Where to Go Next
 
--   [IPv6 Prefix Delegation: A Troubleshooting Cookbook](ipv6-prefix-delegation-troubleshooting.html): the companion debugging guide for when the steps above don't go to plan
--   [Building a FreeBSD pf Router](freebsd-pf-router.html): the host this all runs on
--   [pf.conf: Writing Rules That Survive a Power Outage](pf-firewall-rules.html): the IPv4 ruleset that pairs with this
--   [WireGuard on FreeBSD: A 30-Minute Setup](freebsd-wireguard.html): how the v6 prefix makes road-warrior VPN setup nicer
+-   [IPv6 Prefix Delegation: A Troubleshooting Cookbook](ipv6-prefix-delegation-troubleshooting): the companion debugging guide for when the steps above don't go to plan
+-   [Building a FreeBSD pf Router](freebsd-pf-router): the host this all runs on
+-   [pf.conf: Writing Rules That Survive a Power Outage](pf-firewall-rules): the IPv4 ruleset that pairs with this
+-   [WireGuard on FreeBSD: A 30-Minute Setup](freebsd-wireguard): how the v6 prefix makes road-warrior VPN setup nicer
 
-Run a different ISP or a different setup? [Send me your config](../contact.html). I'd love to add a section for setups that aren't mine.
+Run a different ISP or a different setup? [Send me your config](../contact). I'd love to add a section for setups that aren't mine.
