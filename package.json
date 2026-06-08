@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "node-html-parser": "^7.1.0",
-    "turndown": "^7.2.4"
+    "turndown": "^7.2.4",
+    "wrangler": "^4.98.0"
   }
 }
