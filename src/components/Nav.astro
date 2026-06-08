@@ -1,0 +1,27 @@
+---
+// Single source of truth for the site nav.
+// On the homepage, in-page section links stay as bare #hashes so the
+// smooth-scroll script intercepts them. On every other page they become
+// root-relative (/#about) so they navigate home, then jump to the section.
+const path = Astro.url.pathname;
+const isHome = path === '/' || path === '/index.html';
+const home = isHome ? '#home' : '/';
+const about = isHome ? '#about' : '/#about';
+const projects = isHome ? '#projects' : '/#projects';
+const blog = isHome ? '#blog' : '/#blog';
+---
+<nav>
+  <ul>
+    <li><a href={home}>Home</a></li>
+    <li><a href="/openworld.html" class={isHome ? 'new' : undefined}>OpenWorld</a></li>
+    <li><a href={about}>About</a></li>
+    <li><a href="/resume.html">Resume</a></li>
+    <li><a href={projects}>Projects</a></li>
+    <li><a href={blog}>Blog</a></li>
+    <li><a href="/homelab.html">Homelab</a></li>
+    <li><a href="/now.html">Now</a></li>
+    <li><a href="/uses.html">Uses</a></li>
+    <li><a href="/visuals.html">Visuals</a></li>
+    <li><a href="/contact.html">Contact</a></li>
+  </ul>
+</nav>

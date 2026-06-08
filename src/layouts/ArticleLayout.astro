@@ -1,0 +1,88 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  entry: CollectionEntry<'articles'>;
+}
+const { entry } = Astro.props;
+const d = entry.data;
+
+// Resolve related-post titles from the collection so titles never drift.
+const all = await getCollection('articles');
+const titleBySlug = new Map(all.map((a) => [a.id, a.data.title]));
+const related = d.related.filter((slug) => titleBySlug.has(slug));
+
+const dateISO = d.date.toISOString().slice(0, 10);
+const dateHuman = d.date.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'UTC',
+});
+---
+<BaseLayout
+  title={`${d.title} - Michael Vivirito`}
+  description={d.description}
+  keywords={d.keywords}
+  ogType="article"
+  ogTitle={d.ogTitle ?? d.title}
+  ogDescription={d.ogDescription ?? d.description}
+  canonical={`/articles/${entry.id}.html`}
+>
+  <article>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>{d.title}</h1>
+      <p class="text-muted">
+        Published on <time datetime={dateISO}>{dateHuman}</time>
+      </p>
+      {d.badges.length > 0 && (
+        <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+          {d.badges.map((b) => <span class="badge">{b}</span>)}
+        </div>
+      )}
+    </header>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+      <slot />
+    </div>
+
+    <!-- Newsletter CTA -->
+    <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
+      <h3 style="margin-top: 0;">$ subscribe --to newsletter</h3>
+      <p class="text-muted">
+        FreeBSD, pf, NixOS, and SRE notes, straight to your inbox. No spam, just signal.
+      </p>
+      <form action="https://buttondown.email/api/emails/embed-subscribe/mvivirito"
+            method="post" target="popupwindow"
+            onsubmit="window.open('https://buttondown.email/mvivirito', 'popupwindow')"
+            style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;">
+        <input type="email" name="email" placeholder="you@example.com" required
+               style="flex: 1; min-width: 200px; padding: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 4px; font-family: 'JetBrains Mono', monospace;" />
+        <button type="submit" class="btn btn-primary" style="cursor: pointer;">Subscribe</button>
+      </form>
+      <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 0; margin-top: 0.5rem;">
+        Powered by <a href="https://buttondown.email" target="_blank" rel="noopener noreferrer">Buttondown</a>. Unsubscribe anytime. ~2 emails/month. Or grab the <a href="/feed.xml">RSS feed</a>.
+      </p>
+    </div>
+
+    {related.length > 0 && (
+      <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+        <h3>Related Posts</h3>
+        <ul>
+          {related.map((slug) => (
+            <li><a href={`/articles/${slug}.html`}>{titleBySlug.get(slug)}</a></li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+      <p class="text-center">
+        <a href="/#blog" class="btn btn-secondary">← Back to Blog</a>
+      </p>
+    </div>
+
+  </article>
+</BaseLayout>

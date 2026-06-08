@@ -1,0 +1,242 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Homelab: FreeBSD pf Router behind XGS-PON - Michael Vivirito"
+  description="A self-built FreeBSD 15 edge router on a CWWK N100 mini PC, sitting behind an X-ONU-SFPP XGS-PON SFP+ module with the AT&T gateway fully bypassed. pf, unbound, ISC DHCP, VLANs, and a Sodola switch downstream."
+  keywords="FreeBSD, pf, firewall, router, homelab, networking, self-hosted, unbound, dhcpd, jails, ZFS, edge router, XGS-PON, X-ONU-SFPP, AT&T bypass, OpenWRT, CWWK, Sodola, VLAN"
+  ogTitle="Homelab: FreeBSD pf Router behind XGS-PON"
+  ogDescription="FreeBSD 15 on a CWWK N100, behind an XGS-PON SFP+ ONT. AT&T gateway out of the path. pf, unbound, VLANs, and the operational lessons that came with the build."
+  canonical="/homelab.html"
+>
+
+  <article>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>Homelab: FreeBSD pf Router</h1>
+      <p class="subtitle" style="color: var(--text-secondary); font-size: 1.1rem;">
+        FreeBSD 15 on a CWWK N100, behind an XGS-PON SFP+ module, with the AT&amp;T gateway out of the path
+      </p>
+      <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+        <span class="badge">FreeBSD 15</span>
+        <span class="badge">pf</span>
+        <span class="badge">XGS-PON</span>
+        <span class="badge">Networking</span>
+        <span class="badge">Self-Hosted</span>
+      </div>
+    </header>
+
+    <!-- Overview -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>What This Is</h2>
+      <p>
+        At the edge of my homelab is a small FreeBSD 15 box, hostname <code>homefw</code>,
+        that handles every packet coming into and out of my network. It's the WAN router,
+        the firewall, the DHCP and DNS server, the VPN endpoint, and the boundary that
+        everything else sits behind. The AT&amp;T fiber gateway is gone; an
+        <strong>X-ONU-SFPP XGS-PON SFP+ module</strong> takes the fiber directly and slots
+        into one of the box's 10G SFP+ ports, so the FreeBSD host gets the public IP itself.
+      </p>
+      <p>
+        I built it instead of buying a turnkey router for the same reason I run NixOS on
+        servers: I want the configuration to be obvious, version-controlled, and learnable.
+        FreeBSD's <code>pf</code>, <code>rc.conf</code>, and tightly integrated networking
+        stack give me exactly that.
+      </p>
+    </div>
+
+    <!-- Why FreeBSD -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Why Not OPNsense or pfSense?</h2>
+      <p>
+        OPNsense and pfSense are both excellent, and both are FreeBSD-based. But they ship
+        a heavyweight web UI on top of FreeBSD, and the moment you click into "Advanced",
+        you discover the UI doesn't expose what you actually want to configure. You SSH in,
+        edit a hidden file, and now your config is split between the GUI and a shadow config
+        you have to remember.
+      </p>
+      <p>
+        Plain FreeBSD avoids that split. Every line of configuration is in
+        <code>/etc/rc.conf</code>, <code>/etc/pf.conf</code>, <code>/usr/local/etc/unbound/</code>,
+        readable, greppable, and trivial to put in git. The router is small enough to fit
+        in my head, which is the entire point.
+      </p>
+    </div>
+
+    <!-- Hardware -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Hardware</h2>
+      <ul>
+        <li><strong>Chassis</strong>: CWWK Intel Alder Lake N100 mini PC (4C/4T, up to 3.4 GHz)</li>
+        <li><strong>10G uplinks</strong>: Dual Intel SFP+ 10 GbE (the FreeBSD <code>ix(4)</code> driver). One hosts the XGS-PON ONT for WAN, the other carries the LAN trunk.</li>
+        <li><strong>2.5G ports</strong>: 4x Intel I226-V 2.5 GbE (the <code>igc(4)</code> driver). Spare today, useful for an OOB management LAN or a future split.</li>
+        <li><strong>Memory</strong>: 8 GB DDR5</li>
+        <li><strong>Storage</strong>: 128 GB NVMe with ZFS root and boot environments</li>
+        <li><strong>WAN ONT</strong>: <a href="https://pon.wiki/category/bgw320-500/" target="_blank" rel="noopener noreferrer">X-ONU-SFPP</a> XGS-PON SFP+ module, pre-flashed with the 8311 community firmware and the Azores bootloader. SC/APC connector takes the AT&amp;T fiber directly. Active USB-C cooler attached because these modules run hot.</li>
+        <li><strong>Switch downstream</strong>: <a href="https://a.co/d/0bHmg42w" target="_blank" rel="noopener noreferrer">Sodola 12-port 10G managed switch</a> (8x SFP+ / 4x 10GBase-T, 1U), carrying the LAN trunk and the VLAN 20 tag out to the UniFi APs</li>
+      </ul>
+      <p>
+        Intel NICs matter. Realtek and other budget NICs technically work, but they
+        regularly cost more in debugging time than the BOM saved.
+      </p>
+    </div>
+
+    <!-- Topology -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Network Topology</h2>
+      <pre><code>        ┌────────────────────────────────┐
+        │   AT&amp;T XGS-PON Fiber            │
+        │   (SC/APC, no ISP gateway)      │
+        └───────────────┬────────────────┘
+                        │
+        ┌───────────────▼────────────────┐
+        │  X-ONU-SFPP (XGS-PON SFP+ ONT) │
+        │  8311 firmware · Azores boot   │
+        └───────────────┬────────────────┘
+                        │ ix0 (WAN, 10G SFP+)
+        ┌───────────────▼────────────────┐
+        │   FreeBSD 15 Router (homefw)   │
+        │   pf · unbound · ISC dhcpd     │
+        └───────────────┬────────────────┘
+                        │ ix1 (LAN trunk, 10G SFP+)
+        ┌───────────────▼────────────────┐
+        │      Sodola Managed Switch     │
+        └──┬─────────────────────────┬───┘
+           │ untagged                │ VLAN 20 tagged
+        ┌──▼──────────┐         ┌────▼─────────┐
+        │ UniFi APs   │         │ UniFi APs    │
+        │ SSID:       │         │ SSID:        │
+        │ UniWorld    │         │ UniWork      │
+        │ 10.0.0.0/24 │         │ 10.20.0.0/24 │
+        │ (main LAN)  │         │ (ix1.20)     │
+        └──┬──────────┘         └──────────────┘
+           │
+        ┌──▼──────────────────┐
+        │ Wired LAN           │
+        │ Workstations        │
+        │ Servers / homelab   │
+        └─────────────────────┘</code></pre>
+      <p>
+        One trunk down to the Sodola switch, two SSIDs out at the UniFi APs.
+        <strong>UniWorld</strong> is the main LAN, untagged on
+        <code>ix1</code>. <strong>UniWork</strong> is VLAN 20, terminated on
+        <code>ix1.20</code> with its own subnet, so devices on that SSID never share a
+        broadcast domain with the rest of the house and have to traverse pf to talk to
+        anything else.
+      </p>
+    </div>
+
+    <!-- Software -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Software Stack</h2>
+      <ul>
+        <li><strong>FreeBSD 15.0-RELEASE</strong> (pkgbase): base OS, ZFS root, GENERIC kernel</li>
+        <li><strong>pf</strong>: stateful firewall, NAT, anti-spoofing</li>
+        <li><strong>unbound</strong>: local recursive DNS, DNSSEC validation, blocklists</li>
+        <li><strong>ISC dhcpd</strong>: leases on the main LAN and VLAN 20</li>
+        <li><strong>ntpd</strong>: local NTP for the network</li>
+        <li><strong>WireGuard</strong>: road-warrior VPN back into the LAN</li>
+        <li><strong>iocage / bastille</strong>: jails for service isolation</li>
+      </ul>
+      <p>
+        Everything is in base or in <code>pkg</code>. Running pkgbase means base updates
+        flow through the same package manager as everything else, which keeps the
+        boot-environment story clean.
+      </p>
+    </div>
+
+    <!-- Configuration in spirit -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>The Configuration, in Spirit</h2>
+      <pre><code># /etc/rc.conf (excerpt)
+hostname="homefw"
+zfs_enable="YES"
+
+# Forwarding for v4 and v6
+gateway_enable="YES"
+ipv6_gateway_enable="YES"
+
+# WAN: SFP+ port hosting the X-ONU-SFPP XGS-PON ONT
+ifconfig_ix0="DHCP"
+ifconfig_ix0_ipv6="inet6 accept_rtadv"
+background_dhclient_ix0="YES"   # XGS-PON DHCP can be slow at boot
+
+# LAN trunk and VLAN 20 (UniWork)
+ifconfig_ix1="inet 10.0.0.1 netmask 255.255.255.0"
+vlans_ix1="20"
+ifconfig_ix1_20="inet 10.20.0.1/24"
+
+# Services
+pf_enable="YES"
+pflog_enable="YES"
+unbound_enable="YES"
+dhcpd_enable="YES"
+dhcpd_ifaces="ix1 ix1.20"
+sshd_enable="YES"</code></pre>
+      <p>
+        Two lines worth flagging. <code>background_dhclient_ix0="YES"</code> is the line
+        that fixed a class of boot-time bugs: the XGS-PON ONT sometimes takes a few
+        seconds to settle and hand out a DHCP lease, and without backgrounding the boot
+        would hang waiting for it, dragging ntpd, unbound, and even sshd down with it.
+        The VLAN pair (<code>vlans_ix1</code> plus <code>ifconfig_ix1_20</code>) is what
+        creates the <code>ix1.20</code> interface; if that interface doesn't exist before
+        pf loads, anything in pf that references it silently breaks.
+      </p>
+      <p>
+        Most of the rest is in <code>/etc/pf.conf</code>, see the
+        <a href="articles/pf-firewall-rules.html">pf rules deep dive</a> for the full
+        ruleset and the reasoning behind it.
+      </p>
+    </div>
+
+    <!-- Operational habits -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Operational Habits</h2>
+      <ul>
+        <li><strong>git-tracked config.</strong> <code>/etc</code>,
+            <code>/usr/local/etc</code>, and the jail manifests live in a private git repo.
+            Every change is a commit with a message.</li>
+        <li><strong>ZFS boot environments.</strong> Before any meaningful change I clone
+            the boot environment with <code>bectl create</code>. If something breaks, I
+            reboot to the previous BE in seconds.</li>
+        <li><strong>pfctl -nf before pfctl -f.</strong> Always validate the ruleset before
+            loading it. Never edit pf.conf in place over SSH without a safety net.</li>
+        <li><strong>Console access.</strong> Serial console wired up. The day pf locks me
+            out is the day I'm grateful for it.</li>
+        <li><strong>ZFS snapshots + offsite send.</strong> Hourly snapshots, daily replication
+            to a remote ZFS host. Belt and suspenders.</li>
+      </ul>
+    </div>
+
+    <!-- Deeper Reading -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Articles in This Series</h2>
+      <ul>
+        <li><a href="articles/xgs-pon-bypass-att-gateway.html">Bypassing the AT&amp;T Fiber Gateway with an XGS-PON SFP+ Module</a>: how the AT&amp;T BGW320-500 came out of the path and the X-ONU-SFPP went into <code>ix0</code></li>
+        <li><a href="articles/freebsd-pf-router.html">Building a FreeBSD pf Router behind XGS-PON</a>: hardware, install, and first-boot configuration on the host this WAN attaches to</li>
+        <li><a href="articles/pf-firewall-rules.html">pf.conf: Writing Rules That Survive a Power Outage</a>: rule design, NAT, anti-spoofing, and a real config</li>
+        <li><a href="articles/freebsd-jails-network.html">FreeBSD Jails for Network Services</a>: using VNET jails to isolate DNS, monitoring, and VPN</li>
+        <li><a href="articles/freebsd-ipv6-router.html">IPv6 for Home Networks: A FreeBSD Walkthrough</a>: DHCPv6-PD, rtadvd, and v6-aware pf rules</li>
+        <li><a href="articles/ipv6-prefix-delegation-troubleshooting.html">IPv6 Prefix Delegation: A Troubleshooting Cookbook</a>: debugging dhcp6c, RAs, RDNSS, and PMTU</li>
+        <li><a href="articles/freebsd-wireguard.html">WireGuard on FreeBSD: A 30-Minute Setup</a>: server, clients, pf, and DNS through the tunnel</li>
+        <li><a href="articles/zfs-send-recv-replication.html">ZFS Send/Recv: Replicating Your Homelab</a>: snapshots, incremental streams, and a real pull-based cron script</li>
+        <li><a href="articles/freebsd-vs-linux-sre.html">FreeBSD vs Linux: An SRE's Take</a>: when to reach for each, and why I run both</li>
+      </ul>
+    </div>
+
+    <!-- Related -->
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+      <h2>Related Reading</h2>
+      <ul>
+        <li><a href="https://www.freebsd.org/doc/handbook/" target="_blank" rel="noopener noreferrer">FreeBSD Handbook</a>: the canonical reference, written like an actual book</li>
+        <li><a href="https://man.freebsd.org/cgi/man.cgi?query=pf.conf&amp;sektion=5" target="_blank" rel="noopener noreferrer">pf.conf(5)</a>: the manual page that does most of the teaching</li>
+        <li><a href="https://man.freebsd.org/cgi/man.cgi?query=jail&amp;sektion=8" target="_blank" rel="noopener noreferrer">jail(8)</a>: the original lightweight container, still going strong</li>
+      </ul>
+      <p>
+        Have questions about the build, or notice something I'd benefit from changing?
+        <a href="contact.html">Drop me a line</a>.
+      </p>
+    </div>
+
+  </article>
+
+</BaseLayout>

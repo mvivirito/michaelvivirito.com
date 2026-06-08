@@ -1,0 +1,22 @@
+---
+interface Props {
+  // 'home' (default): subpage footer, leads with a Home link.
+  // 'youtube': homepage footer, leads with the YouTube link.
+  variant?: 'home' | 'youtube';
+}
+const { variant = 'home' } = Astro.props;
+---
+<footer>
+  <p>
+    {variant === 'youtube' ? (
+      <a href="https://www.youtube.com/c/michaelvivirito" target="_blank" rel="noopener noreferrer">YouTube</a>
+    ) : (
+      <a href="/">Home</a>
+    )} &bull;
+    <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a> &bull;
+    <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+  </p>
+  <p class="text-muted" style="margin-top: 1rem;">
+    &copy; 2026 Michael Vivirito
+  </p>
+</footer>

@@ -1,0 +1,464 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Resume: Michael Vivirito"
+  description="Michael Vivirito, Lead Site Reliability Engineer (contingent / MSP) at a top-tier technology company. A decade of infrastructure experience across payments, telecom, and financial services. Resume with experience, key achievements, technical skills, and career timeline."
+  keywords="Michael Vivirito, resume, CV, Lead SRE, Site Reliability Engineer, contingent engineer, MSP contractor, Kubernetes, AWS, FreeBSD, NixOS, MCP, mvivirito"
+  ogType="profile"
+  ogTitle="Resume, Michael Vivirito"
+  ogDescription="Lead Site Reliability Engineer (contingent / MSP) at a top-tier technology company, 4 years managing critical infrastructure for billions of users, on top of a prior decade across payments, telecom, and financial services."
+  canonical="/resume.html"
+>
+
+  <article>
+    <!-- Header -->
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>Michael Vivirito</h1>
+      <p class="subtitle" style="color: var(--text-secondary); font-size: 1.1rem;">
+        Lead Site Reliability Engineer · Enterprise Platforms Integration
+      </p>
+      <p class="text-muted" style="font-size: 0.9rem;">
+        Contingent Engineer (Managed Service Provider) ·
+        Top-tier technology company serving billions of users ·
+        Remote (United States) · 2022 - Present
+      </p>
+      <p class="text-muted" style="font-size: 0.875rem; margin-top: 0.5rem;">
+        <a href="contact.html">Contact</a> ·
+        <a href="https://www.linkedin.com/in/mvivirito" target="_blank" rel="noopener noreferrer">LinkedIn</a> ·
+        <a href="https://github.com/mvivirito" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </p>
+    </header>
+
+    <!-- Stats Hero -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <pre><code>$ cat ~/career/stats
+tenure:               4 years
+code_changes:         750+
+tasks_completed:      500
+applications_managed: 7+
+team_size_led:        4 engineers
+team_role:            Lead SRE, Enterprise Platforms</code></pre>
+    </div>
+
+    <!-- Professional Summary -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Professional Summary</h2>
+      <p>
+        Results-driven Site Reliability Engineering Lead with extensive experience
+        managing enterprise platform operations at a top-tier technology company
+        serving billions of users. Proven track record of leading cross-functional
+        initiatives spanning application lifecycle management, security compliance,
+        zero-trust / VPN-less architecture, and AI-powered tooling. Skilled at
+        translating complex technical challenges into actionable solutions by
+        bridging engineering teams, stakeholders, and leadership. Currently leading
+        a team of 4 engineers supporting third-party application integration,
+        reliability, and automation across the client's enterprise infrastructure.
+      </p>
+      <p class="text-muted" style="font-size: 0.875rem; margin-top: 1rem;">
+        Engaged as a contingent engineer through a Managed Service Provider.
+        Specific client name, internal-platform names, and third-party product
+        names redacted out of respect for the client. Specifics happily shared
+        under NDA on request.
+      </p>
+    </div>
+
+    <!-- Experience -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Experience</h2>
+
+      <h3>Lead SRE, Enterprise Platforms Integration</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">
+        Contingent Engineer via Managed Service Provider ·
+        Top-tier technology company · Remote · 2022 - Present
+      </p>
+
+      <h4>Team Leadership &amp; Operations</h4>
+      <ul>
+        <li>Lead a team of 4 SRE engineers responsible for the lifecycle management of third-party enterprise applications across the client's global infrastructure.</li>
+        <li>Serve as Tier 2 escalation point for application lifecycle operations, coordinating incident response and resolution across multiple stakeholder groups.</li>
+        <li>Manage NORAM office-hours rotation, providing real-time operational support and cross-functional troubleshooting for enterprise platform issues.</li>
+      </ul>
+
+      <h4>Enterprise Analytics: AI Agent Integration &amp; Auth Infrastructure</h4>
+      <ul>
+        <li>Architected and implemented a Thrift-based authentication proxy service for an enterprise data analytics platform, enabling secure integration with the client's internal AI agent platform.</li>
+        <li>Delivered end-to-end implementation across 8+ changesets: Thrift IDL design, internal service-routing configuration, handler testing, client migration, and codegen compatibility fixes.</li>
+        <li>Created a conversational-AI skillbook for analytics queries, enabling enterprise users to query dashboards through natural language.</li>
+        <li>Authored user documentation and organized wiki resources to support team adoption of the new auth architecture.</li>
+        <li>Resolved complex cross-tier authentication challenges, including bringing per-controller identity authentication into the async tier, coordinating with production-engineering teams across the company.</li>
+      </ul>
+
+      <h4>Zero-Trust / VPN-Less Architecture: Application Migration</h4>
+      <ul>
+        <li>Led the migration of enterprise applications to the client's VPN-less infrastructure, reducing VPN dependency and improving access reliability for global users.</li>
+        <li>Implemented forward-proxy filter configurations, DNS CNAME entries, and backend reverse-proxy service entries for an EHS / sustainability platform's zero-trust integration across production and dev environments.</li>
+        <li>Enabled affiliate-user access to zero-trust enterprise endpoints, expanding secure access to the client's extended workforce.</li>
+      </ul>
+
+      <h4>Enterprise Endpoint Backup Platform Management</h4>
+      <ul>
+        <li>Managed the full lifecycle of an enterprise endpoint backup solution across 15+ changesets spanning deployment, vendor rebranding, disaster recovery, and compliance operations.</li>
+        <li>Led a major vendor rebranding migration: engineered the client-swap method including post-install scripts, identity-file preservation, incremental rollout (2% → 60%), and cross-platform uninstall automation (Windows and Mac).</li>
+        <li>Built region-based deployment automation (EMEA / global) using packaged distribution and feature-flag-controlled rollouts.</li>
+        <li>Developed a custom metrics pipeline: wrote a script controller to send organizational metrics to the client's internal time-series platform for real-time monitoring and capacity planning.</li>
+        <li>Executed disaster-recovery operations including failover from DR replica to primary and secrets-management cluster migration fixes.</li>
+        <li>Integrated with a third-party e-discovery platform via internal service calls for legal-hold compliance.</li>
+        <li>Managed ad-hoc legal-matter operations and user-deployment scripting for Linux endpoints.</li>
+      </ul>
+
+      <h4>Legal-Hold Integration: Compliance Infrastructure</h4>
+      <ul>
+        <li>Owned the legal-hold status agent infrastructure, managing rollout progression and cross-platform packaging.</li>
+        <li>Migrated package ACLs to the client's internal application-platform services for improved security posture.</li>
+        <li>Deprecated legacy controllers and cleaned up logging configurations as part of infrastructure modernization.</li>
+        <li>Built and maintained internal package-build pipelines for cross-platform agent distribution.</li>
+      </ul>
+
+      <h4>Manufacturing Execution System</h4>
+      <ul>
+        <li>Executed a major version upgrade for a production manufacturing-execution system.</li>
+        <li>Led the full decommission effort: removed configuration-management cookbooks, deleted internal workflow configurations, and cleaned up DNS aliases, demonstrating disciplined infrastructure lifecycle management.</li>
+      </ul>
+
+      <h4>Recruiting Whiteboard Application: Internal Tool Development</h4>
+      <ul>
+        <li>Fixed critical React bugs and XSS vulnerabilities in a real-time collaborative whiteboard application used in technical interviews.</li>
+        <li>Managed the production container deployment pipeline for the recruiting whiteboard tool.</li>
+      </ul>
+
+      <h4>Developer Experience &amp; Knowledge Sharing</h4>
+      <ul>
+        <li>Published an internal engineering guide on developing client-platform applications directly in VS Code, enabling engineers across the company to develop locally with shareable preview URLs.</li>
+        <li>Created comprehensive developer-setup documentation including yarn path configuration, npmrc proxy fixes, and per-app workflow guides.</li>
+        <li>Built data pipelines using the client's internal data-pipeline platform for automated data-processing workflows.</li>
+      </ul>
+
+      <h4>Infrastructure &amp; Cloud Operations</h4>
+      <ul>
+        <li>Managed cloud infrastructure using Terraform, updating deprecated attributes and maintaining configuration as code.</li>
+        <li>Configured ACLs on the client's internal key-value store, configuration-management cookbooks, and config-as-code settings across multiple enterprise services.</li>
+        <li>Maintained DNS configurations, FQDN aliases, and service routing for enterprise application availability.</li>
+      </ul>
+
+      <hr style="margin: 2.5rem 0 1.5rem; border: none; border-top: 1px solid rgba(59, 130, 246, 0.2);">
+
+      <h3>Prior Experience</h3>
+      <p class="text-muted" style="font-size: 0.875rem; margin-bottom: 1.5rem;">
+        Pre-MSP career, direct-hire roles spanning cloud migration, systems
+        administration, and IT infrastructure across financial services,
+        payments, and telecom.
+      </p>
+
+      <h3>Network Administrator II: Atlantic Pacific Processing Systems</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">
+        Fountain Valley, CA · May 2021 - May 2022
+      </p>
+      <ul>
+        <li>Led three concurrent cloud-migration projects in a rapidly expanding payments organization, consolidating workloads from Azure, Eukhost, and Linode into a primary AWS environment while maintaining 99% uptime.</li>
+        <li>Authored the company-wide migration plan and executed workload migration via the AWS Migration Acceleration Program (MAP), saving 25% on newly migrated assets.</li>
+        <li>Drove the AWS Control Tower implementation across multi-account production environments, delivered ~30% under budget and 7 days ahead of schedule.</li>
+        <li>Built CI/CD pipelines with Atlassian Bamboo and self-service products in AWS Service Catalog to streamline developer workflows.</li>
+        <li>Stood up an ECS-hosted internal operations dashboard, reducing tooling costs and improving maintainability.</li>
+        <li>Orchestrated site-to-site VPN tunnels with the TSYS global payment processor for production card-processing connectivity.</li>
+        <li>Upgraded on-site firewalls to Fortinet FortiGate 100F units and deployed Palo Alto Cortex XDR endpoint protection across workstations and production servers.</li>
+        <li>Partnered with Accounting, Compliance, IT, and Risk teams to scope migrations, resolve outstanding issues, and quantify migration timelines based on data size and complexity.</li>
+      </ul>
+
+      <h3>Systems Administrator: AT&amp;T / DirecTV</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">
+        El Segundo, CA · March 2020 - May 2021
+      </p>
+      <ul>
+        <li>Supported 50+ developers and testers; managed 600+ servers and workstations including patching, migration, and greenfield environment builds.</li>
+        <li>Authored Ansible playbooks and CFEngine policies to configure and maintain workload-management systems, saved ~$12k/year via automated monitoring and cut ticket volume by 16%.</li>
+        <li>Resolved 500+ tickets requiring reverse engineering and advanced troubleshooting across Python, PowerShell, vSphere, NetApp, and Grafana.</li>
+        <li>Built Python and PowerShell automation tooling that empowered multiple internal teams.</li>
+      </ul>
+
+      <h3>IT Administrator: Centek Capital Group</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">
+        Beverly Hills, CA · August 2015 - March 2020
+      </p>
+      <ul>
+        <li>Stood up a Windows Server 2016 domain controller managing 15 desktop workstations, 99.9% uptime sustained for 5 consecutive years.</li>
+        <li>Built and maintained a 12-node Debian Linux workstation network; learned Ansible on the job to manage the fleet at scale, reducing tickets 12%.</li>
+        <li>Built custom PHP and Java line-of-business applications, pre-approval form generators, a physical-file tracking system, and internal monitoring tooling, recapturing ~$7k/year in time and materials.</li>
+        <li>Took over and reverse-engineered a legacy C#.NET marketing application from the original developer; established maintenance practices and shipped several new features.</li>
+      </ul>
+    </div>
+
+    <!-- Key Achievements -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Key Achievements</h2>
+
+      <h3>Built and Operated an Enterprise Endpoint Backup Platform</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">374 code changes</p>
+      <p>
+        <strong>What:</strong> Owned the full lifecycle of an enterprise endpoint
+        backup solution protecting corporate devices across a global fleet. Built
+        automated employee-transition workflows, international rollout
+        infrastructure, secrets-management cluster with disaster recovery, data
+        pipeline for user-lifecycle automation, and fleet-wide metric collection.
+      </p>
+      <p>
+        <strong>Scale:</strong> Fleet of tens of thousands of corporate devices
+        (Mac / Windows) across dozens of countries.
+      </p>
+      <p>
+        <strong>Technologies:</strong> PHP / Hack, Python, Chef, Terraform,
+        HashiCorp Vault, AWS EKS, data-pipeline orchestration, distributed graph
+        databases, dynamic configuration, feature flags.
+      </p>
+      <p>
+        <strong>Result:</strong> Achieved reliable enterprise backup coverage
+        across the global corporate device fleet with automated onboarding /
+        offboarding, multi-region DR, and compliance-driven legal-hold integration.
+      </p>
+
+      <h3>Pioneered AI Tool Integration Across Four Internal AI Platforms</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">95+ code changes</p>
+      <p>
+        <strong>What:</strong> Led the integration of an enterprise data
+        analytics platform with four of the client's internal AI / ML agent
+        platforms. Rewrote the tool server from Python to a typed server-side
+        language for platform compatibility. Designed self-service authentication
+        architecture replacing admin-managed credentials.
+      </p>
+      <p>
+        <strong>Result:</strong> Delivered working AI tool integration across all
+        four platforms. Navigated a month-long platform outage by rewriting the
+        entire server in a different language to bypass the blocked path.
+        Established reusable patterns for the broader team.
+      </p>
+
+      <h3>Led Infrastructure Takeover of a Mission-Critical Recruiting Application</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">38 code changes</p>
+      <p>
+        <strong>What:</strong> Completed full infrastructure takeover of a
+        real-time collaborative whiteboard application used in technical
+        interviews. Migrated from legacy VMs to Kubernetes with multi-datacenter
+        high availability.
+      </p>
+      <p>
+        <strong>Scale:</strong> ~500 daily active users on mission-critical
+        interview infrastructure.
+      </p>
+      <p>
+        <strong>Result:</strong> Deprovisioned 14 legacy VMs, removed 8+ unused
+        load-balancer records, established comprehensive documentation. Reduced
+        incident frequency from ~1 SEV / month through proactive monitoring.
+        Completed one month ahead of schedule.
+      </p>
+
+      <h3>Built Legal-Hold Compliance Integration System</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">79 code changes</p>
+      <p>
+        <strong>What:</strong> Designed and maintained a compliance system
+        connecting legal-hold processes with enterprise backup infrastructure.
+        Managed third-party e-discovery platform integration, custodian
+        lifecycle syncing, and data-preservation workflows.
+      </p>
+      <p>
+        <strong>Result:</strong> Ensured continuous legal compliance for
+        data-preservation requirements with automated custodian management,
+        handling edge cases like employee-leave status and identity transitions.
+      </p>
+
+      <h3>Enabled Native AI Capabilities on an Enterprise Analytics Platform</h3>
+      <p>
+        <strong>What:</strong> Led the integration of a cloud AI service with an
+        enterprise analytics platform, allowing users to use natural language to
+        generate visualizations, create calculated fields, and build data flows.
+      </p>
+      <p>
+        <strong>Result:</strong> Successfully delivered AI-powered analytics
+        capabilities to beta users with full project closure documentation and
+        architecture diagrams for ongoing operations.
+      </p>
+    </div>
+
+    <!-- Career Timeline -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Career Timeline</h2>
+
+      <h3>2022: 78 code changes</h3>
+      <p>
+        Joined as an enterprise infrastructure engineer focused on endpoint
+        backup solutions. Ramped quickly on the corporate device-management
+        stack, building configuration-management cookbooks, API controllers, and
+        package-management automation.
+      </p>
+
+      <h3>2023: 171 code changes</h3>
+      <p>
+        Expanded scope significantly. Took ownership of the legal-hold compliance
+        integration, built secrets-management disaster-recovery infrastructure,
+        and deepened cloud-operations expertise. Became an active
+        knowledge-sharing contributor across engineering communities.
+      </p>
+
+      <h3>2024: 233 code changes</h3>
+      <p>
+        Peak productivity year. Broadened portfolio to include data-analytics
+        platform management. Began managing multiple enterprise application
+        environments and incident response. Drove major refactoring efforts to
+        modernize legacy codebases.
+      </p>
+
+      <h3>2025: 196 code changes</h3>
+      <p>
+        Shifted toward higher-impact project leadership. Led analytics Tier 2
+        enablement, managed platform upgrades, and supported data-center
+        infrastructure tooling. Took on the recruiting-whiteboard infrastructure
+        takeover project.
+      </p>
+
+      <h3>2026: 75 code changes (YTD)</h3>
+      <p>
+        Transitioned into AI-focused technical leadership. Pioneered MCP tool
+        integration across four internal AI platforms, completed
+        recruiting-infrastructure takeover ahead of schedule, and established
+        reusable AI-onboarding patterns for the broader team.
+      </p>
+    </div>
+
+    <!-- Technical Skills -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Technical Skills</h2>
+
+      <h3>Languages &amp; Frameworks</h3>
+      <ul>
+        <li>PHP / Hack (typed server-side language): <strong>Expert</strong></li>
+        <li>Chef / configuration management: <strong>Expert</strong></li>
+        <li>Python: <strong>Advanced</strong></li>
+        <li>Terraform / Infrastructure as Code: <strong>Advanced</strong></li>
+        <li>Shell scripting (Bash / Zsh): <strong>Advanced</strong></li>
+        <li>HCL (Terraform): <strong>Advanced</strong></li>
+        <li>Ruby (Chef DSL): <strong>Advanced</strong></li>
+        <li>JavaScript / React: <strong>Working</strong></li>
+        <li>Thrift IDL: <strong>Working</strong></li>
+      </ul>
+
+      <h3>Infrastructure &amp; Systems</h3>
+      <ul>
+        <li>Kubernetes / Helm: <strong>Advanced</strong> (container CI / CD, multi-DC)</li>
+        <li>AWS (EKS, IAM, multi-region): <strong>Advanced</strong></li>
+        <li>HashiCorp Vault (HA, DR, auto-unseal): <strong>Advanced</strong></li>
+        <li>Nginx, reverse proxies, DNS: <strong>Advanced</strong></li>
+        <li>Monitoring &amp; observability: <strong>Intermediate</strong></li>
+        <li>Data pipelines / ETL: <strong>Intermediate</strong></li>
+      </ul>
+
+      <h3>Domains</h3>
+      <ul>
+        <li>Enterprise application lifecycle management</li>
+        <li>Endpoint security &amp; backup at scale</li>
+        <li>Legal compliance &amp; e-discovery integration</li>
+        <li>AI / ML tool integration (MCP: Model Context Protocol)</li>
+        <li>Incident response &amp; SEV management</li>
+        <li>Zero-trust / VPN-less architecture &amp; secure access</li>
+      </ul>
+
+      <h3>Practices</h3>
+      <ul>
+        <li>Infrastructure as Code</li>
+        <li>Cross-platform fleet management</li>
+        <li>Feature-flag-driven rollouts</li>
+        <li>Documentation-first delivery</li>
+        <li>Multi-datacenter HA architecture</li>
+      </ul>
+
+      <h3>Internal-Tooling Experience</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">
+        The client operates a large internal-platform suite. Comfortable with
+        their equivalents of: configuration-as-code platforms, service mesh /
+        routing layers, container orchestration, time-series metrics &amp;
+        real-time analytics, CI / CD pipelines, feature-flag rollout systems,
+        internal package management, GraphQL / graph services, and internal
+        AI-agent / assistant platforms. Specific product names withheld;
+        available on request.
+      </p>
+
+      <h3>Categories of Platforms Owned or Operated</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">
+        Enterprise data analytics · enterprise endpoint backup · manufacturing
+        execution systems · EHS / sustainability platforms · recruiting and
+        collaborative-whiteboard tools · internal application-development
+        platforms.
+      </p>
+
+      <h3>Architecture &amp; Security</h3>
+      <p class="text-muted" style="font-size: 0.875rem;">
+        Zero-trust / VPN-less infrastructure · Thrift services · MCP (Model
+        Context Protocol) · AI-agent integration · authentication-proxy design ·
+        legal hold &amp; e-discovery · secrets-management migration ·
+        ACL management
+      </p>
+    </div>
+
+    <!-- Leadership & Soft Skills -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Leadership &amp; Soft Skills</h2>
+      <ul>
+        <li><strong>Cross-functional Mediation:</strong> Proven ability to align engineering teams, PMs, and stakeholders around solutions, even when not the deepest technical expert in the room.</li>
+        <li><strong>Problem Decomposition:</strong> Skilled at breaking complex, ambiguous problems into actionable work streams and guiding teams to resolution.</li>
+        <li><strong>Knowledge Sharing:</strong> Proactive documentation author and community contributor (internal engineering publications, wiki authoring, developer-workflow guides).</li>
+        <li><strong>Team Building:</strong> Experience managing direct reports, running operational rotations, and mentoring engineers across skill levels.</li>
+      </ul>
+
+      <h3>Selected Community &amp; Documentation Contributions</h3>
+      <ul>
+        <li>Authored an internal Tier 2 application-operations wiki resource.</li>
+        <li>Authored an internal AI-enablement / MCP analysis portfolio document; drove participation in the company's AI initiatives; proposed AI-assistant integrations for the team's portfolio.</li>
+        <li>Published an internal engineering guide on developing client-platform applications directly in VS Code with shareable preview URLs.</li>
+        <li>Ran Kubernetes and analytics-platform learning sessions for engineering communities across the company.</li>
+      </ul>
+    </div>
+
+    <!-- Education & Certifications -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Education &amp; Certifications</h2>
+
+      <h3>Education</h3>
+      <ul>
+        <li>Bachelor of Science, Computer Science: Western Governors University, 2022</li>
+        <li>Associate of Arts, Computer Science / Math &amp; Physics: West Los Angeles College, 2020</li>
+      </ul>
+
+      <h3>Certifications</h3>
+      <div class="certifications" style="margin-top: 0.5rem;">
+        <span class="badge">AWS Developer Associate</span>
+        <span class="badge">AWS SysOps Administrator Associate</span>
+        <span class="badge">CompTIA Project+</span>
+        <span class="badge">AWS Solutions Architect Associate <em style="opacity: 0.7;">(expired 2023)</em></span>
+        <span class="badge">CompTIA Security+ <em style="opacity: 0.7;">(expired 2023)</em></span>
+      </div>
+    </div>
+
+    <!-- Side Projects callout -->
+    <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
+      <h2>Beyond the Day Job</h2>
+      <p>
+        Outside of the client engagement I run a self-built FreeBSD edge router
+        and write about the infrastructure choices behind it. The deeper
+        write-ups live in the <a href="homelab.html">homelab tour</a> and the
+        <a href="index.html#blog">blog</a>. I'm also building
+        <a href="https://www.openworld.run" target="_blank" rel="noopener noreferrer">OpenWorld</a>,
+        a platform for proposing and collaborating on real-world infrastructure
+        improvements.
+      </p>
+    </div>
+
+    <!-- Footer / call to action -->
+    <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2); text-align: center;">
+      <p>
+        <a href="contact.html" class="btn btn-primary">Get in Touch</a>
+        <a href="index.html#about" class="btn btn-secondary">About</a>
+        <a href="homelab.html" class="btn btn-secondary">Homelab</a>
+      </p>
+    </div>
+
+  </article>
+
+</BaseLayout>
