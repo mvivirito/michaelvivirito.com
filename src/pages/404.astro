@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="404 Not Found - Michael Vivirito"
+  description="The page you were looking for does not exist."
+  canonical="/404.html"
+>
+  <section>
+    <h1 class="text-center">404</h1>
+    <div class="card" style="max-width: 600px; margin: 2rem auto; text-align: center;">
+      <pre><code>$ curl -sI .
+HTTP/1.1 404 Not Found</code></pre>
+      <p>That page doesn't exist (anymore). Head back to the
+        <a href="/">homepage</a> or browse the <a href="/#blog">blog</a>.</p>
+    </div>
+  </section>
+</BaseLayout>
