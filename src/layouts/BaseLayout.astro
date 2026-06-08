@@ -36,18 +36,11 @@ const {
   footerVariant = 'home',
 } = Astro.props;
 
-// Resolve a canonical .html path so existing URLs and inbound links keep working.
-const path = Astro.url.pathname;
-let canonicalPath: string;
-if (canonical) {
-  canonicalPath = canonical;
-} else if (path === '/' || path === '/index.html') {
-  canonicalPath = '/';
-} else if (path.endsWith('.html')) {
-  canonicalPath = path;
-} else {
-  canonicalPath = (path.endsWith('/') ? path.slice(0, -1) : path) + '.html';
-}
+// Cloudflare serves these as clean URLs (/foo, not /foo.html), so canonicalize
+// to the extensionless form. Old .html links still 307 to the clean URL.
+let canonicalPath = canonical ?? Astro.url.pathname;
+canonicalPath = canonicalPath.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
+if (canonicalPath === '') canonicalPath = '/';
 const canonicalURL = new URL(canonicalPath, Astro.site).href;
 const ogImageURL = new URL(ogImage, Astro.site).href;
 
