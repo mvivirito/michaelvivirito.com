@@ -2,6 +2,8 @@
 import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
+import OpenWorldFunnel from '../components/OpenWorldFunnel.astro';
+import AuthorBio from '../components/AuthorBio.astro';
 
 interface Props {
   entry: CollectionEntry<'articles'>;
@@ -21,6 +23,23 @@ const dateHuman = d.date.toLocaleDateString('en-US', {
   day: 'numeric',
   timeZone: 'UTC',
 });
+
+// BlogPosting JSON-LD. author + publisher reference the Person @id published
+// on the homepage so every article ties back to the same author entity.
+const articleURL = new URL(`/articles/${entry.id}`, Astro.site).href;
+const imageURL = new URL(d.ogImage ?? '/pix/portrait.jpg', Astro.site).href;
+const jsonLd: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: d.title,
+  description: d.description,
+  image: imageURL,
+  datePublished: d.date.toISOString(),
+  dateModified: (d.updated ?? d.date).toISOString(),
+  author: { '@id': 'https://michaelvivirito.com/#michael' },
+  publisher: { '@id': 'https://michaelvivirito.com/#michael' },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': articleURL },
+};
 ---
 <BaseLayout
   title={`${d.title} - Michael Vivirito`}
@@ -29,7 +48,9 @@ const dateHuman = d.date.toLocaleDateString('en-US', {
   ogType="article"
   ogTitle={d.ogTitle ?? d.title}
   ogDescription={d.ogDescription ?? d.description}
+  ogImage={d.ogImage}
   canonical={`/articles/${entry.id}`}
+  jsonLd={jsonLd}
 >
   <article>
     <header style="text-align: center; margin-bottom: 3rem;">
@@ -66,6 +87,10 @@ const dateHuman = d.date.toLocaleDateString('en-US', {
         Powered by <a href="https://buttondown.email" target="_blank" rel="noopener noreferrer">Buttondown</a>. Unsubscribe anytime. ~2 emails/month. Or grab the <a href="/feed.xml">RSS feed</a>.
       </p>
     </div>
+
+    <OpenWorldFunnel entrySlug={entry.id} />
+
+    <AuthorBio />
 
     {related.length > 0 && (
       <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">

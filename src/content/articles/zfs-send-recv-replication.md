@@ -1,6 +1,6 @@
 ---
 title: "ZFS Send/Recv: Replicating Your Homelab"
-description: "A practical guide to ZFS replication with send and recv. Snapshots, incremental streams, raw encrypted send, resumable transfers, and a working pull-based cron script."
+description: "ZFS replication with send and recv. Snapshots, incremental streams, raw encrypted send, resumable transfers, and a pull-based cron script."
 date: 2026-05-10
 keywords: "ZFS, send, recv, replication, FreeBSD, backup, snapshots, OpenZFS, encrypted, incremental, homelab"
 ogTitle: "ZFS Send/Recv: Replicating Your Homelab"

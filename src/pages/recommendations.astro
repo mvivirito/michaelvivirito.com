@@ -1,0 +1,106 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Recommendations - Michael Vivirito"
+  description="Gear, software, and books I actually use and recommend. Some links are affiliate links; see the disclosure."
+  keywords="recommendations, gear, affiliate, Protectli, Glove80, Advantage360, books, homelab, networking"
+  ogTitle="Recommendations - Michael Vivirito"
+  ogDescription="Gear and software I actually use. Some links are affiliate links."
+  canonical="/recommendations"
+>
+  <section>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>Recommendations</h1>
+      <p class="text-muted">Gear and software I actually use. Some links are affiliate links.</p>
+      <p class="text-muted" style="font-size: 0.875rem;">Last updated: June 7, 2026</p>
+    </header>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <!-- Affiliate disclosure callout -->
+      <div style="background: var(--bg-surface); padding: 1rem; border: 1px solid var(--border-accent); border-left: 3px solid var(--accent-primary); margin: 1.5rem 0;">
+        <p style="margin: 0; font-size: 0.9rem;">
+          <strong>Heads-up:</strong> Some links on this page are affiliate links.
+          Buying through them helps fund <a href="/openworld">OpenWorld</a> and
+          the homelab. See the <a href="/disclosure">disclosure</a> for details.
+        </p>
+      </div>
+
+      <pre><code>$ cat ~/recommendations.txt
+network:   xgs-pon sfp+ · cwwk n100 · sodola 10g switch
+keyboards: glove80 · advantage360
+desk:      headphones · mic · monitor arm
+books:     unix · networking · sre
+software:  the paid subscriptions worth the money</code></pre>
+
+      <h2>Networking Hardware</h2>
+
+      <h3>The Edge Router</h3>
+      <ul>
+        <li><strong>CWWK N100 mini PC</strong> &mdash; the fanless 4-core box my <a href="/articles/freebsd-pf-router">FreeBSD pf router</a> runs on. Dual SFP+ 10 GbE plus four Intel I226-V 2.5 GbE ports, 8&nbsp;GB DDR5, 128&nbsp;GB NVMe. <em>[Affiliate link pending]</em></li>
+        <li><strong>X-ONU-SFPP XGS-PON SFP+ module</strong> &mdash; replaces the AT&amp;T gateway entirely; the FreeBSD box pulls the public DHCP lease itself. See the <a href="/articles/xgs-pon-bypass-att-gateway">bypass write-up</a>. <em>[Affiliate link pending]</em></li>
+        <li><strong>Sodola 12-port 10G managed switch</strong> &mdash; SFP+ trunk to the router, line rate for the fileserver. <a href="https://a.co/d/0bHmg42w" rel="sponsored noopener noreferrer" target="_blank">Sodola 12-port 10G managed switch on Amazon</a></li>
+      </ul>
+
+      <h3>Cables and Optics</h3>
+      <ul>
+        <li><strong>DACs and SFP+ optics</strong> &mdash; for the 10G LAN trunk. <em>[Affiliate link pending]</em></li>
+        <li><strong>Cat 6 / Cat 6a patch cables</strong> &mdash; boring, fine. <em>[Affiliate link pending]</em></li>
+      </ul>
+
+      <h2>Keyboards</h2>
+      <ul>
+        <li><strong>MoErgo Glove80</strong> &mdash; my daily driver. Split, columnar, contoured. My <a href="https://github.com/mvivirito/glove80-config" target="_blank" rel="noopener noreferrer">layout</a> is on GitHub. <em>[Affiliate link pending]</em></li>
+        <li><strong>Kinesis Advantage360 Professional</strong> &mdash; travel keyboard with ZMK firmware. Config is <a href="https://github.com/mvivirito/advantage360" target="_blank" rel="noopener noreferrer">here</a>. <em>[Affiliate link pending]</em></li>
+      </ul>
+
+      <h2>Workstation</h2>
+      <ul>
+        <li><strong>Monitor arm</strong> &mdash; vertical stacking, locked solid. <em>[Affiliate link pending]</em></li>
+        <li><strong>Closed-back headphones</strong> &mdash; focus work, no leakage. <em>[Affiliate link pending]</em></li>
+        <li><strong>XLR mic on a boom arm</strong> &mdash; calls and the rare YouTube recording. <em>[Affiliate link pending]</em></li>
+      </ul>
+
+      <h2>Books</h2>
+
+      <h3>Systems and Operations</h3>
+      <ul>
+        <li><strong>The Unix Programming Environment</strong> (Kernighan, Pike). <em>[Affiliate link pending]</em></li>
+        <li><strong>Site Reliability Engineering</strong> (Google). <em>[Affiliate link pending]</em></li>
+        <li><strong>The Practice of System and Network Administration</strong> (Limoncelli). <em>[Affiliate link pending]</em></li>
+      </ul>
+
+      <h3>Networking</h3>
+      <ul>
+        <li><strong>The TCP/IP Guide</strong> (Kozierok). <em>[Affiliate link pending]</em></li>
+        <li><strong>UNIX Network Programming</strong> (Stevens). <em>[Affiliate link pending]</em></li>
+      </ul>
+
+      <h2>Software</h2>
+      <ul>
+        <li><strong>Buttondown</strong> &mdash; the newsletter platform powering this site's list. <em>[Referral link pending]</em></li>
+        <li><strong>A password manager that doesn't sync through anyone else's cloud.</strong> <em>[Affiliate link pending]</em></li>
+      </ul>
+
+      <h2>What's Not Here</h2>
+      <p>
+        If something I use a lot isn't on this list, it's because either no
+        affiliate program exists, the program isn't worth participating in, or
+        I haven't gotten to it yet. The <a href="/uses">uses</a> page is the
+        complete picture; this page is the buyable subset.
+      </p>
+
+      <pre><code>$ echo "Real gear, real recommendations, real disclosure."</code></pre>
+
+    </div>
+
+    <div style="max-width: 800px; margin: 2rem auto 0; text-align: center;">
+      <p>
+        <a href="/uses" class="btn btn-secondary">/uses (full list)</a>
+        <a href="/disclosure" class="btn btn-secondary">Disclosure</a>
+        <a href="/" class="btn btn-primary">← Home</a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>

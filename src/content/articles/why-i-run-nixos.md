@@ -1,6 +1,6 @@
 ---
 title: "Why I Run NixOS on My Servers"
-description: "A practical guide to running NixOS in production. Declarative configuration, atomic rollbacks, and reproducible builds, lessons from 3 years of NixOS on Proxmox and bare metal."
+description: "Running NixOS in production. Declarative configuration, atomic rollbacks, and reproducible builds, from 3 years on Proxmox and bare metal."
 date: 2026-04-02
 keywords: "NixOS, Nix, Linux, server management, declarative configuration, DevOps, SRE, infrastructure"
 ogTitle: "Why I Run NixOS on My Servers"

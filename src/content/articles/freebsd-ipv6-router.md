@@ -1,6 +1,6 @@
 ---
 title: "IPv6 for Home Networks: A FreeBSD Walkthrough"
-description: "A practical guide to running real, native IPv6 on a FreeBSD home router. Prefix delegation, rtsold, dhcp6c, rtadvd, and pf rules, without breaking your IPv4 setup."
+description: "Running real, native IPv6 on a FreeBSD home router. Prefix delegation, rtsold, dhcp6c, rtadvd, and pf rules, without breaking IPv4."
 date: 2026-05-10
 keywords: "IPv6, FreeBSD, pf, networking, DHCPv6-PD, rtadvd, rtsold, dhcp6c, prefix delegation, home network"
 ogTitle: "IPv6 for Home Networks: A FreeBSD Walkthrough"
