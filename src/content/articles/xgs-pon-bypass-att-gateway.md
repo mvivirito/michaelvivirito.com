@@ -1,6 +1,6 @@
 ---
 title: "Bypassing the AT&T Fiber Gateway with an XGS-PON SFP+ Module"
-description: "A practical write-up of replacing the AT&T BGW320-500 fiber gateway with an X-ONU-SFPP XGS-PON SFP+ module plugged directly into a FreeBSD 15 router. Hardware, prep, FreeBSD-side configuration, boot-timing gotchas, and rollback notes."
+description: "Replacing the AT&T BGW320-500 fiber gateway with an X-ONU-SFPP XGS-PON SFP+ module plugged directly into a FreeBSD 15 router. Hardware, config, gotchas."
 date: 2026-05-10
 keywords: "XGS-PON, X-ONU-SFPP, AT&T, BGW320, BGW320-500, fiber bypass, ONT, 8311, Azores, pon.wiki, FreeBSD, ix, SFP+, CWWK, homelab, DHCP"
 ogTitle: "Bypassing the AT&T Fiber Gateway with an XGS-PON SFP+ Module"

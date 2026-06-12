@@ -1,6 +1,6 @@
 ---
 title: "Set Up Prometheus and Grafana Monitoring in 10 Minutes"
-description: "A practical guide to setting up Prometheus and Grafana for Kubernetes monitoring. Includes Docker Compose configs, alert rules, and a pre-built dashboard you can deploy immediately."
+description: "Set up Prometheus and Grafana for Kubernetes monitoring. Docker Compose configs, alert rules, and a pre-built dashboard you can deploy."
 date: 2026-04-02
 keywords: "Prometheus, Grafana, monitoring, Kubernetes, DevOps, observability, Docker Compose, alerting"
 ogTitle: "Set Up Prometheus and Grafana Monitoring in 10 Minutes"

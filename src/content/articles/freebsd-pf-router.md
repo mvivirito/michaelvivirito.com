@@ -1,6 +1,6 @@
 ---
 title: "Building a FreeBSD pf Router behind XGS-PON"
-description: "A practical, opinionated guide to building a FreeBSD 15 edge router on a CWWK N100 mini PC, with an X-ONU-SFPP XGS-PON SFP+ module taking the AT&T fiber directly. ZFS root, pf, unbound, ISC DHCP, and a VLAN, from boot media to a working gateway."
+description: "Building a FreeBSD 15 edge router on a CWWK N100 mini PC with an XGS-PON SFP+ module taking the AT&T fiber directly. ZFS root, pf, unbound, DHCP, and a VLAN."
 date: 2026-05-10
 keywords: "FreeBSD, pf, router, firewall, homelab, networking, unbound, dhcpd, ZFS, ix, XGS-PON, X-ONU-SFPP, AT&T bypass, CWWK, N100, VLAN, Sodola"
 ogTitle: "Building a FreeBSD pf Router behind XGS-PON"
@@ -8,6 +8,10 @@ ogDescription: "From boot media to a working FreeBSD 15 edge router with an XGS-
 badges: ["FreeBSD 15", "pf", "XGS-PON", "Networking", "Homelab"]
 related: ["pf-firewall-rules", "freebsd-jails-network", "freebsd-ipv6-router", "freebsd-wireguard"]
 ---
+<div style="background: var(--bg-surface); padding: 1rem; border: 1px solid var(--border-accent); border-left: 3px solid var(--accent-primary); margin: 1.5rem 0; font-size: 0.9rem;">
+<strong>Heads-up:</strong> Some hardware links in this post are affiliate links. Buying through them helps fund <a href="/openworld">OpenWorld</a> and the homelab. See the <a href="/disclosure">disclosure</a> for details.
+</div>
+
 ## Why Build It Yourself?
 
 Consumer routers run a Linux kernel from 2017, a vendor-modified userspace, and a web UI that lies about what's actually configured. OPNsense and pfSense are excellent, they're both FreeBSD-based, in fact, but their abstraction is also their burden: the GUI eventually doesn't expose the knob you need, and you end up editing a config file that the GUI may overwrite tomorrow.
@@ -22,7 +26,7 @@ I'm boring on purpose, with one specific upgrade over the usual 4-port mini-PC r
 -   **2x Intel SFP+ 10 GbE**. The FreeBSD `ix(4)` driver is in base. One port is the WAN (with the XGS-PON SFP module installed), the other is the LAN trunk down to a managed switch.
 -   **4x Intel I226-V 2.5 GbE**. The `igc(4)` driver, also in base. Useful for an OOB management LAN, a separate jail network, or simply spare capacity.
 -   **WAN ONT**: [X-ONU-SFPP](https://pon.wiki/category/bgw320-500/) XGS-PON SFP+ module, pre-flashed with the 8311 community firmware. Takes the AT&T fiber directly via SC/APC, slots into `ix0`, and lets the FreeBSD box pull the public DHCP lease itself. Bring a USB-C cooler; these modules run hot.
--   **Downstream switch**: any decent managed switch with 802.1Q VLANs. I run a [Sodola 12-port 10G managed switch](https://a.co/d/0bHmg42w) (8x SFP+ / 4x 10GBase-T, 1U) so the LAN trunk side stays at line rate for fileserver and backup traffic.
+-   **Downstream switch**: any decent managed switch with 802.1Q VLANs. I run a <a href="https://a.co/d/0bHmg42w" rel="sponsored noopener noreferrer" target="_blank">Sodola 12-port 10G managed switch</a> (8x SFP+ / 4x 10GBase-T, 1U) so the LAN trunk side stays at line rate for fileserver and backup traffic.
 
 Avoid Realtek NICs unless you enjoy writing forum posts. Intel chips are boring and that's the highest praise you can give a router NIC.
 

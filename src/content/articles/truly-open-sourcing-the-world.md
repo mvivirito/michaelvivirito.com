@@ -1,6 +1,6 @@
 ---
 title: "Truly Open-Sourcing the World"
-description: "Why I'm building OpenWorld, a mobile-first coordination layer for civic action. The smart-stop-sign moment, the four kinds of pin, and the worldview behind the platform."
+description: "Why I'm building OpenWorld, a coordination layer for civic action. The smart-stop-sign moment, the four kinds of pin, and the worldview behind it."
 date: 2026-05-06
 keywords: "OpenWorld, openworld.run, civic tech, civic coordination, civic action, infrastructure, blueprints, mobile platform, manifesto"
 ogTitle: "Truly Open-Sourcing the World"

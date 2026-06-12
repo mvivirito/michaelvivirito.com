@@ -10,9 +10,17 @@ const articles = defineCollection({
     title: z.string(),
     description: z.string(),
     date: z.coerce.date(),
+    /** Optional last-modified date; bumps BlogPosting.dateModified when set. */
+    updated: z.coerce.date().optional(),
     keywords: z.string().optional(),
     ogTitle: z.string().optional(),
     ogDescription: z.string().optional(),
+    /**
+     * Optional per-article social-card image. Path-or-URL; defaults to the
+     * site portrait when unset. See README "Writing a new post" for the
+     * upgrade path to /pix/og/<slug>.jpg images.
+     */
+    ogImage: z.string().optional(),
     badges: z.array(z.string()).default([]),
     related: z.array(z.string()).default([]),
     draft: z.boolean().default(false),

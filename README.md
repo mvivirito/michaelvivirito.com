@@ -56,6 +56,29 @@ pick it up on the next build. No other files to touch. (This replaces the old
 four-places-to-edit dance of `index.html` + `feed.xml` + `sitemap.xml` + the
 article file.)
 
+## Affiliate links
+
+Some posts and the `/recommendations` page contain affiliate links. The
+canonical pattern, in either markdown or `.astro`:
+
+```html
+<a href="..." rel="sponsored noopener noreferrer" target="_blank">Product name</a>
+```
+
+Use inline HTML in markdown so the `rel="sponsored"` attribute survives the
+build. Any page that surfaces an affiliate link should display this callout
+near the top of the body so readers see it before they click:
+
+```html
+<div style="background: var(--bg-surface); padding: 1rem; border: 1px solid var(--border-accent); border-left: 3px solid var(--accent-primary); margin: 1.5rem 0; font-size: 0.9rem;">
+<strong>Heads-up:</strong> Some links on this page are affiliate links. Buying through them helps fund <a href="/openworld">OpenWorld</a> and the homelab. See the <a href="/disclosure">disclosure</a> for details.
+</div>
+```
+
+The FTC disclosure lives at `/disclosure` and is footer-linked from every page
+via `src/components/Footer.astro`. Add new products to the matching section of
+`src/pages/recommendations.astro`.
+
 ## Project structure
 
 ```

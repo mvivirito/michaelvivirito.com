@@ -1,6 +1,6 @@
 ---
 title: "WireGuard on FreeBSD: A 30-Minute Setup"
-description: "A practical, no-fluff guide to running a WireGuard VPN on FreeBSD. Kernel module, key generation, server and client config, pf rules, and DNS through the tunnel."
+description: "A no-fluff guide to running a WireGuard VPN on FreeBSD. Kernel module, key generation, server/client config, pf rules, and DNS through the tunnel."
 date: 2026-05-10
 keywords: "WireGuard, FreeBSD, VPN, networking, pf, road warrior, kernel module, wg-tools, mobile VPN"
 ogTitle: "WireGuard on FreeBSD: A 30-Minute Setup"
