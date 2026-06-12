@@ -1,0 +1,32 @@
+---
+import { affiliates } from '../../data/affiliates';
+
+export function getStaticPaths() {
+  return Object.entries(affiliates).map(([slug, link]) => ({
+    params: { slug },
+    props: { url: link.url, label: link.label },
+  }));
+}
+
+interface Props {
+  url: string;
+  label: string;
+}
+const { url, label } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting&hellip;</title>
+    <meta http-equiv="refresh" content={`0; url=${url}`} />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="canonical" href={url} />
+  </head>
+  <body>
+    <p>
+      Redirecting to <a href={url} rel="sponsored nofollow noopener noreferrer">{label}</a>&hellip;
+    </p>
+    <script set:html={`window.location.replace(${JSON.stringify(url)});`} />
+  </body>
+</html>
