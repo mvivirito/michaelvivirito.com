@@ -1,5 +1,41 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  '@id': 'https://michaelvivirito.com/#michael',
+  name: 'Michael Vivirito',
+  url: 'https://michaelvivirito.com',
+  image: 'https://michaelvivirito.com/pix/portrait.jpg',
+  jobTitle: 'Lead Site Reliability Engineer',
+  alumniOf: [
+    { '@type': 'CollegeOrUniversity', name: 'Western Governors University' },
+    { '@type': 'CollegeOrUniversity', name: 'West Los Angeles College' },
+  ],
+  knowsAbout: [
+    'Site Reliability Engineering',
+    'Model Context Protocol (MCP)',
+    'AI agent integration',
+    'Tableau',
+    'Hack programming language',
+    'Kubernetes',
+    'AWS',
+    'Chef',
+    'Terraform',
+    'Thrift',
+    'JWT authentication',
+    'FreeBSD',
+    'NixOS',
+  ],
+  sameAs: [
+    'https://www.linkedin.com/in/mvivirito',
+    'https://github.com/mvivirito',
+    'https://www.youtube.com/c/michaelvivirito',
+    'https://x.com/mvivirito',
+    'https://www.instagram.com/miketheinventor',
+  ],
+};
 ---
 <BaseLayout
   title="Resume: Michael Vivirito"
@@ -9,6 +45,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   ogTitle="Resume, Michael Vivirito"
   ogDescription="Lead SRE at an MSP working for a top-tier company. Four-engineer team, 40+ apps, plus a decade of cloud, payments, and financial-services infrastructure behind it. Currently building a team-brain knowledge layer for AI-forward engineering teams."
   canonical="/resume"
+  jsonLd={jsonLd}
 >
 
   <article>

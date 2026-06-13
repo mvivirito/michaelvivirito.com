@@ -11,26 +11,27 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <header style="text-align: center; margin-bottom: 3rem;">
       <h1>Now</h1>
       <p class="text-muted">What I'm focused on right now.</p>
-      <p class="text-muted" style="font-size: 0.875rem;">Last updated: May 3, 2026</p>
+      <p class="text-muted" style="font-size: 0.875rem;">Last updated: June 13, 2026</p>
     </header>
 
     <div class="card" style="max-width: 800px; margin: 0 auto;">
 
       <pre><code>$ cat ~/.status
-Last updated: 2026-05-10
+Last updated: 2026-06-13
 Location:  Los Angeles, CA</code></pre>
 
       <h2>Building</h2>
       <ul>
-        <li><strong>FreeBSD pf router</strong>: A self-built edge router and firewall at the heart of my homelab. FreeBSD 15 on a CWWK N100 mini PC (hostname <code>homefw</code>), with an X-ONU-SFPP XGS-PON SFP+ module replacing the AT&amp;T fiber gateway entirely. ZFS root, pf, unbound, ISC DHCP, WireGuard, and a <a href="https://a.co/d/0bHmg42w" target="_blank" rel="noopener noreferrer">Sodola 12-port 10G managed switch</a> downstream of the LAN trunk. <a href="homelab">Tour the setup</a>.</li>
-        <li><strong>Jail-isolated services</strong>: Moving DNS, monitoring, and VPN out of the router host and into VNET jails. One service, one dataset, one ZFS snapshot before every change.</li>
-        <li><strong>NixOS + K8s lab</strong>: A 3-node bare-metal Kubernetes cluster on Proxmox, configured declaratively in a private nix-config flake.</li>
+        <li><strong><a href="/openworld">OpenWorld</a></strong>: A coordination layer for civic action, pin a place, propose an idea, flag an issue, give kudos, or organize a time-bounded event. <strong>iOS and Android are live</strong> on the App Store and Google Play.</li>
+        <li><strong>Team Brain &amp; Oncall Agent</strong> (work): a shared-memory knowledge layer that every team AI session consults automatically, killing the explanation tax for engineers and feeding the bot that comments on incoming tasks. Currently rolling out across the team. <a href="/resume#key-achievements">Full write-up on the resume</a>.</li>
+        <li><strong>Personal Second Brain Vault</strong>: an Obsidian-backed personal vault with a Telegram surface for capture and retrieval. Same instinct as the team brain at work, applied to my own daily memory loop.</li>
+        <li><strong>FreeBSD pf router</strong>: a self-built edge router and firewall at the heart of my homelab. FreeBSD 15 on a CWWK N100 mini PC (hostname <code>homefw</code>), with an X-ONU-SFPP XGS-PON SFP+ module replacing the AT&amp;T fiber gateway entirely. ZFS root, pf, unbound, ISC DHCP, WireGuard, and a <a href="/go/sodola-10g/" rel="sponsored noopener noreferrer" target="_blank">Sodola 12-port 10G managed switch</a> downstream of the LAN trunk. <a href="/homelab">Tour the setup</a>.</li>
       </ul>
 
       <h2>Running</h2>
       <ul>
         <li>FreeBSD 15 edge router (<code>homefw</code>) behind XGS-PON, with pf, unbound, ISC dhcpd, ntpd</li>
-        <li>NixOS on Proxmox: 3-node Kubernetes cluster, bare metal</li>
+        <li>NixOS on Proxmox for declarative server management</li>
         <li>Monitoring: Prometheus, Grafana, Alertmanager</li>
         <li>WireGuard for road-warrior VPN back into the LAN</li>
         <li>ZFS everywhere with hourly snapshots and offsite send/recv</li>
@@ -38,9 +39,9 @@ Location:  Los Angeles, CA</code></pre>
 
       <h2>Learning</h2>
       <ul>
-        <li>Cilium eBPF networking: replacing kube-proxy on the cluster</li>
-        <li>Talos Linux: immutable OS for k8s nodes</li>
-        <li>FreeBSD VNET internals and bhyve</li>
+        <li>MCP server design patterns and agent workflow primitives</li>
+        <li>Obsidian + Telegram automation for the personal second brain</li>
+        <li>bhyve internals</li>
         <li>IPv6 design for residential networks (real prefix delegation, not 6to4)</li>
       </ul>
 
@@ -48,22 +49,20 @@ Location:  Los Angeles, CA</code></pre>
       <ul>
         <li>FreeBSD pf router build and operations</li>
         <li>pf.conf design: rules, NAT, anti-spoofing, logging</li>
-        <li>FreeBSD jails for network services</li>
-        <li>NixOS in production</li>
-        <li>Kubernetes on bare metal</li>
+        <li>Team-brain architecture and the &ldquo;explanation tax&rdquo; framing</li>
         <li>AWS cost optimization (real numbers, not fluff)</li>
       </ul>
 
       <h2>Stack</h2>
       <pre><code>$ cat ~/.stack
-Edge:      FreeBSD 15 (homefw) + pf + unbound + XGS-PON SFP
-Servers:   NixOS 24.11 (declarative)
-Cluster:   kubeadm + Cilium
+Edge:       FreeBSD 15 (homefw) + pf + unbound + XGS-PON SFP
+Servers:    NixOS 24.11 (declarative)
 Hypervisor: Proxmox + ZFS
-Editor:    Neovim
-Shell:     Zsh + Starship
-Terminal:  Wezterm
-Monitoring: Prometheus + Grafana</code></pre>
+Editor:     Neovim
+Shell:      Zsh + Starship
+Terminal:   Wezterm
+Monitoring: Prometheus + Grafana
+PKM:        Obsidian + Telegram (personal vault)</code></pre>
 
       <h2>Reading</h2>
       <ul>
