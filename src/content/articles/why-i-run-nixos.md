@@ -81,13 +81,10 @@ $ nixos-rebuild build-vm --flake .#my-server
 Here's what I actually run:
 
 -   **Proxmox VM** running NixOS as my main server
--   **Kubernetes** cluster on NixOS nodes
 -   **Docker Compose** stacks for monitoring (Prometheus, Grafana)
 -   A [FreeBSD pf router](../homelab) at the edge: different OS, same declarative spirit
 
-All NixOS pieces are configured in one flake. One `git push` and a rebuild deploys everything consistently. The FreeBSD router has its own git repo for `/etc`; together they cover the whole network from packets to pods.
-
-<div style="background: var(--bg-surface); padding: 1rem; border: 1px solid var(--border-accent); border-left: 3px solid var(--accent-primary); margin: 1.5rem 0;"><p style="margin: 0;"><strong>Tip:</strong> I packaged my NixOS + K8s configs as a <a href="https://github.com/mvivirito">DevOps toolkit</a>. If you want to get started with declarative infrastructure, it's a solid foundation.</p></div>
+The NixOS side is configured in one flake. One `git push` and a rebuild deploys everything consistently. The FreeBSD router has its own git repo for `/etc`; together they cover the whole network from packets to processes.
 
 ## The Learning Curve
 
