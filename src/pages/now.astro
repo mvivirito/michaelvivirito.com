@@ -24,7 +24,7 @@ Location:  Los Angeles, CA</code></pre>
       <ul>
         <li><strong><a href="/openworld">OpenWorld</a></strong>: A coordination layer for civic action, pin a place, propose an idea, flag an issue, give kudos, or organize a time-bounded event. <strong>iOS and Android are live</strong> on the App Store and Google Play.</li>
         <li><strong>Team Brain &amp; Oncall Agent</strong> (work): a shared-memory knowledge layer that every team AI session consults automatically, killing the explanation tax for engineers and feeding the bot that comments on incoming tasks. Currently rolling out across the team. <a href="/resume#key-achievements">Full write-up on the resume</a>.</li>
-        <li><strong>Personal Second Brain Vault</strong>: an Obsidian-backed personal vault with a Telegram surface for capture and retrieval. Same instinct as the team brain at work, applied to my own daily memory loop.</li>
+        <li><strong>Personal Second Brain Vault</strong>: an Obsidian-backed personal vault with a Telegram surface for capture and retrieval. Same instinct as the team brain at work, applied to my own daily memory loop. In the spirit of <a href="https://karpathy.ai" target="_blank" rel="noopener noreferrer">Karpathy's</a> personal-system experiments.</li>
         <li><strong>FreeBSD pf router</strong>: a self-built edge router and firewall at the heart of my homelab. FreeBSD 15 on a CWWK N100 mini PC (hostname <code>homefw</code>), with an X-ONU-SFPP XGS-PON SFP+ module replacing the AT&amp;T fiber gateway entirely. ZFS root, pf, unbound, ISC DHCP, WireGuard, and a <a href="/go/sodola-10g/" rel="sponsored noopener noreferrer" target="_blank">Sodola 12-port 10G managed switch</a> downstream of the LAN trunk. <a href="/homelab">Tour the setup</a>.</li>
       </ul>
 
@@ -58,9 +58,10 @@ Location:  Los Angeles, CA</code></pre>
 Edge:       FreeBSD 15 (homefw) + pf + unbound + XGS-PON SFP
 Servers:    NixOS 24.11 (declarative)
 Hypervisor: Proxmox + ZFS
+Local AI:   Ollama on Threadripper 1950X + RTX 4080 (NixOS VM, GPU passthrough)
 Editor:     Neovim
 Shell:      Zsh + Starship
-Terminal:   Wezterm
+Terminal:   Alacritty
 Monitoring: Prometheus + Grafana
 PKM:        Obsidian + Telegram (personal vault)</code></pre>
 

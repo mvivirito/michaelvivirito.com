@@ -4,7 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <BaseLayout
   title="Uses: Michael Vivirito"
   description="The hardware, software, and tools Michael Vivirito uses every day, from FreeBSD on the edge to Neovim and the Glove80 keyboard."
-  keywords="uses, dotfiles, FreeBSD, NixOS, Neovim, Wezterm, Glove80, Advantage360, homelab, Proxmox, mvivirito"
+  keywords="uses, dotfiles, FreeBSD, NixOS, Nix Darwin, Neovim, Alacritty, Glove80, Advantage360, homelab, Proxmox, Threadripper, Ollama, mvivirito"
   ogTitle="Uses, Michael Vivirito"
   ogDescription="What I use every day, hardware, OS, editor, network, and homelab."
   canonical="/uses"
@@ -25,7 +25,7 @@ $ cat ~/.workflow
 edit:    nvim
 shell:   zsh
 mux:     tmux
-term:    wezterm
+term:    alacritty
 keys:    glove80</code></pre>
 
       <h2>Hardware</h2>
@@ -40,8 +40,11 @@ keys:    glove80</code></pre>
 
       <h3>Workstation</h3>
       <ul>
-        <li>A reasonably-spec'd desktop for heavier work and a 14-inch laptop for travel.</li>
-        <li>Two displays. Vertical arrangement, not horizontal.</li>
+        <li><strong>Threadripper 1950X desktop</strong>: 64 GB RAM, RTX 4080. Proxmox at the host level; my main NixOS workstation runs as a VM with full GPU passthrough. This is where the AI work happens, Claude sessions during the day and <strong>Ollama</strong> for local model experiments after.</li>
+        <li><strong>ThinkPad X1 Nano</strong> (personal): NixOS, same flake as the desktop.</li>
+        <li><strong>ASUS Zephyrus G16</strong> with an RTX 4090: NixOS, same flake.</li>
+        <li>Two <strong>MacBooks</strong> (work + personal) managed with <strong>Nix Darwin</strong>, sharing the same flake as the Linux machines.</li>
+        <li>Two displays, vertical arrangement, not horizontal.</li>
         <li>Wired ethernet wherever practical. Wifi is for visitors.</li>
       </ul>
 
@@ -54,14 +57,14 @@ keys:    glove80</code></pre>
       <h2>Operating Systems</h2>
       <ul>
         <li><strong>FreeBSD 15.0-RELEASE</strong> (pkgbase) on the <a href="homelab">edge router</a> and on a small fleet of long-uptime hosts. ZFS root, base-system everything.</li>
-        <li><strong>NixOS 24.11</strong> on workstations and Kubernetes nodes. Declarative, reproducible, and the closest thing to "it just works" once you've climbed the learning curve. (See <a href="articles/why-i-run-nixos">why</a>.)</li>
+        <li><strong>NixOS 24.11</strong> across the entire fleet, the Threadripper desktop, both laptops, the Proxmox-hosted server VMs, and (via Nix Darwin) the MacBooks. One flake spans all of them. Declarative, reproducible, and the closest thing to "it just works" once you've climbed the learning curve. (See <a href="articles/why-i-run-nixos">why</a>.)</li>
         <li><strong>Proxmox VE</strong> as the hypervisor under most of it.</li>
       </ul>
 
       <h2>Editor &amp; Terminal</h2>
       <ul>
         <li><strong>Neovim</strong> with a small Lua config. LSPs for the languages I touch most, telescope for fuzzy navigation, treesitter for highlighting, nothing exotic.</li>
-        <li><strong>Wezterm</strong> as the terminal: GPU-accelerated, scriptable in Lua, sensible defaults.</li>
+        <li><strong>Alacritty</strong> as the terminal lately: GPU-accelerated, Rust-fast, minimal by design. tmux handles tabs and splits.</li>
         <li><strong>tmux</strong> for persistent sessions on remote hosts. SSH disconnects shouldn't take work with them.</li>
       </ul>
 
