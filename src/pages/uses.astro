@@ -4,7 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <BaseLayout
   title="Uses: Michael Vivirito"
   description="The hardware, software, and tools Michael Vivirito uses every day, from FreeBSD on the edge to Neovim and the Glove80 keyboard."
-  keywords="uses, dotfiles, FreeBSD, NixOS, Nix Darwin, Neovim, Glove80, Advantage360, homelab, Proxmox, Threadripper, Ollama, mvivirito"
+  keywords="uses, dotfiles, FreeBSD, NixOS, Nix Darwin, Neovim, Alacritty, Glove80, Advantage360, homelab, Proxmox, Threadripper, Ollama, mvivirito"
   ogTitle="Uses, Michael Vivirito"
   ogDescription="What I use every day, hardware, OS, editor, network, and homelab."
   canonical="/uses"
@@ -25,6 +25,7 @@ $ cat ~/.workflow
 edit:    nvim
 shell:   zsh
 mux:     tmux
+term:    alacritty
 keys:    glove80</code></pre>
 
       <h2>Hardware</h2>
@@ -60,9 +61,10 @@ keys:    glove80</code></pre>
         <li><strong>Proxmox VE</strong> as the hypervisor under most of it.</li>
       </ul>
 
-      <h2>Editor</h2>
+      <h2>Editor &amp; Terminal</h2>
       <ul>
         <li><strong>Neovim</strong> with a small Lua config. LSPs for the languages I touch most, telescope for fuzzy navigation, treesitter for highlighting, nothing exotic.</li>
+        <li><strong>Alacritty</strong> as the terminal lately: GPU-accelerated, Rust-fast, minimal by design. tmux handles tabs and splits.</li>
         <li><strong>tmux</strong> for persistent sessions on remote hosts. SSH disconnects shouldn't take work with them.</li>
       </ul>
 
