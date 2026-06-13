@@ -14,9 +14,9 @@ head, and footer live in one place and blog posts are plain markdown.
 - **Nav / Footer** are single components (`src/components/`) — edit once.
 - **Articles** are a content collection: drop a markdown file and the blog
   index, RSS feed, and sitemap all update themselves.
-- Output is 100% static HTML/CSS, deployed to Cloudflare Pages.
-- URLs are preserved: `build.format: 'file'` emits `/page.html`, matching the
-  old hand-written paths so no inbound link or search result breaks.
+- Output is 100% static HTML/CSS, deployed to Cloudflare Workers Assets.
+- `build.format: 'file'` emits `/page.html` files; Cloudflare serves them at
+  clean URLs (`/page`). Legacy `.html` URLs still resolve.
 
 ## Develop
 
@@ -30,7 +30,7 @@ bun run preview    # serve the built dist/ locally
 ## Add a blog post
 
 Create `src/content/articles/<slug>.md`. The file name becomes the URL
-(`/articles/<slug>.html`). Frontmatter:
+(`/articles/<slug>`). Frontmatter:
 
 ```markdown
 ---
@@ -58,7 +58,7 @@ article file.)
 
 ## Affiliate links
 
-Some posts and the `/recommendations` page contain affiliate links. The
+Some posts and the `/recommends` page contain affiliate links. The
 canonical pattern, in either markdown or `.astro`:
 
 ```html
@@ -77,7 +77,9 @@ near the top of the body so readers see it before they click:
 
 The FTC disclosure lives at `/disclosure` and is footer-linked from every page
 via `src/components/Footer.astro`. Add new products to the matching section of
-`src/pages/recommendations.astro`.
+`src/pages/recommends.astro` and route the affiliate URL through
+`src/data/affiliates.ts` so it gets a clean `/go/<slug>/` redirect with
+`rel="sponsored nofollow"`.
 
 ## Project structure
 
@@ -109,11 +111,12 @@ The design uses CSS custom properties. Edit `public/style.css` and modify the
 
 ## Deploy
 
-Cloudflare Pages, building from this repo:
+Cloudflare Workers (Assets), with the Cloudflare GitHub integration building
+from this repo:
 
 - **Build command:** `bun run build`
 - **Build output directory:** `dist`
-- Push to the default branch deploys production; branches/PRs get preview URLs.
+- Push to the production branch deploys production; branches/PRs get preview URLs.
 
 ## Contact
 
