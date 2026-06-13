@@ -95,12 +95,12 @@ team_scope:    platforms team behind 40+ apps</code></pre>
         <li>Manage NORAM office-hours rotation, providing real-time operational support and cross-functional troubleshooting for enterprise platform issues.</li>
       </ul>
 
-      <h4>Enterprise Analytics: AI Agent Integration &amp; Auth Infrastructure</h4>
+      <h4>Enterprise-Grade Tableau MCP Server &amp; Auth Infrastructure</h4>
       <ul>
-        <li>Built an enterprise-grade <strong>MCP (Model Context Protocol) server for Tableau</strong>, exposing the analytics platform's dashboards and underlying data to Claude and the client's internal AI agents.</li>
-        <li>Architected and implemented a Thrift-based authentication proxy service for an enterprise data analytics platform, enabling secure integration with the client's internal AI agent platform.</li>
+        <li>Built the <strong>Enterprise-Grade Tableau MCP server</strong>, rewritten from scratch in <strong>Hack</strong>, exposing Tableau dashboards and underlying data to Claude and the client's internal AI agent platform through the Model Context Protocol.</li>
+        <li>Architected the corresponding <strong>Thrift Proxy middle layer</strong> that fronts the MCP server and handles <strong>JWT minting for secure authentication with direct trust</strong> between Tableau, the proxy, and the client's internal AI agent platform.</li>
         <li>Delivered end-to-end implementation: Thrift IDL design, internal service-routing configuration, handler testing, client migration, and codegen compatibility fixes.</li>
-        <li>Created a conversational-AI skillbook for analytics queries, enabling enterprise users to query dashboards through natural language.</li>
+        <li>Created a conversational-AI skillbook for analytics queries, enabling enterprise users to query Tableau dashboards through natural language.</li>
         <li>Authored user documentation and organized wiki resources to support team adoption of the new auth architecture.</li>
         <li>Resolved complex cross-tier authentication challenges, including bringing per-controller identity authentication into the async tier, coordinating with production-engineering teams across the company.</li>
       </ul>
