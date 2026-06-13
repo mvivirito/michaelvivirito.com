@@ -6,7 +6,7 @@ keywords: "NixOS, Nix, Linux, server management, declarative configuration, DevO
 ogTitle: "Why I Run NixOS on My Servers"
 ogDescription: "Declarative configuration, atomic rollbacks, and reproducible builds, lessons from running NixOS in production."
 badges: ["NixOS", "DevOps", "Infrastructure"]
-related: ["freebsd-vs-linux-sre", "kubernetes-bare-metal", "prometheus-grafana-monitoring"]
+related: ["freebsd-vs-linux-sre", "prometheus-grafana-monitoring"]
 ---
 ## The Problem with Traditional Linux
 

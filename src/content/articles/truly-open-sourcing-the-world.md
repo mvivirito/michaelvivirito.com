@@ -56,12 +56,12 @@ The bridge from proposal to reality is humans taking action. OpenWorld doesn't r
 
 ## Where It Is Today
 
-Honest status, May 2026:
+Honest status, June 2026:
 
 -   The marketing site at [www.openworld.run](https://www.openworld.run) is live.
 -   The web app at [app.openworld.run](https://app.openworld.run) is intentionally minimal. The phone is the real experience, pinning is a physical-place act and you do it standing in front of the thing.
--   The **iOS app is now live**: [OpenWorld: Pin & Improve on the App Store](https://apps.apple.com/us/app/openworld-pin-improve/id6762533990). Apple approved it earlier this month.
--   The Android app is still in closed testing on Google Play Console while we wait on Google's review. Once it's approved, it goes public.
+-   The **iOS app is live**: [OpenWorld: Pin & Improve on the App Store](https://apps.apple.com/us/app/openworld-pin-improve/id6762533990).
+-   The **Android app is live**: [OpenWorld: Pin & Improve on Google Play](https://play.google.com/store/apps/details?id=com.openworld.openworld).
 
 ## Why I'm Building This, of All Things
 
@@ -90,7 +90,7 @@ That's the bar. Anything less and I'll keep grinding. Anything more and we'll ha
 
 ## If Any of This Resonates
 
-**Download [OpenWorld: Pin & Improve](https://apps.apple.com/us/app/openworld-pin-improve/id6762533990) on the App Store** if you're on iOS. Visit [www.openworld.run](https://www.openworld.run) for the marketing page. Try the [web app](https://app.openworld.run) at any desk. [Email me](../contact) to get added to the Android closed-testing group while we wait on Google review. If you're a politician, organizer, journalist, or community leader and you'd want something specific from a platform like this, I especially want to hear from you, whatever I'm building probably needs your eyes.
+**Download [OpenWorld: Pin & Improve](https://apps.apple.com/us/app/openworld-pin-improve/id6762533990) on the App Store** if you're on iOS, or **[Get it on Google Play](https://play.google.com/store/apps/details?id=com.openworld.openworld)** on Android. Visit [www.openworld.run](https://www.openworld.run) for the marketing page. Try the [web app](https://app.openworld.run) at any desk. If you're a politician, organizer, journalist, or community leader and you'd want something specific from a platform like this, I especially want to hear from you, [email me](../contact), whatever I'm building probably needs your eyes.
 
 And if you're someone who walks past a problem in your city every day and thinks *I wish someone would fix this*: that's why this exists. You're the someone. OpenWorld is the place to put it.
 

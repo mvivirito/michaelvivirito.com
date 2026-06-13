@@ -6,7 +6,7 @@ keywords: "Prometheus, Grafana, monitoring, Kubernetes, DevOps, observability, D
 ogTitle: "Set Up Prometheus and Grafana Monitoring in 10 Minutes"
 ogDescription: "Deploy Prometheus and Grafana with Docker Compose. Includes pre-configured alert rules and dashboards."
 badges: ["Monitoring", "Prometheus", "Grafana", "DevOps"]
-related: ["why-i-run-nixos", "kubernetes-bare-metal", "freebsd-pf-router"]
+related: ["why-i-run-nixos", "freebsd-pf-router"]
 ---
 ## Why Every Team Needs Real Monitoring
 
