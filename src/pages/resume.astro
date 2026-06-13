@@ -112,49 +112,22 @@ team_scope:    platforms team behind 40+ apps</code></pre>
         <li>Enabled affiliate-user access to zero-trust enterprise endpoints, expanding secure access to the client's extended workforce.</li>
       </ul>
 
-      <h4>Enterprise Endpoint Backup Platform Management</h4>
+      <h4>Enterprise Endpoint Backup &amp; Legal-Hold Compliance</h4>
       <ul>
-        <li>Managed the full lifecycle of an enterprise endpoint backup solution spanning deployment, vendor rebranding, disaster recovery, and compliance operations.</li>
+        <li>Managed the full lifecycle of an enterprise endpoint backup solution: deployment, vendor migration, disaster recovery, and compliance operations.</li>
+        <li>Owned the <strong>legal-hold integration</strong> that gated backup eligibility, the legal-hold status agent determined whether a given user's endpoint should be backed up, keeping the platform aligned with active legal matters and e-discovery requirements.</li>
+        <li>Authored and maintained the <strong>Chef cookbook</strong> that handled agent deployment across the global fleet and the <strong>cross-border reinstall logic that kept the platform GDPR-compliant</strong> when users relocated to a different country.</li>
         <li>Led a major vendor rebranding migration: engineered the client-swap method including post-install scripts, identity-file preservation, incremental rollout (2% → 60%), and cross-platform uninstall automation (Windows and Mac).</li>
-        <li>Built region-based deployment automation (EMEA / global) using packaged distribution and feature-flag-controlled rollouts.</li>
         <li>Developed a custom metrics pipeline: wrote a script controller to send organizational metrics to the client's internal time-series platform for real-time monitoring and capacity planning.</li>
         <li>Executed disaster-recovery operations including failover from DR replica to primary and secrets-management cluster migration fixes.</li>
-        <li>Integrated with a third-party e-discovery platform via internal service calls for legal-hold compliance.</li>
-        <li>Managed ad-hoc legal-matter operations and user-deployment scripting for Linux endpoints.</li>
+        <li>Integrated with a third-party e-discovery platform via internal service calls.</li>
       </ul>
 
-      <h4>Legal-Hold Integration: Compliance Infrastructure</h4>
+      <h4>Application Lifecycle Operations</h4>
       <ul>
-        <li>Owned the legal-hold status agent infrastructure, managing rollout progression and cross-platform packaging.</li>
-        <li>Migrated package ACLs to the client's internal application-platform services for improved security posture.</li>
-        <li>Deprecated legacy controllers and cleaned up logging configurations as part of infrastructure modernization.</li>
-        <li>Built and maintained internal package-build pipelines for cross-platform agent distribution.</li>
-      </ul>
-
-      <h4>Manufacturing Execution System</h4>
-      <ul>
-        <li>Executed a major version upgrade for a production manufacturing-execution system.</li>
-        <li>Led the full decommission effort: removed configuration-management cookbooks, deleted internal workflow configurations, and cleaned up DNS aliases, demonstrating disciplined infrastructure lifecycle management.</li>
-      </ul>
-
-      <h4>Recruiting Whiteboard Application: Internal Tool Development</h4>
-      <ul>
-        <li>Fixed critical React bugs and XSS vulnerabilities in a real-time collaborative whiteboard application used in technical interviews.</li>
-        <li>Managed the production container deployment pipeline for the recruiting whiteboard tool.</li>
-      </ul>
-
-      <h4>Developer Experience &amp; Knowledge Sharing</h4>
-      <ul>
-        <li>Published an internal engineering guide on developing client-platform applications directly in VS Code, enabling engineers across the company to develop locally with shareable preview URLs.</li>
-        <li>Created comprehensive developer-setup documentation including yarn path configuration, npmrc proxy fixes, and per-app workflow guides.</li>
-        <li>Built data pipelines using the client's internal data-pipeline platform for automated data-processing workflows.</li>
-      </ul>
-
-      <h4>Infrastructure &amp; Cloud Operations</h4>
-      <ul>
-        <li>Managed cloud infrastructure using Terraform, updating deprecated attributes and maintaining configuration as code.</li>
-        <li>Configured ACLs on the client's internal key-value store, configuration-management cookbooks, and config-as-code settings across multiple enterprise services.</li>
-        <li>Maintained DNS configurations, FQDN aliases, and service routing for enterprise application availability.</li>
+        <li>Owned onboardings, offboardings, and decommissions across the team's app portfolio. Example: a major version upgrade on a production manufacturing-execution system followed by its full decommission (configuration-management cookbooks, internal workflow configurations, DNS aliases all cleaned up).</li>
+        <li>Maintained the Terraform / IaC surface for cloud infrastructure, ACL configurations on the client's internal key-value store, and DNS / FQDN aliases across multiple enterprise services.</li>
+        <li>Built data pipelines on the client's internal data-pipeline platform for automated data-processing workflows.</li>
       </ul>
 
       <hr style="margin: 2.5rem 0 1.5rem; border: none; border-top: 1px solid rgba(59, 130, 246, 0.2);">
@@ -260,13 +233,19 @@ team_scope:    platforms team behind 40+ apps</code></pre>
         <strong>Status:</strong> rolling out across the team.
       </p>
 
-      <h3>Built and Operated an Enterprise Endpoint Backup Platform</h3>
+      <h3>Built and Operated an Enterprise Endpoint Backup &amp; Legal-Hold Platform</h3>
       <p>
         <strong>What:</strong> Owned the full lifecycle of an enterprise endpoint
-        backup solution protecting corporate devices across a global fleet. Built
-        automated employee-transition workflows, international rollout
-        infrastructure, secrets-management cluster with disaster recovery, data
-        pipeline for user-lifecycle automation, and fleet-wide metric collection.
+        backup solution protecting corporate devices across a global fleet,
+        including the <strong>legal-hold integration that gated backup eligibility</strong>
+        on a per-user basis. Authored and maintained a <strong>Chef cookbook</strong>
+        that handled agent deployment across the global fleet plus the
+        <strong>cross-border reinstall logic that kept the platform GDPR-compliant</strong>
+        when users relocated countries. Also built automated employee-transition
+        workflows, international rollout infrastructure, a secrets-management
+        cluster with disaster recovery, a data pipeline for user-lifecycle
+        automation, fleet-wide metric collection, and a third-party
+        e-discovery integration for data-preservation workflows.
       </p>
       <p>
         <strong>Scale:</strong> Fleet of tens of thousands of corporate devices
@@ -278,9 +257,11 @@ team_scope:    platforms team behind 40+ apps</code></pre>
         databases, dynamic configuration, feature flags.
       </p>
       <p>
-        <strong>Result:</strong> Achieved reliable enterprise backup coverage
-        across the global corporate device fleet with automated onboarding /
-        offboarding, multi-region DR, and compliance-driven legal-hold integration.
+        <strong>Result:</strong> Reliable enterprise backup coverage across the
+        global corporate device fleet with automated onboarding / offboarding,
+        multi-region DR, and continuous legal-hold-driven compliance, including
+        edge cases like employee-leave status, identity transitions, and the
+        GDPR cross-border reinstalls.
       </p>
 
       <h3>Pioneered Tableau Integration Across Four Internal AI Platforms</h3>
@@ -317,19 +298,6 @@ team_scope:    platforms team behind 40+ apps</code></pre>
         load-balancer records, established comprehensive documentation. Reduced
         incident frequency from ~1 SEV / month through proactive monitoring.
         Completed one month ahead of schedule.
-      </p>
-
-      <h3>Built Legal-Hold Compliance Integration System</h3>
-      <p>
-        <strong>What:</strong> Designed and maintained a compliance system
-        connecting legal-hold processes with enterprise backup infrastructure.
-        Managed third-party e-discovery platform integration, custodian
-        lifecycle syncing, and data-preservation workflows.
-      </p>
-      <p>
-        <strong>Result:</strong> Ensured continuous legal compliance for
-        data-preservation requirements with automated custodian management,
-        handling edge cases like employee-leave status and identity transitions.
       </p>
 
       <h3>Enabled Native AI Capabilities on an Enterprise Analytics Platform</h3>
