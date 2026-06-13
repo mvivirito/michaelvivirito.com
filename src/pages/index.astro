@@ -14,9 +14,11 @@ const jsonLd = {
   name: 'Michael Vivirito',
   url: 'https://michaelvivirito.com',
   image: 'https://michaelvivirito.com/pix/portrait.jpg',
-  jobTitle: 'Lead Site Reliability Engineer L3',
-  worksFor: { '@type': 'Organization', name: 'Self-Employed' },
-  alumniOf: 'Computer Science, Mathematics, Physics',
+  jobTitle: 'Lead Site Reliability Engineer',
+  alumniOf: [
+    { '@type': 'CollegeOrUniversity', name: 'Western Governors University' },
+    { '@type': 'CollegeOrUniversity', name: 'West Los Angeles College' },
+  ],
   sameAs: [
     'https://www.linkedin.com/in/mvivirito',
     'https://github.com/mvivirito',
@@ -156,11 +158,12 @@ timer   · beach cleanup · 2026-05-23 09:00</code></pre>
       <p>
         The action rails, GoFundMe, sign-ups, petitions, contact-your-rep tools,
         already exist. OpenWorld is the layer that lets people <em>coordinate</em>
-        around them. <strong>iOS is now live on the App Store</strong>; Android in
-        closed Play Console testing.
+        around them. <strong>iOS and Android are now live</strong>, on the App Store
+        and Google Play.
       </p>
       <div style="margin-top: 1.5rem;">
         <a href="https://apps.apple.com/us/app/openworld-pin-improve/id6762533990" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Download on the App Store →</a>
+        <a href="https://play.google.com/store/apps/details?id=com.openworld.openworld" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Get it on Google Play →</a>
         <a href="openworld" class="btn btn-secondary">Meet OpenWorld</a>
         <a href="https://www.openworld.run" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">www.openworld.run</a>
         <a href="articles/truly-open-sourcing-the-world" class="btn btn-secondary">Why I'm Building It</a>

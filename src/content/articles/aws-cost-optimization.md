@@ -6,7 +6,7 @@ keywords: "AWS, cloud cost optimization, SRE, FinOps, Reserved Instances, Spot I
 ogTitle: "AWS Cost Optimization: An SRE's Playbook"
 ogDescription: "Real strategies, real numbers. From $2800/month to $1800/month without sacrificing reliability."
 badges: ["AWS", "FinOps", "SRE"]
-related: ["kubernetes-bare-metal", "prometheus-grafana-monitoring", "why-i-run-nixos"]
+related: ["prometheus-grafana-monitoring", "why-i-run-nixos"]
 ---
 ## The Bill That Woke Me Up
 
