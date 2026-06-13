@@ -3,11 +3,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout
   title="Resume: Michael Vivirito"
-  description="Michael Vivirito, Lead Site Reliability Engineer (contingent / MSP) at a top-tier technology company. A decade of infrastructure experience across payments, telecom, and financial services. Resume with experience, key achievements, technical skills, and career timeline."
-  keywords="Michael Vivirito, resume, CV, Lead SRE, Site Reliability Engineer, contingent engineer, MSP contractor, Kubernetes, AWS, FreeBSD, NixOS, MCP, mvivirito"
+  description="Michael Vivirito, Lead SRE at an MSP working for a top-tier technology company. Leading a four-engineer team behind 40+ apps. Currently building a team-brain knowledge layer that kills the explanation tax for engineers working with AI."
+  keywords="Michael Vivirito, resume, CV, Lead SRE, Site Reliability Engineer, MSP, team brain, oncall agent, knowledge layer, AI agents, LLM, MCP, Kubernetes, AWS, mvivirito"
   ogType="profile"
   ogTitle="Resume, Michael Vivirito"
-  ogDescription="Lead Site Reliability Engineer (contingent / MSP) at a top-tier technology company, 4 years managing critical infrastructure for billions of users, on top of a prior decade across payments, telecom, and financial services."
+  ogDescription="Lead SRE at an MSP working for a top-tier company. Four-engineer team, 40+ apps, plus a decade of cloud, payments, and financial-services infrastructure behind it. Currently building a team-brain knowledge layer for AI-forward engineering teams."
   canonical="/resume"
 >
 
@@ -16,11 +16,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <header style="text-align: center; margin-bottom: 3rem;">
       <h1>Michael Vivirito</h1>
       <p class="subtitle" style="color: var(--text-secondary); font-size: 1.1rem;">
-        Lead Site Reliability Engineer · Enterprise Platforms Integration
+        Lead Site Reliability Engineer
       </p>
       <p class="text-muted" style="font-size: 0.9rem;">
-        Contingent Engineer (Managed Service Provider) ·
-        Top-tier technology company serving billions of users ·
+        Engaged via an MSP, embedded at a top-tier technology company ·
         Remote (United States) · 2022 - Present
       </p>
       <p class="text-muted" style="font-size: 0.875rem; margin-top: 0.5rem;">
@@ -33,33 +32,49 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <!-- Stats Hero -->
     <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
       <pre><code>$ cat ~/career/stats
-tenure:               4 years
-code_changes:         750+
-tasks_completed:      500
-applications_managed: 7+
-team_size_led:        4 engineers
-team_role:            Lead SRE, Enterprise Platforms</code></pre>
+tenure:        4+ years
+role:          Lead SRE (MSP, embedded at top-tier company)
+team_size_led: 4 engineers
+team_scope:    platforms team behind 40+ apps</code></pre>
     </div>
 
     <!-- Professional Summary -->
     <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
       <h2>Professional Summary</h2>
       <p>
-        Results-driven Site Reliability Engineering Lead with extensive experience
-        managing enterprise platform operations at a top-tier technology company
-        serving billions of users. Proven track record of leading cross-functional
-        initiatives spanning application lifecycle management, security compliance,
-        zero-trust / VPN-less architecture, and AI-powered tooling. Skilled at
-        translating complex technical challenges into actionable solutions by
-        bridging engineering teams, stakeholders, and leadership. Currently leading
-        a team of 4 engineers supporting third-party application integration,
-        reliability, and automation across the client's enterprise infrastructure.
+        I'm a Lead SRE at an MSP working for a top-tier technology company, leading
+        a team of four on a platforms organization behind 40+ apps. The work I'm
+        most drawn to is the abstract kind, designing systems that change how teams
+        operate, not just keeping the lights on.
+      </p>
+      <p>
+        The project I'm most fired up about right now is the <strong>team brain</strong>,
+        a shared-memory knowledge layer that every team AI session consults
+        automatically, killing the explanation tax and giving the bots and
+        automations the team builds on top a fresh, always-updating context source.
+        The full write-up sits in <a href="#key-achievements">Key Achievements</a>
+        below.
+      </p>
+      <p>
+        The prior decade went up the stack the long way: IT administration at a
+        Beverly Hills capital group, systems administration at AT&amp;T / DirecTV,
+        and cloud-migration leadership at a payments processor (Atlantic Pacific
+        Processing Systems), where I led three concurrent migrations into a
+        consolidated AWS environment. That route, from domain controllers and
+        Ansible fleets to AWS Control Tower, Kubernetes, and now LLM-driven agent
+        workflows, is what underwrites how I think about reliability.
+      </p>
+      <p>
+        <strong>What I'm building toward:</strong> the agent and knowledge layer
+        that sits above the infrastructure I already know how to run, abstractions
+        that change how a team operates, not just how a service runs. The team
+        brain is the first piece of that. There's a lot more I want to build in
+        the same vein.
       </p>
       <p class="text-muted" style="font-size: 0.875rem; margin-top: 1rem;">
-        Engaged as a contingent engineer through a Managed Service Provider.
-        Specific client name, internal-platform names, and third-party product
-        names redacted out of respect for the client. Specifics happily shared
-        under NDA on request.
+        Engaged through an MSP. Client name, internal product names, and team
+        specifics intentionally withheld. Specifics happily shared under NDA on
+        request.
       </p>
     </div>
 
@@ -67,10 +82,10 @@ team_role:            Lead SRE, Enterprise Platforms</code></pre>
     <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
       <h2>Experience</h2>
 
-      <h3>Lead SRE, Enterprise Platforms Integration</h3>
+      <h3>Lead Site Reliability Engineer</h3>
       <p class="text-muted" style="font-size: 0.875rem;">
-        Contingent Engineer via Managed Service Provider ·
-        Top-tier technology company · Remote · 2022 - Present
+        Engaged via an MSP, embedded at a top-tier technology company ·
+        Remote (United States) · 2022 - Present
       </p>
 
       <h4>Team Leadership &amp; Operations</h4>
@@ -83,7 +98,7 @@ team_role:            Lead SRE, Enterprise Platforms</code></pre>
       <h4>Enterprise Analytics: AI Agent Integration &amp; Auth Infrastructure</h4>
       <ul>
         <li>Architected and implemented a Thrift-based authentication proxy service for an enterprise data analytics platform, enabling secure integration with the client's internal AI agent platform.</li>
-        <li>Delivered end-to-end implementation across 8+ changesets: Thrift IDL design, internal service-routing configuration, handler testing, client migration, and codegen compatibility fixes.</li>
+        <li>Delivered end-to-end implementation: Thrift IDL design, internal service-routing configuration, handler testing, client migration, and codegen compatibility fixes.</li>
         <li>Created a conversational-AI skillbook for analytics queries, enabling enterprise users to query dashboards through natural language.</li>
         <li>Authored user documentation and organized wiki resources to support team adoption of the new auth architecture.</li>
         <li>Resolved complex cross-tier authentication challenges, including bringing per-controller identity authentication into the async tier, coordinating with production-engineering teams across the company.</li>
@@ -98,7 +113,7 @@ team_role:            Lead SRE, Enterprise Platforms</code></pre>
 
       <h4>Enterprise Endpoint Backup Platform Management</h4>
       <ul>
-        <li>Managed the full lifecycle of an enterprise endpoint backup solution across 15+ changesets spanning deployment, vendor rebranding, disaster recovery, and compliance operations.</li>
+        <li>Managed the full lifecycle of an enterprise endpoint backup solution spanning deployment, vendor rebranding, disaster recovery, and compliance operations.</li>
         <li>Led a major vendor rebranding migration: engineered the client-swap method including post-install scripts, identity-file preservation, incremental rollout (2% → 60%), and cross-platform uninstall automation (Windows and Mac).</li>
         <li>Built region-based deployment automation (EMEA / global) using packaged distribution and feature-flag-controlled rollouts.</li>
         <li>Developed a custom metrics pipeline: wrote a script controller to send organizational metrics to the client's internal time-series platform for real-time monitoring and capacity planning.</li>
@@ -146,8 +161,8 @@ team_role:            Lead SRE, Enterprise Platforms</code></pre>
       <h3>Prior Experience</h3>
       <p class="text-muted" style="font-size: 0.875rem; margin-bottom: 1.5rem;">
         Pre-MSP career, direct-hire roles spanning cloud migration, systems
-        administration, and IT infrastructure across financial services,
-        payments, and telecom.
+        administration, and IT infrastructure across financial services and
+        payments.
       </p>
 
       <h3>Network Administrator II: Atlantic Pacific Processing Systems</h3>
@@ -190,10 +205,61 @@ team_role:            Lead SRE, Enterprise Platforms</code></pre>
 
     <!-- Key Achievements -->
     <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
-      <h2>Key Achievements</h2>
+      <h2 id="key-achievements">Key Achievements</h2>
+
+      <h3>Team Brain &amp; Oncall Agent: Platforms Team Knowledge Layer (2026)</h3>
+      <p>
+        Platforms team behind 40+ apps. Two costs compound across every
+        engineer, every day:
+      </p>
+      <ul>
+        <li><strong>The explanation tax.</strong> You open an AI session and paste the same wiki links, re-explain the same app, the same conventions, the same runbook. Next session, same drill. Across a team, across a year, this is an enormous tax on the most leveraged thing engineers do.</li>
+        <li><strong>The wiki rot loop.</strong> The bot that comments on incoming tasks reads from the same wikis. Wikis drift, bot drifts, engineers stop trusting the bot, wikis get worse. Self-reinforcing.</li>
+      </ul>
+      <p>
+        I'm building a <strong>team brain</strong> to kill both, and this is the
+        project I'm most fired up about right now. A git repo of markdown that
+        every team AI session pulls in automatically as <strong>shared memory</strong>.
+        Not a wiki. Wikis are documents people read. <strong>The brain is the
+        context the agent already has when you start typing.</strong>
+      </p>
+      <p>What lives in it:</p>
+      <ul>
+        <li><strong>Playbooks</strong> for every common operation.</li>
+        <li><strong>Processes</strong> the team actually follows.</li>
+        <li><strong>App details and architecture</strong> for the apps the team touches.</li>
+        <li><strong>Useful commands</strong>, the tribal-knowledge one-liners that never made it into a doc.</li>
+        <li><strong>Oncall details and alert history</strong>, what's fired, why, what worked.</li>
+      </ul>
+      <p>Two skill primitives hold the system together:</p>
+      <ul>
+        <li><strong>Read skills</strong> that hydrate new Claude (and other-agent) sessions from the brain before the engineer types a thing. Explanation tax to zero. <strong>The case I care most about: rotating oncall.</strong> Instead of every new oncall paging the SME for every unfamiliar alert, the brain hands them the playbook on the first prompt.</li>
+        <li><strong>Write skills</strong> that update the brain through deeper logic, not raw commits. Engineers are prompted at meaningful moments (closing a task, resolving an alert, finishing an incident) and the skill captures what changed in a structured way the next session can consume.</li>
+      </ul>
+      <p>
+        Bootstrapped both the brain and the task-comment bot off <strong>dynamic
+        workflows over historic task data</strong>, so the rollout started warm,
+        not cold.
+      </p>
+      <p>
+        <strong>The bet:</strong> people move faster. Tribal knowledge stops being
+        a bottleneck, it diminishes when it lives in the brain instead of three
+        people's heads. The texture matters: it feels great to hop on a new
+        session and know the agent already has an idea of what you're talking
+        about. The first turn isn't "let me catch you up." It's "here's what I'd
+        do."
+      </p>
+      <p>
+        And every automation the team builds on top inherits the same advantage.
+        The task-comment bot was just the first; anything new the team ships,
+        workflows, agents, evals, wakes up with a current knowledge base, not a
+        stale one.
+      </p>
+      <p>
+        <strong>Status:</strong> rolling out across the team.
+      </p>
 
       <h3>Built and Operated an Enterprise Endpoint Backup Platform</h3>
-      <p class="text-muted" style="font-size: 0.875rem;">374 code changes</p>
       <p>
         <strong>What:</strong> Owned the full lifecycle of an enterprise endpoint
         backup solution protecting corporate devices across a global fleet. Built
@@ -217,7 +283,6 @@ team_role:            Lead SRE, Enterprise Platforms</code></pre>
       </p>
 
       <h3>Pioneered AI Tool Integration Across Four Internal AI Platforms</h3>
-      <p class="text-muted" style="font-size: 0.875rem;">95+ code changes</p>
       <p>
         <strong>What:</strong> Led the integration of an enterprise data
         analytics platform with four of the client's internal AI / ML agent
@@ -233,7 +298,6 @@ team_role:            Lead SRE, Enterprise Platforms</code></pre>
       </p>
 
       <h3>Led Infrastructure Takeover of a Mission-Critical Recruiting Application</h3>
-      <p class="text-muted" style="font-size: 0.875rem;">38 code changes</p>
       <p>
         <strong>What:</strong> Completed full infrastructure takeover of a
         real-time collaborative whiteboard application used in technical
@@ -252,7 +316,6 @@ team_role:            Lead SRE, Enterprise Platforms</code></pre>
       </p>
 
       <h3>Built Legal-Hold Compliance Integration System</h3>
-      <p class="text-muted" style="font-size: 0.875rem;">79 code changes</p>
       <p>
         <strong>What:</strong> Designed and maintained a compliance system
         connecting legal-hold processes with enterprise backup infrastructure.
@@ -282,7 +345,7 @@ team_role:            Lead SRE, Enterprise Platforms</code></pre>
     <div class="card" style="max-width: 800px; margin: 0 auto 2rem;">
       <h2>Career Timeline</h2>
 
-      <h3>2022: 78 code changes</h3>
+      <h3>2022</h3>
       <p>
         Joined as an enterprise infrastructure engineer focused on endpoint
         backup solutions. Ramped quickly on the corporate device-management
@@ -290,7 +353,7 @@ team_role:            Lead SRE, Enterprise Platforms</code></pre>
         package-management automation.
       </p>
 
-      <h3>2023: 171 code changes</h3>
+      <h3>2023</h3>
       <p>
         Expanded scope significantly. Took ownership of the legal-hold compliance
         integration, built secrets-management disaster-recovery infrastructure,
@@ -298,7 +361,7 @@ team_role:            Lead SRE, Enterprise Platforms</code></pre>
         knowledge-sharing contributor across engineering communities.
       </p>
 
-      <h3>2024: 233 code changes</h3>
+      <h3>2024</h3>
       <p>
         Peak productivity year. Broadened portfolio to include data-analytics
         platform management. Began managing multiple enterprise application
@@ -306,7 +369,7 @@ team_role:            Lead SRE, Enterprise Platforms</code></pre>
         modernize legacy codebases.
       </p>
 
-      <h3>2025: 196 code changes</h3>
+      <h3>2025</h3>
       <p>
         Shifted toward higher-impact project leadership. Led analytics Tier 2
         enablement, managed platform upgrades, and supported data-center
@@ -314,10 +377,12 @@ team_role:            Lead SRE, Enterprise Platforms</code></pre>
         takeover project.
       </p>
 
-      <h3>2026: 75 code changes (YTD)</h3>
+      <h3>2026</h3>
       <p>
-        Transitioned into AI-focused technical leadership. Pioneered MCP tool
-        integration across four internal AI platforms, completed
+        Designed and started rolling out the <strong>team brain</strong>, a
+        shared-memory knowledge layer for every team AI session, and the skills
+        that update it through engineers' normal workflow. Continued the AI tool
+        integration work across internal AI platforms, completed the
         recruiting-infrastructure takeover ahead of schedule, and established
         reusable AI-onboarding patterns for the broader team.
       </p>
@@ -426,13 +491,17 @@ team_role:            Lead SRE, Enterprise Platforms</code></pre>
         <li>Associate of Arts, Computer Science / Math &amp; Physics: West Los Angeles College, 2020</li>
       </ul>
 
-      <h3>Certifications</h3>
+      <h3>Current Certifications</h3>
       <div class="certifications" style="margin-top: 0.5rem;">
         <span class="badge">AWS Developer Associate</span>
         <span class="badge">AWS SysOps Administrator Associate</span>
         <span class="badge">CompTIA Project+</span>
-        <span class="badge">AWS Solutions Architect Associate <em style="opacity: 0.7;">(expired 2023)</em></span>
-        <span class="badge">CompTIA Security+ <em style="opacity: 0.7;">(expired 2023)</em></span>
+      </div>
+
+      <h4 style="margin-top: 1.5rem;">Past Certifications</h4>
+      <div class="certifications" style="margin-top: 0.5rem;">
+        <span class="badge" style="opacity: 0.7;">AWS Solutions Architect Associate (expired 2023)</span>
+        <span class="badge" style="opacity: 0.7;">CompTIA Security+ (expired 2023)</span>
       </div>
     </div>
 
