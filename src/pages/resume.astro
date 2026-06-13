@@ -98,7 +98,7 @@ team_scope:    platforms team behind 40+ apps</code></pre>
       <h4>Enterprise-Grade Tableau MCP Server &amp; Auth Infrastructure</h4>
       <ul>
         <li>Built the <strong>Enterprise-Grade Tableau MCP server</strong>, rewritten from scratch in <strong>Hack</strong>, exposing Tableau dashboards and underlying data to Claude and the client's internal AI agent platform through the Model Context Protocol.</li>
-        <li>Architected the corresponding <strong>Thrift Proxy middle layer</strong> that fronts the MCP server: it extracts the cryptographic user-identity token the enterprise infrastructure attaches to every internal request and mints a per-user <strong>Tableau JWT</strong> from it, providing <strong>direct-trust auth that is fully transparent to any user with a Tableau account</strong>.</li>
+        <li>Architected the corresponding <strong>Thrift Proxy middle layer</strong> that fronts the MCP server: it extracts the user identity from a cryptographic token attached to every internal request and mints a per-user <strong>Tableau JWT</strong> from it, providing <strong>direct-trust auth that is fully transparent to any user with a Tableau account</strong>.</li>
         <li>Delivered end-to-end implementation: Thrift IDL design, internal service-routing configuration, handler testing, client migration, and codegen compatibility fixes.</li>
         <li>Created a conversational-AI skillbook for analytics queries, enabling enterprise users to query Tableau dashboards through natural language.</li>
         <li>Authored user documentation and organized wiki resources to support team adoption of the new auth architecture.</li>
@@ -288,10 +288,10 @@ team_scope:    platforms team behind 40+ apps</code></pre>
         <strong>What:</strong> Led the integration of <strong>Tableau</strong>
         with four of the client's internal AI / ML agent platforms. The work
         produced the <strong>Enterprise-Grade Tableau MCP server</strong>,
-        fronted by a Thrift Proxy that mints per-user Tableau JWTs from the
-        cryptographic user-identity token the enterprise infrastructure attaches
-        to every internal request, direct-trust auth, fully transparent to any
-        user with a Tableau account.
+        fronted by a Thrift Proxy that extracts the user identity from a
+        cryptographic token attached to every internal request and mints a
+        per-user Tableau JWT from it, direct-trust auth, fully transparent to
+        any user with a Tableau account.
       </p>
       <p>
         <strong>Result:</strong> Delivered working AI tool integration across all
