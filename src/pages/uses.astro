@@ -4,7 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <BaseLayout
   title="Uses: Michael Vivirito"
   description="The hardware, software, and tools Michael Vivirito uses every day, from FreeBSD on the edge to Niri, Neovim, local LLMs, and a Telegram-driven Obsidian vault."
-  keywords="uses, dotfiles, FreeBSD, NixOS, Nix Darwin, Niri, Neovim, Alacritty, Glove80, Advantage360, homelab, Proxmox, Threadripper, Ollama, OpenWebUI, Obsidian, mvivirito"
+  keywords="uses, dotfiles, FreeBSD, NixOS, Nix Darwin, Niri, Neovim, Alacritty, Glove80, Advantage360, homelab, Proxmox, Threadripper, Ollama, OpenWebUI, Obsidian, Samsung Odyssey G9, standing desk, mvivirito"
   ogTitle="Uses, Michael Vivirito"
   ogDescription="What I use every day, hardware, OS, desktop, editor, local AI, network, and homelab."
   canonical="/uses"
@@ -18,6 +18,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     </header>
 
     <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <!-- Affiliate disclosure callout -->
+      <div style="background: var(--bg-surface); padding: 1rem; border: 1px solid var(--border-accent); border-left: 3px solid var(--accent-primary); margin: 1.5rem 0;">
+        <p style="margin: 0; font-size: 0.9rem;">
+          <strong>Heads-up:</strong> A few hardware links below are affiliate links.
+          Buying through them helps fund <a href="/openworld">OpenWorld</a> and
+          the homelab. See the <a href="/disclosure">disclosure</a> for details.
+        </p>
+      </div>
 
       <pre><code>$ uname -a
 FreeBSD homefw 15.0-RELEASE-p5 FreeBSD 15.0-RELEASE-p5 amd64
@@ -45,14 +54,22 @@ keys:    glove80</code></pre>
         <li><strong>ThinkPad X1 Nano</strong> (personal): NixOS, same flake as the desktop.</li>
         <li><strong>ASUS Zephyrus G16</strong> with an RTX 4090: NixOS, same flake. The machine that games and records.</li>
         <li>Two <strong>MacBooks</strong> (work + personal) managed with <strong>Nix Darwin</strong>, sharing the same flake as the Linux machines.</li>
-        <li>Two displays, vertical arrangement, not horizontal.</li>
         <li>Wired ethernet wherever practical. Wifi is for visitors.</li>
+      </ul>
+
+      <h3>Desk &amp; Docking</h3>
+      <ul>
+        <li>A standing desk I built: an <a href="https://www.ikea.com/us/en/p/karlby-countertop-walnut-veneer-70335212/" target="_blank" rel="noopener noreferrer">IKEA Karlby walnut countertop</a> on a <a href="/go/vivo-standing-desk-legs/" rel="sponsored noopener noreferrer" target="_blank">VIVO electric dual-motor frame</a>.</li>
+        <li><strong>Samsung 49&quot; Odyssey G9</strong> (G93SC, QD-OLED, DQHD 5120&times;1440, 240&nbsp;Hz) as the one big display, with a laptop on a <a href="/go/lamicall-laptop-stand/" rel="sponsored noopener noreferrer" target="_blank">Lamicall stand</a> to its right, not stacked vertically. <a href="/go/samsung-odyssey-g9/" rel="sponsored noopener noreferrer" target="_blank">The monitor</a> does the heavy lifting; the laptop screen is the side-car.</li>
+        <li><strong>Two USB-C cables dock any laptop</strong>, Mac, Windows, or Linux, all the same: one USB-C&rarr;HDMI to the monitor, one to an <a href="/go/anker-dock/" rel="sponsored noopener noreferrer" target="_blank">Anker DL6350 dock</a>.</li>
+        <li>Off the dock hang a <a href="/go/logitech-g502x/" rel="sponsored noopener noreferrer" target="_blank">Logitech G502 X Lightspeed</a> mouse, an <a href="/go/obsbot-tiny2-lite/" rel="sponsored noopener noreferrer" target="_blank">OBSBOT Tiny 2 Lite</a> webcam, and a <a href="/go/ugreen-usb-switch/" rel="sponsored noopener noreferrer" target="_blank">UGREEN USB switch</a> for sharing peripherals between machines.</li>
       </ul>
 
       <h3>Audio</h3>
       <ul>
+        <li>A pair of <a href="/go/kef-lsx-ii-lt/" rel="sponsored noopener noreferrer" target="_blank">KEF LSX II LT</a> wireless HiFi speakers on <a href="/go/putorsen-speaker-stands/" rel="sponsored noopener noreferrer" target="_blank">PUTORSEN desktop stands</a>.</li>
+        <li><a href="/go/razer-seiren-v3/" rel="sponsored noopener noreferrer" target="_blank">Razer Seiren V3 Chroma</a> USB mic for calls and the rare YouTube recording.</li>
         <li>Closed-back headphones for focus work.</li>
-        <li>A small XLR mic on a boom arm for calls and the rare YouTube recording.</li>
       </ul>
 
       <h2>Operating Systems</h2>
@@ -151,8 +168,6 @@ keys:    glove80</code></pre>
         <li>Heavyweight router GUIs (OPNsense, pfSense). Both fine, both more abstraction than I want.</li>
         <li>Heavyweight prompts and terminal frameworks. Alacritty and a plain zsh prompt cover it.</li>
         <li>Most Electron apps. The ones I keep are kept reluctantly.</li>
-        <li>Managed cloud Kubernetes for personal projects. Bare metal teaches more.</li>
-        <li>Trying to learn ten things at once. Pick one and go deep.</li>
       </ul>
 
       <h2>Influences</h2>
