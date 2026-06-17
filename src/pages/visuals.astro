@@ -1,108 +1,59 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import EscherGeometry from '../components/visuals/EscherGeometry.astro';
+import FractalTree from '../components/visuals/FractalTree.astro';
+import Mandelbrot from '../components/visuals/Mandelbrot.astro';
+import Droste from '../components/visuals/Droste.astro';
 ---
 <BaseLayout
-  title="Visuals - CSS Art Gallery - Michael Vivirito"
-  description="A collection of pure CSS visual art experiments - psychedelic patterns, impossible geometry, and optical illusions."
+  title="Visuals - Michael Vivirito"
+  description="Generative, recursive, Escher-inspired visual experiments: impossible geometry, a fractal tree, an infinite Mandelbrot dive, and a Droste recursion. No images, just math and a little WebGL."
+  keywords="visuals, generative art, fractal, Mandelbrot, Escher, Penrose, recursive, WebGL, canvas, mvivirito"
+  ogTitle="Visuals - Michael Vivirito"
+  ogDescription="Recursive, self-similar, impossible — generative experiments in the browser."
   canonical="/visuals"
 >
-
-  <!-- Header -->
   <section>
-    <h1 class="text-center">CSS Visual Experiments</h1>
-    <p class="text-center text-muted" style="max-width: 700px; margin: 0 auto 2rem;">
-      A collection of visual art created with pure HTML and CSS. No images, no JavaScript, just code.
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>Visuals</h1>
+      <p class="text-muted" style="max-width: 640px; margin: 0 auto;">
+        Recursive, self-similar, impossible. Generative experiments that run in your
+        browser, no images, just math and a little WebGL.
+      </p>
+    </header>
+
+    <div class="viz-piece">
+      <h2>Impossible Geometry</h2>
+      <p class="text-muted">After M.C. Escher: a Penrose tribar your eye accepts but your brain rejects.</p>
+      <EscherGeometry />
+    </div>
+
+    <div class="viz-piece">
+      <h2>Recursive Tree</h2>
+      <p class="text-muted">Every branch is a smaller copy of the whole. Move to sway it, click to regrow.</p>
+      <FractalTree />
+    </div>
+
+    <div class="viz-piece">
+      <h2>Mandelbrot Dive</h2>
+      <p class="text-muted">Infinite self-similarity. Drag to pan, scroll to fall in, or let it dive on its own.</p>
+      <Mandelbrot />
+    </div>
+
+    <div class="viz-piece">
+      <h2>Droste Recursion</h2>
+      <p class="text-muted">The frame contains the frame contains the frame… Escher's "Print Gallery" in CSS.</p>
+      <Droste />
+    </div>
+
+    <p class="text-muted" style="text-align: center; font-size: 0.8rem; max-width: 640px; margin: 0 auto;">
+      Animations pause when off-screen and respect <code>prefers-reduced-motion</code>.
     </p>
   </section>
 
-  <!-- Visual 1: Impossible Cube -->
-  <section>
-    <div class="visual-container">
-      <h2 class="text-center">Impossible Cube</h2>
-      <p class="text-center text-muted">Inspired by M.C. Escher's impossible geometry</p>
-      <div class="visual-box">
-        <div class="impossible-cube">
-          <div class="cube-face cube-front"></div>
-          <div class="cube-face cube-back"></div>
-          <div class="cube-face cube-right"></div>
-          <div class="cube-face cube-left"></div>
-          <div class="cube-face cube-top"></div>
-          <div class="cube-face cube-bottom"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Visual 2: Psychedelic Spiral -->
-  <section>
-    <div class="visual-container">
-      <h2 class="text-center">Psychedelic Spiral</h2>
-      <p class="text-center text-muted">Infinite rotating gradients</p>
-      <div class="visual-box">
-        <div class="psychedelic-spiral">
-          <div class="spiral-layer spiral-1"></div>
-          <div class="spiral-layer spiral-2"></div>
-          <div class="spiral-layer spiral-3"></div>
-          <div class="spiral-layer spiral-4"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Visual 3: 3D Corridor -->
-  <section>
-    <div class="visual-container">
-      <h2 class="text-center">3D Corridor</h2>
-      <p class="text-center text-muted">Perspective depth illusion</p>
-      <div class="visual-box">
-        <div class="corridor-3d">
-          <div class="corridor-segment corridor-1"></div>
-          <div class="corridor-segment corridor-2"></div>
-          <div class="corridor-segment corridor-3"></div>
-          <div class="corridor-segment corridor-4"></div>
-          <div class="corridor-segment corridor-5"></div>
-          <div class="corridor-vanish"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Visual 4: Tessellation Grid -->
-  <section>
-    <div class="visual-container">
-      <h2 class="text-center">Tessellation Grid</h2>
-      <p class="text-center text-muted">M.C. Escher style repeating patterns</p>
-      <div class="visual-box">
-        <div class="tessellation-grid"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Visual 5: Magic Eye Pattern -->
-  <section>
-    <div class="visual-container">
-      <h2 class="text-center">Magic Eye Pattern</h2>
-      <p class="text-center text-muted">Stereogram-inspired repeating elements</p>
-      <div class="visual-box">
-        <div class="magic-eye-pattern"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Info Section -->
-  <section>
-    <div class="card" style="max-width: 800px; margin: 2rem auto;">
-      <h2>About These Visuals</h2>
-      <p>
-        All of these visual effects are created using pure CSS, no images, no canvas, no JavaScript.
-        They demonstrate the power of modern CSS features like transforms, animations, gradients,
-        and pseudo-elements.
-      </p>
-      <p class="text-muted" style="font-size: 0.875rem; margin-top: 1.5rem;">
-        <strong>Note:</strong> These animations may be resource-intensive. If your browser feels sluggish,
-        try viewing one section at a time.
-      </p>
-    </div>
-  </section>
-
+  <style>
+    .viz-piece { max-width: 900px; margin: 0 auto 4rem; }
+    .viz-piece h2 { margin-bottom: 0.25rem; }
+    .viz-piece > p { margin-top: 0; margin-bottom: 1rem; }
+  </style>
 </BaseLayout>

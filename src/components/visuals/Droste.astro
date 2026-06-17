@@ -1,0 +1,38 @@
+---
+// Droste recursion: self-similar nested frames + seamless infinite-zoom loop.
+---
+<div class="viz-stage">
+  <div class="droste" id="viz-droste"></div>
+  <span class="viz-hint">infinite zoom</span>
+</div>
+
+<style>
+  .viz-stage { position: relative; height: clamp(340px, 50vw, 520px); border: 1px solid var(--border); border-radius: 12px; background: #020503; overflow: hidden; display: grid; place-items: center; }
+  .droste { position: absolute; inset: 0; transform-origin: center center; animation: droste-zoom 7s linear infinite; }
+  .droste :global(.dl) {
+    position: absolute; inset: 0;
+    border: 1px solid rgba(34, 197, 94, .5);
+    border-radius: 8px;
+    transform-origin: center center;
+    transform: scale(.74) rotate(11deg);
+    box-shadow: inset 0 0 24px rgba(34, 197, 94, .07);
+  }
+  .droste :global(.dl-core) { display: grid; place-items: center; color: rgba(134, 239, 172, .9); font-family: var(--font-mono); font-size: .7rem; }
+  @keyframes droste-zoom { from { transform: scale(1) rotate(0deg); } to { transform: scale(1.3514) rotate(-11deg); } }
+  @media (prefers-reduced-motion: reduce) { .droste { animation: none; } }
+</style>
+
+<script>
+  const root = document.getElementById('viz-droste');
+  if (root) {
+    let node = root;
+    for (let i = 0; i < 14; i++) {
+      const d = document.createElement('div');
+      d.className = 'dl';
+      node.appendChild(d);
+      node = d;
+    }
+    node.classList.add('dl-core');
+    node.textContent = '∞';
+  }
+</script>
