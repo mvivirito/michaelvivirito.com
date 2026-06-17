@@ -61,4 +61,20 @@ export const affiliates: Record<string, AffiliateLink> = {
     url: 'https://amzn.to/4uIrqvL',
     label: 'AKG K240 Studio semi-open headphones on Amazon',
   },
+  'elinkume-pendant': {
+    url: 'https://amzn.to/4v90RRk',
+    label: 'ELINKUME 23W LED pendant light on Amazon',
+  },
+  'btf-ws2812b': {
+    url: 'https://amzn.to/4a1dNjU',
+    label: 'BTF-LIGHTING WS2812B addressable LED strip on Amazon',
+  },
+  'esp32-devboard': {
+    url: 'https://amzn.to/4vLLn5M',
+    label: 'ESP-WROOM-32 ESP32 development board on Amazon',
+  },
+  'naoevo-16awg-wire': {
+    url: 'https://amzn.to/4aV25rc',
+    label: 'NAOEVO 16 AWG stranded hookup wire on Amazon',
+  },
 };
