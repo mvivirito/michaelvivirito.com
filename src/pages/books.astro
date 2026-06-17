@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import books from '../data/books.json';
+
+type Book = {
+  asin: string;
+  title: string;
+  format: 'Physical' | 'Audible';
+  firstPurchased: string | null;
+  lastPurchased: string | null;
+  timesOrdered: number;
+  amazonUrl: string;
+};
+
+const all = books as Book[];
+
+// Group by purchase year, newest year first, alphabetical within a year.
+const byYear = new Map<string, Book[]>();
+for (const b of all) {
+  const y = (b.firstPurchased ?? '').slice(0, 4) || 'Undated';
+  (byYear.get(y) ?? byYear.set(y, []).get(y)!).push(b);
+}
+const years = [...byYear.keys()].sort().reverse();
+for (const y of years) byYear.get(y)!.sort((a, b) => a.title.localeCompare(b.title));
+
+const total = all.length;
+const yearsOnly = all.map((b) => b.firstPurchased?.slice(0, 4)).filter(Boolean).sort();
+const span = `${yearsOnly[0]}–${yearsOnly[yearsOnly.length - 1]}`;
+---
+<BaseLayout
+  title="Books: Michael Vivirito"
+  description="The books I've bought over the years — systems, math, and the occasional novel. The shelf as it actually is: in progress, not a trophy case."
+  keywords="books, reading list, bookshelf, FreeBSD, TCP/IP, algorithms, calculus, computer science books, Michael Vivirito"
+  ogTitle="Books, Michael Vivirito"
+  ogDescription="Every book I've bought on Amazon over the years, grouped by year. Systems, math, security, and a few novels."
+  ogImage="/pix/bookshelf.jpg"
+  canonical="/books"
+>
+
+  <section>
+    <header style="text-align: center; margin-bottom: 2rem;">
+      <h1>Books</h1>
+      <p class="text-muted">{total} books I've bought over the years, {span}.</p>
+    </header>
+
+    <figure style="max-width: 460px; margin: 0 auto 2.5rem;">
+      <img
+        src="/pix/bookshelf.jpg"
+        alt="Michael's bookshelf: systems and programming titles — TCP/IP Guide, Absolute FreeBSD, Absolute OpenBSD, the Calculus Lifesaver, JavaScript & jQuery — beside a glowing mechanical keyboard and a code-lit monitor."
+        width="1080"
+        height="1440"
+        loading="eager"
+        style="width: 100%; height: auto; border-radius: 10px; image-orientation: from-image;"
+      />
+      <figcaption class="text-muted" style="font-size: 0.85rem; text-align: center; margin-top: 0.6rem;">
+        The shelf as it actually is right now.
+      </figcaption>
+    </figure>
+
+    <div class="card" style="max-width: 800px; margin: 0 auto;">
+
+      <p>
+        This is the running list of books I've bought over the years — mostly systems,
+        networking, math, and security, with the occasional novel that snuck in. I'm
+        usually in the middle of several at once.
+      </p>
+      <p>
+        Honest disclaimer: I haven't read every one of these cover to cover. Some I worked
+        straight through, some I keep as references, and a few are still waiting their turn.
+        It's a shelf, not a trophy case — and it's still growing.
+      </p>
+
+      <!-- Affiliate disclosure callout -->
+      <div style="background: var(--bg-surface); padding: 1rem; border: 1px solid var(--border-accent); border-left: 3px solid var(--accent-primary); margin: 1.5rem 0;">
+        <p style="margin: 0; font-size: 0.9rem;">
+          <strong>Heads-up:</strong> the title links are Amazon affiliate links.
+          Buying through them helps fund <a href="/openworld">OpenWorld</a> and the homelab,
+          at no extra cost to you. See the <a href="/disclosure">disclosure</a>.
+        </p>
+      </div>
+
+      {years.map((year) => (
+        <section style="margin-top: 2rem;">
+          <h2>{year}</h2>
+          <ul>
+            {byYear.get(year)!.map((b) => (
+              <li>
+                <a href={b.amazonUrl} rel="sponsored noopener noreferrer" target="_blank">{b.title}</a>
+                {b.format === 'Audible' && <span class="text-muted"> · audiobook</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+
+    </div>
+
+    <div style="max-width: 800px; margin: 2rem auto 0; text-align: center;">
+      <p class="text-muted">Pulled from my own order history. The list updates as the shelf does.</p>
+      <p>
+        <a href="/" class="btn btn-secondary">← Home</a>
+        <a href="/uses" class="btn btn-secondary">/uses</a>
+        <a href="/now" class="btn btn-primary">/now</a>
+      </p>
+    </div>
+
+  </section>
+
+</BaseLayout>
