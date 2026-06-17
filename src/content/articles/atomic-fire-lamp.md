@@ -1,10 +1,11 @@
 ---
 title: "Building the Atomic Fire Lamp"
-description: "An ESP32 running WLED drives a WS2812B strip inside a pendant fixture for a convincing flame effect. A weekend build inspired by Dave's Garage."
+description: "An ESP32 running WLED drives a WS2812B strip wrapped around a pendant frame into a glowing, atom-shaped lamp. A weekend build inspired by Dave's Garage."
 date: 2026-06-16
-keywords: "Atomic Fire Lamp, WLED, ESP32, WS2812B, addressable LED, Dave's Garage, DIY lamp, fire effect, FastLED"
+keywords: "Atomic Fire Lamp, WLED, ESP32, WS2812B, addressable LED, Dave's Garage, DIY lamp, atom lamp, fire effect"
 ogTitle: "Building the Atomic Fire Lamp"
-ogDescription: "ESP32 + WLED + a WS2812B strip in a pendant light: a convincing flame effect, start to finish."
+ogDescription: "ESP32 + WLED + a WS2812B strip wrapped into an atom-shaped lamp: a convincing flame effect and the full color range."
+ogImage: "/pix/atomic-fire-lamp-1.jpg"
 badges: ["Hardware", "DIY", "ESP32", "WLED"]
 related: []
 draft: false
@@ -14,33 +15,36 @@ draft: false
   <p style="margin: 0; font-size: 0.9rem;"><strong>Heads-up:</strong> the parts list below uses affiliate links. Buying through them helps fund <a href="/openworld">OpenWorld</a> and the homelab, at no extra cost to you. See the <a href="/disclosure">disclosure</a>.</p>
 </div>
 
-Dave Plummer (of [Dave's Garage](https://youtu.be/_wCOCI18nAk)) built a lamp that looks like it has a contained, living flame inside it. No fire, no moving parts, just a strip of addressable LEDs running a fire animation behind a diffuser. I watched the assembly video, decided I needed one on the shelf, and ordered the parts that night. Here's the whole build.
+Dave Plummer (of [Dave's Garage](https://youtu.be/_wCOCI18nAk)) built a lamp shaped like an atom, glowing arcs of addressable LEDs crossing like electron orbits around a core. No screen, no actual fire, just a strip of WS2812B LEDs bent into a sphere and driven by an ESP32 running WLED. I watched the assembly video, decided I needed one on the bench, and ordered the parts that night. Here's the whole build.
+
+<figure style="margin: 1.5rem 0;">
+  <img src="/pix/atomic-fire-lamp-1.jpg" alt="The finished Atomic Fire Lamp: crossing arcs of LEDs glowing in a rainbow of colors in a dark room" width="1600" height="1200" loading="lazy" style="width: 100%; height: auto; border-radius: 8px;" />
+  <figcaption class="text-muted" style="font-size: 0.85rem; text-align: center; margin-top: 0.5rem;">Running a rainbow cycle, every LED individually addressable.</figcaption>
+</figure>
 
 ## What It Actually Is
 
-Strip the romance away and it's three things: a lamp body to diffuse the light, a length of individually-addressable LEDs, and a microcontroller running a fire animation. The diffuser is what sells it, it blurs the individual LEDs into a single warm, flickering glow that reads as flame from across the room.
-
-I used a cheap pendant fixture as the body, a WS2812B strip for the LEDs, and an ESP32 running [WLED](https://kno.wled.ge/) for the brains. WLED is the shortcut here: it ships with a **Fire 2012** effect out of the box, so there's no code to write.
+Strip away the romance and it's three parts: a frame to hold the LEDs in a shape, a length of individually-addressable LEDs, and a microcontroller running an animation. The shape is what sells it, curved arcs crossing like the orbits in a Bohr-model atom, each one lined with WS2812B. WLED is the shortcut: it ships with a **Fire 2012** effect (the namesake) plus dozens of others, so the same lamp goes from a flickering flame to a full rainbow without writing a line of code.
 
 ## The Parts
 
-- <a href="/go/elinkume-pendant/" rel="sponsored noopener noreferrer" target="_blank">ELINKUME 23W LED pendant light</a> — the body. Gut the original LED guts; you're keeping the shade and the diffuser tube.
-- <a href="/go/btf-ws2812b/" rel="sponsored noopener noreferrer" target="_blank">BTF-LIGHTING WS2812B strip</a> — 144 LEDs/m, individually addressable. The high density matters: more LEDs per inch means a smoother flame and no visible "dots" through the diffuser.
+- <a href="/go/elinkume-pendant/" rel="sponsored noopener noreferrer" target="_blank">ELINKUME 23W LED pendant light</a> — the skeleton. It's sold as a chandelier; I kept the curved arcs and the base, ditched the original driver, and used the arcs as the form to mount the strip along.
+- <a href="/go/btf-ws2812b/" rel="sponsored noopener noreferrer" target="_blank">BTF-LIGHTING WS2812B strip</a> — 144 LEDs/m, individually addressable. The high density keeps the color gradients smooth as they sweep around each arc instead of reading as a string of dots.
 - <a href="/go/esp32-devboard/" rel="sponsored noopener noreferrer" target="_blank">ESP32 (ESP-WROOM-32) dev board</a> — runs WLED, joins Wi-Fi, costs a few dollars.
 - <a href="/go/naoevo-16awg-wire/" rel="sponsored noopener noreferrer" target="_blank">NAOEVO 16 AWG stranded wire</a> — for the 5V power run. Thin signal wire sags voltage over any real length; use proper gauge for power.
 - A **5V power supply** sized to your LED count (see the power note below). The strip does *not* run off the ESP32's regulator.
 
 ## How It Works
 
-Every WS2812B LED has its own little driver chip baked in, so a single data line can address all 144 of them independently, color and brightness, pixel by pixel. WLED takes that data line and renders animations on it. Its **Fire 2012** effect (a port of the classic FastLED algorithm) walks a heat value up the strip and maps it onto a warm palette, so the "flame" rises, flickers, and dies down exactly like the real thing. You tune intensity and speed from your phone and never touch a line of code.
+Every WS2812B LED has its own little driver chip baked in, so a single data line can address all of them independently, color and brightness, pixel by pixel. WLED takes that data line and renders animations on it. Its **Fire 2012** effect (a port of the classic FastLED algorithm) walks a heat value along the strip and maps it onto a warm palette, so the "flame" rises and flickers, but the same firmware does rainbows, color sweeps, and solid colors too. You pick and tune all of it from your phone.
 
 ## The Build
 
-1. **Gut the fixture.** Pull the original LED board out of the ELINKUME pendant. Keep the housing, the shade, and especially the frosted diffuser, that's the part doing the optical work.
-2. **Mount the strip.** Wind or run the WS2812B inside the body so the diffuser sits between the LEDs and your eye. Watch the little arrows printed on the strip, they show data direction, and the data input (DIN) has to be the upstream end.
-3. **Wire it.** Run 5V and GND from the supply to the strip with the 16 AWG wire. Run the data line from an ESP32 GPIO (GPIO2 is a sane default) to the strip's DIN.
+1. **Strip the fixture to its frame.** Pull the original LED driver out of the ELINKUME pendant and keep the curved arcs and the base, that's your form.
+2. **Run the strip along the arcs.** Lay the WS2812B down each arc, watching the little arrows printed on the strip, they show data direction, and the data has to flow continuously from one arc into the next.
+3. **Wire it.** Run 5V and GND from the supply to the strip with the 16 AWG wire. Run the data line from an ESP32 GPIO (GPIO2 is a sane default) to the strip's data input.
 4. **Tie the grounds together.** The ESP32 ground and the power-supply ground *must* be common, or the data signal has no reference and nothing lights correctly. This is the single most common mistake.
-5. **Inject power at both ends.** On a 1m+ run of 144/m, feed 5V to both ends of the strip so the far end doesn't brown out and shift color.
+5. **Inject power at both ends.** Over a meter-plus of 144/m strip, feed 5V to both ends so the far arcs don't brown out and shift color.
 
 ## Flashing WLED
 
@@ -53,19 +57,27 @@ The easy path is the browser installer, no toolchain required:
 4. Join the WLED-AP Wi-Fi, point it at your network.
 ```
 
-Then in the WLED UI: open **Config → LED Preferences**, set the LED count (144 per meter you used) and the data GPIO (2). Back on the main screen, pick the **Fire 2012** effect, choose a warm palette, dial in intensity and speed, and save it as a preset so it comes up that way on every power-on.
+Then in the WLED UI: open **Config → LED Preferences**, set the LED count and the data GPIO (2). Back on the main screen, pick an effect, **Fire 2012** for the namesake, or a rainbow, and dial in intensity and speed. Save it as a preset so it comes up that way on every power-on.
 
 ## Notes and Gotchas
 
-- **Power budget.** 144 LEDs at full white is roughly 8.6 A at 5V. The fire effect never gets anywhere near that, but size the supply with headroom and never try to run the strip off the ESP32's 3.3V regulator, you'll brown out the board.
+- **Power budget.** 144 LEDs at full white is roughly 8.6 A at 5V. Most effects never get near that, but size the supply with headroom and never try to run the strip off the ESP32's 3.3V regulator, you'll brown out the board.
 - **Logic levels.** WS2812B nominally wants ~5V on the data line. At short runs a 3.3V ESP32 pin usually drives it fine; if the first few LEDs flicker or show the wrong color, add a level shifter.
-- **Diffusion is everything.** If you can see individual LEDs, add distance or a heavier diffuser. The magic is in *not* seeing the strip.
+- **Plan the seams.** Decide where the strip crosses from one arc to the next before you stick anything down, you want the data line continuous and the jumper wires hidden behind the frame.
 
 ## The Result
 
-Through the diffuser, the individual LEDs vanish and what's left is a warm flicker that genuinely reads as a contained flame. It's the kind of build that's cheap, takes an evening, and gets a "wait, is that real?" from everyone who walks past it.
+Powered up, it's exactly the toy you'd hope for: glowing arcs you can throw any color or animation at from your phone. Fire for ambiance, a slow rainbow for show, a solid color to match the room. It's cheap, it's an evening's work, and it earns a "wait, is that real?" from everyone who walks past it.
 
-<!-- TODO(michael): drop a photo or short GIF of the finished lamp here, e.g. /pix/atomic-fire-lamp.jpg -->
+<div style="display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0;">
+  <figure style="flex: 1 1 45%; margin: 0;">
+    <img src="/pix/atomic-fire-lamp-2.jpg" alt="The Atomic Fire Lamp glowing in pink and magenta tones" width="1600" height="1200" loading="lazy" style="width: 100%; height: auto; border-radius: 8px;" />
+  </figure>
+  <figure style="flex: 1 1 45%; margin: 0;">
+    <img src="/pix/atomic-fire-lamp-3.jpg" alt="The Atomic Fire Lamp glowing in cool blue tones" width="1600" height="1200" loading="lazy" style="width: 100%; height: auto; border-radius: 8px;" />
+  </figure>
+</div>
+<p class="text-muted" style="font-size: 0.85rem; text-align: center; margin-top: -0.5rem;">Same lamp, two more of WLED's palettes, on the bench next to the printer.</p>
 
 All credit to [Dave Plummer's Dave's Garage](https://youtu.be/_wCOCI18nAk) for the original Atomic Fire Lamp, watch his assembly video for the inspiration and a second take on the wiring.
 
