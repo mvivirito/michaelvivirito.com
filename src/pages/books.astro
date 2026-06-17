@@ -5,6 +5,7 @@ import books from '../data/books.json';
 type Book = {
   asin: string;
   title: string;
+  author: string;
   format: 'Physical' | 'Audible';
   firstPurchased: string | null;
   lastPurchased: string | null;
@@ -86,6 +87,7 @@ const span = `${yearsOnly[0]}–${yearsOnly[yearsOnly.length - 1]}`;
             {byYear.get(year)!.map((b) => (
               <li>
                 <a href={b.amazonUrl} rel="sponsored noopener noreferrer" target="_blank">{b.title}</a>
+                {b.author && <span class="text-muted"> — {b.author}</span>}
                 {b.format === 'Audible' && <span class="text-muted"> · audiobook</span>}
               </li>
             ))}

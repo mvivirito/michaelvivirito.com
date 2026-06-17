@@ -2,6 +2,7 @@
   {
     "asin": "0679720200",
     "title": "The Stranger",
+    "author": "Albert Camus",
     "format": "Physical",
     "firstPurchased": "2014-07-01",
     "lastPurchased": "2014-07-01",
@@ -11,6 +12,7 @@
   {
     "asin": "0375759891",
     "title": "Basic Writings of Existentialism (Modern Library Classics)",
+    "author": "ed. Gordon Marino",
     "format": "Physical",
     "firstPurchased": "2014-07-01",
     "lastPurchased": "2014-07-01",
@@ -20,6 +22,7 @@
   {
     "asin": "0679750150",
     "title": "The Sailor Who Fell from Grace with the Sea",
+    "author": "Yukio Mishima",
     "format": "Physical",
     "firstPurchased": "2014-07-01",
     "lastPurchased": "2014-07-01",
@@ -29,6 +32,7 @@
   {
     "asin": "024080953X",
     "title": "Cinema 4D: The Artist's Project Sourcebook, 2nd Edition",
+    "author": "Kent McQuilkin & Anne Powers",
     "format": "Physical",
     "firstPurchased": "2014-11-10",
     "lastPurchased": "2014-11-10",
@@ -38,6 +42,7 @@
   {
     "asin": "0321721330",
     "title": "Practical Object-Oriented Design in Ruby: An Agile Primer (Addison-Wesley Professional Ruby Series)",
+    "author": "Sandi Metz",
     "format": "Physical",
     "firstPurchased": "2015-07-12",
     "lastPurchased": "2015-07-12",
@@ -47,6 +52,7 @@
   {
     "asin": "1250045924",
     "title": "Magicians of the Gods: The Forgotten Wisdom of Earth's Lost Civilization",
+    "author": "Graham Hancock",
     "format": "Physical",
     "firstPurchased": "2015-11-04",
     "lastPurchased": "2015-11-04",
@@ -56,6 +62,7 @@
   {
     "asin": "0321832183",
     "title": "PHP Advanced and Object-Oriented Programming: Visual QuickPro Guide (3rd Edition)",
+    "author": "Larry Ullman",
     "format": "Physical",
     "firstPurchased": "2016-02-11",
     "lastPurchased": "2016-02-11",
@@ -65,6 +72,7 @@
   {
     "asin": "0321784073",
     "title": "PHP and MySQL for Dynamic Web Sites: Visual QuickPro Guide (4th Edition)",
+    "author": "Larry Ullman",
     "format": "Physical",
     "firstPurchased": "2016-02-11",
     "lastPurchased": "2016-02-11",
@@ -74,6 +82,7 @@
   {
     "asin": "1890774685",
     "title": "Murach's MySQL",
+    "author": "Joel Murach",
     "format": "Physical",
     "firstPurchased": "2016-02-11",
     "lastPurchased": "2016-02-11",
@@ -83,6 +92,7 @@
   {
     "asin": "1583335080",
     "title": "The Willpower Instinct: How Self-Control Works, Why It Matters, and What You Can Do to Get More of It",
+    "author": "Kelly McGonigal",
     "format": "Physical",
     "firstPurchased": "2016-03-11",
     "lastPurchased": "2016-03-11",
@@ -92,6 +102,7 @@
   {
     "asin": "1111969752",
     "title": "Programming Logic and Design, Comprehensive",
+    "author": "Joyce Farrell",
     "format": "Physical",
     "firstPurchased": "2016-04-12",
     "lastPurchased": "2016-04-12",
@@ -101,6 +112,7 @@
   {
     "asin": "013336092X",
     "title": "Starting Out with C++: Early Objects (8th Edition)",
+    "author": "Tony Gaddis",
     "format": "Physical",
     "firstPurchased": "2016-05-21",
     "lastPurchased": "2016-05-21",
@@ -110,6 +122,7 @@
   {
     "asin": "161768029X",
     "title": "Epic Spell Wars of The Battle Wizards: Duel at Mt. Skullzfyre",
+    "author": "",
     "format": "Physical",
     "firstPurchased": "2016-07-12",
     "lastPurchased": "2016-07-12",
@@ -119,6 +132,7 @@
   {
     "asin": "0071848290",
     "title": "How to Diagnose and Fix Everything Electronic, Second Edition",
+    "author": "Michael Jay Geier",
     "format": "Physical",
     "firstPurchased": "2016-08-08",
     "lastPurchased": "2016-08-08",
@@ -128,6 +142,7 @@
   {
     "asin": "0321497686",
     "title": "Starting Out with Java: Early Objects (3rd Edition)",
+    "author": "Tony Gaddis",
     "format": "Physical",
     "firstPurchased": "2016-08-10",
     "lastPurchased": "2016-08-10",
@@ -137,6 +152,7 @@
   {
     "asin": "032164008X",
     "title": "Prealgebra (Hardcover) (6th Edition)",
+    "author": "Elayn Martin-Gay",
     "format": "Physical",
     "firstPurchased": "2016-08-15",
     "lastPurchased": "2016-08-15",
@@ -146,6 +162,7 @@
   {
     "asin": "0132354764",
     "title": "Core Java, Volume I--Fundamentals (8th Edition)",
+    "author": "Cay S. Horstmann & Gary Cornell",
     "format": "Physical",
     "firstPurchased": "2016-09-29",
     "lastPurchased": "2016-09-29",
@@ -155,6 +172,7 @@
   {
     "asin": "0393920305",
     "title": "Give Me Liberty!: An American History (Seagull Fourth Edition)  (Vol. 1)",
+    "author": "Eric Foner",
     "format": "Physical",
     "firstPurchased": "2016-10-08",
     "lastPurchased": "2016-10-08",
@@ -164,6 +182,7 @@
   {
     "asin": "0132354799",
     "title": "Core Java, Vol. 2: Advanced Features, 8th Edition",
+    "author": "Cay S. Horstmann & Gary Cornell",
     "format": "Physical",
     "firstPurchased": "2016-10-15",
     "lastPurchased": "2016-10-15",
@@ -173,6 +192,7 @@
   {
     "asin": "0134171454",
     "title": "Android Programming: The Big Nerd Ranch Guide (2nd Edition)",
+    "author": "Bill Phillips et al.",
     "format": "Physical",
     "firstPurchased": "2016-10-18",
     "lastPurchased": "2016-10-18",
@@ -182,6 +202,7 @@
   {
     "asin": "1534724141",
     "title": "The Great Gatsby",
+    "author": "F. Scott Fitzgerald",
     "format": "Physical",
     "firstPurchased": "2016-10-18",
     "lastPurchased": "2016-10-18",
@@ -191,6 +212,7 @@
   {
     "asin": "B01D57L814",
     "title": "The Seventh Sense",
+    "author": "Joshua Cooper Ramo",
     "format": "Audible",
     "firstPurchased": "2017-03-30",
     "lastPurchased": "2017-03-30",
@@ -200,6 +222,7 @@
   {
     "asin": "1540444961",
     "title": "Hash Crack: Password Cracking Manual",
+    "author": "Joshua Picolet",
     "format": "Physical",
     "firstPurchased": "2017-04-23",
     "lastPurchased": "2017-04-25",
@@ -209,6 +232,7 @@
   {
     "asin": "1494295504",
     "title": "Rtfm: Red Team Field Manual",
+    "author": "Ben Clark",
     "format": "Physical",
     "firstPurchased": "2017-04-25",
     "lastPurchased": "2017-04-25",
@@ -218,6 +242,7 @@
   {
     "asin": "1512214566",
     "title": "The Hacker Playbook 2: Practical Guide To Penetration Testing",
+    "author": "Peter Kim",
     "format": "Physical",
     "firstPurchased": "2017-04-25",
     "lastPurchased": "2017-04-25",
@@ -227,6 +252,7 @@
   {
     "asin": "0133769402",
     "title": "Assembly Language for x86 Processors (7th Edition)",
+    "author": "Kip R. Irvine",
     "format": "Physical",
     "firstPurchased": "2017-08-29",
     "lastPurchased": "2017-08-29",
@@ -236,6 +262,7 @@
   {
     "asin": "0143117009",
     "title": "Collapse: How Societies Choose to Fail or Succeed: Revised Edition",
+    "author": "Jared Diamond",
     "format": "Physical",
     "firstPurchased": "2017-09-23",
     "lastPurchased": "2017-09-23",
@@ -245,6 +272,7 @@
   {
     "asin": "0061438294",
     "title": "What Every BODY is Saying: An Ex-FBI Agent’s Guide to Speed-Reading People",
+    "author": "Joe Navarro",
     "format": "Physical",
     "firstPurchased": "2017-10-15",
     "lastPurchased": "2017-10-15",
@@ -254,6 +282,7 @@
   {
     "asin": "0262035618",
     "title": "Deep Learning (Adaptive Computation and Machine Learning series)",
+    "author": "Ian Goodfellow et al.",
     "format": "Physical",
     "firstPurchased": "2017-10-15",
     "lastPurchased": "2017-10-15",
@@ -263,6 +292,7 @@
   {
     "asin": "0999282905",
     "title": "Algorithms Illuminated: Part 1: The Basics",
+    "author": "Tim Roughgarden",
     "format": "Physical",
     "firstPurchased": "2017-10-21",
     "lastPurchased": "2017-10-21",
@@ -272,6 +302,7 @@
   {
     "asin": "039916524X",
     "title": "A Mind for Numbers: How to Excel at Math and Science (Even If You Flunked Algebra)",
+    "author": "Barbara Oakley",
     "format": "Physical",
     "firstPurchased": "2017-11-30",
     "lastPurchased": "2017-11-30",
@@ -281,6 +312,7 @@
   {
     "asin": "1544840705",
     "title": "Mind Mapping: Improve Memory, Concentration, Communication, Organization, Creativity, and Time Management",
+    "author": "Kam Knight",
     "format": "Physical",
     "firstPurchased": "2017-11-30",
     "lastPurchased": "2017-11-30",
@@ -290,6 +322,7 @@
   {
     "asin": "0307338401",
     "title": "Secrets of Mental Math: The Mathemagician's Guide to Lightning Calculation and Amazing Math Tricks",
+    "author": "Arthur Benjamin & Michael Shermer",
     "format": "Physical",
     "firstPurchased": "2017-11-30",
     "lastPurchased": "2017-11-30",
@@ -299,6 +332,7 @@
   {
     "asin": "0538497815",
     "title": "Calculus, 7th Edition",
+    "author": "James Stewart",
     "format": "Physical",
     "firstPurchased": "2017-12-29",
     "lastPurchased": "2017-12-29",
@@ -308,6 +342,7 @@
   {
     "asin": "0321903080",
     "title": "Physics Technology Update (4th Edition)",
+    "author": "James S. Walker",
     "format": "Physical",
     "firstPurchased": "2018-02-07",
     "lastPurchased": "2018-02-07",
@@ -317,6 +352,7 @@
   {
     "asin": "0321820460",
     "title": "Lecture-Tutorials for Introductory Astronomy, 3rd Edition",
+    "author": "Edward E. Prather et al.",
     "format": "Physical",
     "firstPurchased": "2018-04-05",
     "lastPurchased": "2018-04-05",
@@ -326,6 +362,7 @@
   {
     "asin": "0553232673",
     "title": "What Do You Say After You Say Hello?: The Psychology of Human Destiny",
+    "author": "Eric Berne",
     "format": "Physical",
     "firstPurchased": "2018-05-04",
     "lastPurchased": "2018-05-04",
@@ -335,6 +372,7 @@
   {
     "asin": "0321185587",
     "title": "Thomas' Calculus, 11th Edition",
+    "author": "George B. Thomas et al.",
     "format": "Physical",
     "firstPurchased": "2018-08-29",
     "lastPurchased": "2018-08-29",
@@ -344,6 +382,7 @@
   {
     "asin": "0691163596",
     "title": "The Origins and History of Consciousness (Mythos: The Princeton/Bollingen Series in World Mythology)",
+    "author": "Erich Neumann",
     "format": "Physical",
     "firstPurchased": "2018-09-10",
     "lastPurchased": "2018-09-10",
@@ -353,6 +392,7 @@
   {
     "asin": "143800916X",
     "title": "501 Spanish Verbs (501 Verb Series)",
+    "author": "Christopher Kendris & Theodore Kendris",
     "format": "Physical",
     "firstPurchased": "2018-11-18",
     "lastPurchased": "2018-11-18",
@@ -362,6 +402,7 @@
   {
     "asin": "book-of-pf-3e",
     "title": "The Book of PF, 3rd Edition: A No-Nonsense Guide to the OpenBSD Firewall",
+    "author": "Peter N. M. Hansteen",
     "format": "Physical",
     "firstPurchased": "2019-01-01",
     "lastPurchased": "2019-01-01",
@@ -371,6 +412,7 @@
   {
     "asin": "0465026567",
     "title": "Gödel, Escher, Bach: An Eternal Golden Braid",
+    "author": "Douglas R. Hofstadter",
     "format": "Physical",
     "firstPurchased": "2019-05-25",
     "lastPurchased": "2019-05-25",
@@ -380,6 +422,7 @@
   {
     "asin": "1593278926",
     "title": "Absolute FreeBSD, 3rd Edition: The Complete Guide to FreeBSD",
+    "author": "Michael W. Lucas",
     "format": "Physical",
     "firstPurchased": "2019-06-03",
     "lastPurchased": "2019-06-03",
@@ -389,6 +432,7 @@
   {
     "asin": "1642350036",
     "title": "Ed Mastery: The Standard Unix Text Editor (IT Mastery) (Volume 13)",
+    "author": "Michael W. Lucas",
     "format": "Physical",
     "firstPurchased": "2019-06-14",
     "lastPurchased": "2019-06-14",
@@ -398,6 +442,7 @@
   {
     "asin": "1642350230",
     "title": "FreeBSD Mastery: Jails (IT Mastery)",
+    "author": "Michael W. Lucas",
     "format": "Physical",
     "firstPurchased": "2019-06-14",
     "lastPurchased": "2019-06-14",
@@ -407,6 +452,7 @@
   {
     "asin": "1565922255",
     "title": "sed & awk",
+    "author": "Dale Dougherty & Arnold Robbins",
     "format": "Physical",
     "firstPurchased": "2019-06-14",
     "lastPurchased": "2019-06-14",
@@ -416,6 +462,7 @@
   {
     "asin": "020107981X",
     "title": "The AWK Programming Language",
+    "author": "Alfred V. Aho et al.",
     "format": "Physical",
     "firstPurchased": "2019-06-14",
     "lastPurchased": "2019-06-14",
@@ -425,6 +472,7 @@
   {
     "asin": "1784871516",
     "title": "The Gulag Archipelago",
+    "author": "Aleksandr Solzhenitsyn",
     "format": "Physical",
     "firstPurchased": "2019-06-26",
     "lastPurchased": "2019-06-26",
@@ -434,6 +482,7 @@
   {
     "asin": "1642350028",
     "title": "SSH Mastery: OpenSSH, PuTTY, Tunnels and Keys (IT Mastery) (Volume 12)",
+    "author": "Michael W. Lucas",
     "format": "Physical",
     "firstPurchased": "2019-08-16",
     "lastPurchased": "2019-08-16",
@@ -443,6 +492,7 @@
   {
     "asin": "159327047X",
     "title": "The TCP/IP Guide: A Comprehensive, Illustrated Internet Protocols Reference",
+    "author": "Charles M. Kozierok",
     "format": "Physical",
     "firstPurchased": "2019-08-16",
     "lastPurchased": "2019-08-16",
@@ -452,6 +502,7 @@
   {
     "asin": "1260091996",
     "title": "Discrete Mathematics and Its Applications",
+    "author": "Kenneth H. Rosen",
     "format": "Physical",
     "firstPurchased": "2019-08-26",
     "lastPurchased": "2019-08-26",
@@ -461,6 +512,7 @@
   {
     "asin": "0470458216",
     "title": "Elementary Linear Algebra",
+    "author": "Howard Anton",
     "format": "Physical",
     "firstPurchased": "2019-08-27",
     "lastPurchased": "2019-08-27",
@@ -470,6 +522,7 @@
   {
     "asin": "1680501275",
     "title": "Practical Vim: Edit Text at the Speed of Thought",
+    "author": "Drew Neil",
     "format": "Physical",
     "firstPurchased": "2019-10-14",
     "lastPurchased": "2019-10-14",
@@ -479,6 +532,7 @@
   {
     "asin": "0201633612",
     "title": "Design Patterns: Elements of Reusable Object-Oriented Software",
+    "author": "Erich Gamma et al.",
     "format": "Physical",
     "firstPurchased": "2019-11-23",
     "lastPurchased": "2019-11-23",
@@ -488,6 +542,7 @@
   {
     "asin": "095749324X",
     "title": "Dual Language Spanish Reader: Parallel Spanish-English. Level: Beginner to Intermediate.",
+    "author": "Peter Oakfield",
     "format": "Physical",
     "firstPurchased": "2019-12-11",
     "lastPurchased": "2019-12-11",
@@ -497,6 +552,7 @@
   {
     "asin": "0131103628",
     "title": "C Programming Language, 2nd Edition",
+    "author": "Brian W. Kernighan & Dennis M. Ritchie",
     "format": "Physical",
     "firstPurchased": "2019-12-12",
     "lastPurchased": "2019-12-12",
@@ -506,6 +562,7 @@
   {
     "asin": "013937681X",
     "title": "The Unix Programming Environment (Prentice-Hall Software Series)",
+    "author": "Brian W. Kernighan & Rob Pike",
     "format": "Physical",
     "firstPurchased": "2019-12-12",
     "lastPurchased": "2019-12-12",
@@ -515,6 +572,7 @@
   {
     "asin": "1593272839",
     "title": "Learn You a Haskell for Great Good!: A Beginner's Guide",
+    "author": "Miran Lipovača",
     "format": "Physical",
     "firstPurchased": "2020-01-04",
     "lastPurchased": "2020-01-04",
@@ -524,6 +582,7 @@
   {
     "asin": "0142437816",
     "title": "Forty Stories (Penguin Classics)",
+    "author": "Anton Chekhov",
     "format": "Physical",
     "firstPurchased": "2020-01-30",
     "lastPurchased": "2020-01-30",
@@ -533,6 +592,7 @@
   {
     "asin": "1706230230",
     "title": "Notes on Diffy Qs: Differential Equations for Engineers",
+    "author": "Jiří Lebl",
     "format": "Physical",
     "firstPurchased": "2020-02-25",
     "lastPurchased": "2020-02-25",
@@ -542,6 +602,7 @@
   {
     "asin": "0130215171",
     "title": "Physics for Scientists and Engineers with Modern Physics (3rd Edition)",
+    "author": "Douglas C. Giancoli",
     "format": "Physical",
     "firstPurchased": "2020-02-27",
     "lastPurchased": "2020-02-27",
@@ -551,6 +612,7 @@
   {
     "asin": "0534368417",
     "title": "Elementary Differential Equations",
+    "author": "William F. Trench",
     "format": "Physical",
     "firstPurchased": "2020-03-10",
     "lastPurchased": "2020-03-10",
@@ -560,6 +622,7 @@
   {
     "asin": "1305116399",
     "title": "Physics for Scientists and Engineers, Technology Update (No access codes included)",
+    "author": "Raymond A. Serway & John W. Jewett",
     "format": "Physical",
     "firstPurchased": "2020-09-02",
     "lastPurchased": "2020-09-02",
@@ -569,6 +632,7 @@
   {
     "asin": "1905026358",
     "title": "Derren Brown Tricks Of Mind",
+    "author": "Derren Brown",
     "format": "Physical",
     "firstPurchased": "2021-05-12",
     "lastPurchased": "2021-05-12",
@@ -578,6 +642,7 @@
   {
     "asin": "1878424580",
     "title": "The Four Agreements Toltec Wisdom Collection: 3-Book Boxed Set",
+    "author": "Don Miguel Ruiz",
     "format": "Physical",
     "firstPurchased": "2021-06-04",
     "lastPurchased": "2021-06-04",
@@ -587,6 +652,7 @@
   {
     "asin": "1119644720",
     "title": "PowerShell 7 for IT Professionals",
+    "author": "Thomas Lee",
     "format": "Physical",
     "firstPurchased": "2021-06-13",
     "lastPurchased": "2021-06-13",
@@ -596,6 +662,7 @@
   {
     "asin": "0385480016",
     "title": "Bird by Bird: Some Instructions on Writing and Life",
+    "author": "Anne Lamott",
     "format": "Physical",
     "firstPurchased": "2021-08-08",
     "lastPurchased": "2021-08-08",
@@ -605,6 +672,7 @@
   {
     "asin": "1883536065",
     "title": "Battle for the Mind: A Physiology of Conversion and Brainwashing - How Evangelists, Psychiatrists, Politicians, and Medicine Men Can Change Your Beliefs and Behavior",
+    "author": "William Sargant",
     "format": "Physical",
     "firstPurchased": "2021-08-31",
     "lastPurchased": "2021-08-31",
@@ -614,6 +682,7 @@
   {
     "asin": "0691130884",
     "title": "The Calculus Lifesaver: All the Tools you Need to Excel at Calculus (Princeton Lifesaver Study Guides)",
+    "author": "Adrian Banner",
     "format": "Physical",
     "firstPurchased": "2021-11-05",
     "lastPurchased": "2021-11-05",
@@ -623,6 +692,7 @@
   {
     "asin": "0060898771",
     "title": "Emergency: This Book Will Save Your Life",
+    "author": "Neil Strauss",
     "format": "Physical",
     "firstPurchased": "2022-04-11",
     "lastPurchased": "2022-04-11",
@@ -632,6 +702,7 @@
   {
     "asin": "198508659X",
     "title": "Operating Systems: Three Easy Pieces",
+    "author": "Remzi H. Arpaci-Dusseau & Andrea C. Arpaci-Dusseau",
     "format": "Physical",
     "firstPurchased": "2022-09-12",
     "lastPurchased": "2022-09-12",
@@ -641,6 +712,7 @@
   {
     "asin": "1449373321",
     "title": "Designing Data-Intensive Applications: The Big Ideas Behind Reliable, Scalable, and Maintainable Systems",
+    "author": "Martin Kleppmann",
     "format": "Physical",
     "firstPurchased": "2022-09-12",
     "lastPurchased": "2022-09-12",
@@ -650,6 +722,7 @@
   {
     "asin": "9332573905",
     "title": "Computer Systems: A Programmer's Perspective, 3 Edition",
+    "author": "Randal E. Bryant & David R. O'Hallaron",
     "format": "Physical",
     "firstPurchased": "2022-09-12",
     "lastPurchased": "2022-09-12",
@@ -659,6 +732,7 @@
   {
     "asin": "0471694665",
     "title": "Operating System Concepts, Seventh Edition",
+    "author": "Abraham Silberschatz et al.",
     "format": "Physical",
     "firstPurchased": "2023-05-15",
     "lastPurchased": "2023-05-15",
@@ -668,6 +742,7 @@
   {
     "asin": "0984782850",
     "title": "Cracking the Coding Interview: 189 Programming Questions and Solutions",
+    "author": "Gayle Laakmann McDowell",
     "format": "Physical",
     "firstPurchased": "2023-05-16",
     "lastPurchased": "2023-05-16",
@@ -677,6 +752,7 @@
   {
     "asin": "0136820158",
     "title": "Systems Performance (Addison-Wesley Professional Computing Series)",
+    "author": "Brendan Gregg",
     "format": "Physical",
     "firstPurchased": "2023-05-16",
     "lastPurchased": "2023-05-16",
@@ -686,6 +762,7 @@
   {
     "asin": "1586408208",
     "title": "Biblia Bilingüe Reina Valera 1960/KJV. Letra grande, imitación piel, negro, con índice | Bilingual Bible RVR 1960/KJV. Large print, Imitation Leather, Black, Indexed (Spanish Edition)",
+    "author": "",
     "format": "Physical",
     "firstPurchased": "2023-10-04",
     "lastPurchased": "2023-10-04",
@@ -695,6 +772,7 @@
   {
     "asin": "1532814658",
     "title": "Reality transurfing. Steps I-V",
+    "author": "Vadim Zeland",
     "format": "Physical",
     "firstPurchased": "2023-10-15",
     "lastPurchased": "2023-10-15",
@@ -704,6 +782,7 @@
   {
     "asin": "0262560992",
     "title": "The Little Schemer - 4th Edition",
+    "author": "Daniel P. Friedman & Matthias Felleisen",
     "format": "Physical",
     "firstPurchased": "2024-03-15",
     "lastPurchased": "2024-03-15",
@@ -713,6 +792,7 @@
   {
     "asin": "0134190440",
     "title": "Go Programming Language, The (Addison-Wesley Professional Computing Series)",
+    "author": "Alan A. A. Donovan & Brian W. Kernighan",
     "format": "Physical",
     "firstPurchased": "2024-03-30",
     "lastPurchased": "2024-03-30",
@@ -722,6 +802,7 @@
   {
     "asin": "0999282921",
     "title": "Algorithms Illuminated (Part 2): Graph Algorithms and Data Structures",
+    "author": "Tim Roughgarden",
     "format": "Physical",
     "firstPurchased": "2024-04-01",
     "lastPurchased": "2024-04-01",
@@ -731,6 +812,7 @@
   {
     "asin": "1633438538",
     "title": "Grokking Algorithms, Second Edition",
+    "author": "Aditya Y. Bhargava",
     "format": "Physical",
     "firstPurchased": "2024-06-20",
     "lastPurchased": "2024-06-20",
@@ -740,6 +822,7 @@
   {
     "asin": "1259587541",
     "title": "Practical Electronics for Inventors, Fourth Edition",
+    "author": "Paul Scherz & Simon Monk",
     "format": "Physical",
     "firstPurchased": "2024-11-01",
     "lastPurchased": "2024-11-01",
@@ -749,6 +832,7 @@
   {
     "asin": "1642350885",
     "title": "Networking for System Administrators",
+    "author": "Michael W. Lucas",
     "format": "Physical",
     "firstPurchased": "2025-11-12",
     "lastPurchased": "2025-11-12",
