@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import pagefind from 'astro-pagefind';
 import rehypeExternalLinks from 'rehype-external-links';
 
 // https://astro.build/config
@@ -8,7 +9,7 @@ export default defineConfig({
   site: 'https://michaelvivirito.com',
   // Emit /page.html (not /page/index.html) so every existing URL is preserved.
   build: { format: 'file' },
-  integrations: [sitemap()],
+  integrations: [sitemap(), pagefind()],
   markdown: {
     // Restore target="_blank" on external links in article markdown.
     rehypePlugins: [

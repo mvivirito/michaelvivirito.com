@@ -1,0 +1,41 @@
+---
+// giscus comments (GitHub Discussions). Discussions are enabled and the repo
+// + category IDs below are already filled in.
+//
+// ONE-TIME ACTIVATION:
+//   1. Install the giscus GitHub App on this repo:
+//      https://github.com/apps/giscus  → Install → only michaelvivirito.com
+//   2. Set ENABLE_COMMENTS = true below and deploy.
+// Until then this renders nothing (no broken widget).
+const ENABLE_COMMENTS = true;
+
+const giscus = {
+  repo: 'mvivirito/michaelvivirito.com',
+  repoId: 'R_kgDOOzhqJQ',
+  category: 'Announcements',
+  categoryId: 'DIC_kwDOOzhqJc4C_Tdl',
+};
+---
+{ENABLE_COMMENTS && (
+  <section class="comments" style="max-width: 800px; margin: 3rem auto 0; padding-top: 2rem; border-top: 1px solid var(--border);">
+    <h3>Comments</h3>
+    <script
+      is:inline
+      src="https://giscus.app/client.js"
+      data-repo={giscus.repo}
+      data-repo-id={giscus.repoId}
+      data-category={giscus.category}
+      data-category-id={giscus.categoryId}
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="noborder_dark"
+      data-lang="en"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async
+    ></script>
+  </section>
+)}

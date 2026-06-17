@@ -1,0 +1,73 @@
+---
+import Search from 'astro-pagefind/components/Search.astro';
+import { getPosts, getTags } from '../lib/blog';
+
+const posts = await getPosts();
+const recent = posts.slice(0, 5);
+const tags = [...(await getTags()).values()].sort(
+  (a, b) => b.posts.length - a.posts.length || a.name.localeCompare(b.name),
+);
+---
+<aside class="blog-sidebar">
+  <div class="sidebar-block">
+    <h3>Search</h3>
+    <Search className="blog-search" />
+  </div>
+
+  <div class="sidebar-block">
+    <h3>Tags</h3>
+    <div class="tag-cloud">
+      {tags.map((t) => (
+        <a href={`/tags/${t.slug}`} class="badge tag-chip">{t.name}<span class="tag-count">{t.posts.length}</span></a>
+      ))}
+    </div>
+  </div>
+
+  <div class="sidebar-block">
+    <h3>Recent posts</h3>
+    <ul class="sidebar-recent">
+      {recent.map((p) => <li><a href={`/articles/${p.id}`}>{p.data.title}</a></li>)}
+    </ul>
+  </div>
+
+  <div class="sidebar-block">
+    <h3>Subscribe</h3>
+    <p class="text-muted" style="font-size: 0.85rem; margin: 0;">
+      <a href="/feed.xml">RSS feed</a> · <a href="/#newsletter">Newsletter</a>
+    </p>
+  </div>
+</aside>
+
+<style>
+  .blog-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    position: sticky;
+    top: 1.5rem;
+  }
+  .sidebar-block h3 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.7;
+    margin: 0 0 0.75rem;
+  }
+  .tag-cloud { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .tag-chip {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .tag-count { opacity: 0.55; font-size: 0.75em; }
+  .sidebar-recent {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .sidebar-recent a { font-size: 0.9rem; line-height: 1.35; }
+</style>

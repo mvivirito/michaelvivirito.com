@@ -1,0 +1,27 @@
+---
+import type { Post } from '../lib/blog';
+import { readingTime, tagSlug } from '../lib/blog';
+
+interface Props {
+  post: Post;
+}
+const { post } = Astro.props;
+const fmtDate = (d: Date) =>
+  d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+---
+<article class="card">
+  <h2 style="margin-top: 0; margin-bottom: 0.25rem;">
+    <a href={`/articles/${post.id}`} style="text-decoration: none;">{post.data.title}</a>
+  </h2>
+  <p class="text-muted" style="font-size: 0.875rem; margin: 0 0 0.75rem;">
+    <time datetime={post.data.date.toISOString().slice(0, 10)}>{fmtDate(post.data.date)}</time> · {readingTime(post.body)}
+  </p>
+  <p style="margin: 0 0 0.75rem;">{post.data.description}</p>
+  {post.data.badges.length > 0 && (
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      {post.data.badges.map((b) => (
+        <a href={`/tags/${tagSlug(b)}`} class="badge" style="text-decoration: none;">{b}</a>
+      ))}
+    </div>
+  )}
+</article>
