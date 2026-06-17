@@ -322,14 +322,18 @@ timer   · beach cleanup · 2026-05-23 09:00</code></pre>
     <h2>Blog</h2>
     <div class="card" style="max-width: 800px; margin: 0 auto;">
       <div class="blog-ls">
-        <div class="blog-ls-header">$ ls -lah ~/blog/</div>
-        {posts.map((post) => (
+        <div class="blog-ls-header">$ ls -lah ~/blog/ | head</div>
+        {posts.slice(0, 5).map((post) => (
           <div class="blog-ls-item">
             <span class="blog-ls-perms">-rw-r--r--</span>
             <span class="blog-ls-date">{fmtDate(post.data.date)}</span>
             <a href={`/articles/${post.id}`} class="blog-ls-link">{post.id}.html</a>
           </div>
         ))}
+      </div>
+
+      <div style="margin-top: 1.25rem;">
+        <a href="/articles" class="btn btn-secondary">View all {posts.length} posts →</a>
       </div>
 
       <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">

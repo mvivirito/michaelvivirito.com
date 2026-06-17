@@ -1,0 +1,71 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('articles', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const fmtDate = (d) =>
+  d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  '@id': 'https://michaelvivirito.com/articles',
+  name: 'Michael Vivirito — Blog',
+  url: 'https://michaelvivirito.com/articles',
+  author: { '@id': 'https://michaelvivirito.com/#michael' },
+  blogPost: posts.map((p) => ({
+    '@type': 'BlogPosting',
+    headline: p.data.title,
+    description: p.data.description,
+    datePublished: p.data.date.toISOString(),
+    url: `https://michaelvivirito.com/articles/${p.id}`,
+  })),
+};
+---
+<BaseLayout
+  title="Blog - Michael Vivirito"
+  description="Writing on FreeBSD and pf networking, NixOS, SRE, the homelab, and the occasional hardware build."
+  keywords="Michael Vivirito, blog, FreeBSD, pf, NixOS, SRE, homelab, networking, ESP32, WLED, mvivirito"
+  ogTitle="Blog - Michael Vivirito"
+  ogDescription="FreeBSD, NixOS, SRE, networking, and hardware build logs."
+  canonical="/articles"
+  jsonLd={jsonLd}
+>
+  <section>
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1>Blog</h1>
+      <p class="text-muted">FreeBSD and pf, NixOS, SRE, the homelab, and the occasional build log.</p>
+      <p class="text-muted" style="font-size: 0.875rem;">{posts.length} posts</p>
+    </header>
+
+    <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.25rem;">
+      {posts.map((post) => (
+        <a href={`/articles/${post.id}`} class="card" style="display: block; text-decoration: none;">
+          <h2 style="margin-top: 0; margin-bottom: 0.25rem;">{post.data.title}</h2>
+          <p class="text-muted" style="font-size: 0.875rem; margin: 0 0 0.75rem;">
+            <time datetime={post.data.date.toISOString().slice(0, 10)}>{fmtDate(post.data.date)}</time>
+          </p>
+          <p style="margin: 0;">{post.data.description}</p>
+          {post.data.badges.length > 0 && (
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;">
+              {post.data.badges.map((b) => <span class="badge">{b}</span>)}
+            </div>
+          )}
+        </a>
+      ))}
+    </div>
+
+    <div style="max-width: 800px; margin: 2rem auto 0; text-align: center;">
+      <p class="text-muted">
+        <strong>Subscribe:</strong> <a href="/feed.xml">RSS feed</a> • <a href="/#newsletter">Newsletter</a>
+      </p>
+      <p>
+        <a href="/" class="btn btn-secondary">← Home</a>
+        <a href="/uses" class="btn btn-secondary">/uses</a>
+        <a href="/recommends" class="btn btn-primary">Recommendations</a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
