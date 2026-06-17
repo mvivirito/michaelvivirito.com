@@ -1,0 +1,32 @@
+---
+import BlogLayout from '../../layouts/BlogLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getTags } from '../../lib/blog';
+
+export async function getStaticPaths() {
+  const tags = await getTags();
+  return [...tags.values()].map((t) => ({
+    params: { tag: t.slug },
+    props: { name: t.name, posts: t.posts },
+  }));
+}
+
+const { tag } = Astro.params;
+const { name, posts } = Astro.props;
+---
+<BlogLayout
+  title={`Posts tagged "${name}" - Michael Vivirito`}
+  description={`Every blog post tagged ${name}.`}
+  keywords={`${name}, blog, Michael Vivirito`}
+  canonical={`/tags/${tag}`}
+>
+  <header style="margin-bottom: 2rem;">
+    <p class="text-muted" style="margin: 0 0 0.25rem; font-size: 0.875rem;"><a href="/tags">Tags</a> /</p>
+    <h1 style="margin: 0;">{name}</h1>
+    <p class="text-muted">{posts.length} {posts.length === 1 ? 'post' : 'posts'}</p>
+  </header>
+
+  <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+    {posts.map((post) => <PostCard post={post} />)}
+  </div>
+</BlogLayout>

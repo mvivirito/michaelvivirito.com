@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import { getPosts, readingTime, prevNext, relatedByTags } from '../../lib/blog';
 
 export async function getStaticPaths() {
   const articles = await getCollection('articles', ({ data }) => !data.draft);
@@ -11,8 +12,20 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
+
+const posts = await getPosts();
+const { newer, older } = prevNext(posts, entry.id);
+const relatedPosts = relatedByTags(posts, entry, 3);
+const minutesRead = readingTime(entry.body);
 ---
-<ArticleLayout entry={entry}>
+<ArticleLayout
+  entry={entry}
+  headings={headings}
+  minutesRead={minutesRead}
+  newer={newer}
+  older={older}
+  relatedPosts={relatedPosts}
+>
   <Content />
 </ArticleLayout>

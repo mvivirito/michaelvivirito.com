@@ -1,0 +1,44 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import BlogSidebar from '../components/BlogSidebar.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  keywords?: string;
+  canonical?: string;
+  jsonLd?: unknown;
+}
+const { title, description, keywords, canonical, jsonLd } = Astro.props;
+---
+<BaseLayout
+  title={title}
+  description={description}
+  keywords={keywords}
+  ogTitle={title}
+  ogDescription={description}
+  canonical={canonical}
+  jsonLd={jsonLd}
+>
+  <section>
+    <div class="blog-grid">
+      <div class="blog-main"><slot /></div>
+      <BlogSidebar />
+    </div>
+  </section>
+
+  <style>
+    .blog-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 2.5rem;
+      max-width: 1080px;
+      margin: 0 auto;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .blog-grid { grid-template-columns: 1fr; }
+      .blog-grid :global(.blog-sidebar) { position: static; }
+    }
+  </style>
+</BaseLayout>

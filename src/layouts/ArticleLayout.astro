@@ -4,17 +4,38 @@ import { getCollection } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
 import OpenWorldFunnel from '../components/OpenWorldFunnel.astro';
 import AuthorBio from '../components/AuthorBio.astro';
+import BlogComments from '../components/BlogComments.astro';
+import { tagSlug } from '../lib/blog';
 
 interface Props {
   entry: CollectionEntry<'articles'>;
+  headings?: { depth: number; slug: string; text: string }[];
+  minutesRead?: string;
+  newer?: CollectionEntry<'articles'> | null;
+  older?: CollectionEntry<'articles'> | null;
+  relatedPosts?: CollectionEntry<'articles'>[];
 }
-const { entry } = Astro.props;
+const {
+  entry,
+  headings = [],
+  minutesRead,
+  newer = null,
+  older = null,
+  relatedPosts = [],
+} = Astro.props;
 const d = entry.data;
 
-// Resolve related-post titles from the collection so titles never drift.
+// Related: prefer hand-curated `related`; fall back to shared-tag matches.
 const all = await getCollection('articles');
-const titleBySlug = new Map(all.map((a) => [a.id, a.data.title]));
-const related = d.related.filter((slug) => titleBySlug.has(slug));
+const titleById = new Map(all.map((a) => [a.id, a.data.title]));
+const manual = d.related
+  .filter((slug) => titleById.has(slug))
+  .map((slug) => ({ id: slug, title: titleById.get(slug)! }));
+const related = manual.length
+  ? manual
+  : relatedPosts.map((p) => ({ id: p.id, title: p.data.title }));
+
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 
 const dateISO = d.date.toISOString().slice(0, 10);
 const dateHuman = d.date.toLocaleDateString('en-US', {
@@ -24,10 +45,8 @@ const dateHuman = d.date.toLocaleDateString('en-US', {
   timeZone: 'UTC',
 });
 
-// BlogPosting JSON-LD. author + publisher reference the Person @id published
-// on the homepage so every article ties back to the same author entity.
 const articleURL = new URL(`/articles/${entry.id}`, Astro.site).href;
-const imageURL = new URL(d.ogImage ?? '/pix/portrait.jpg', Astro.site).href;
+const imageURL = new URL(d.ogImage ?? `/og/${entry.id}.png`, Astro.site).href;
 const jsonLd: Record<string, unknown> = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
@@ -48,7 +67,7 @@ const jsonLd: Record<string, unknown> = {
   ogType="article"
   ogTitle={d.ogTitle ?? d.title}
   ogDescription={d.ogDescription ?? d.description}
-  ogImage={d.ogImage}
+  ogImage={d.ogImage ?? `/og/${entry.id}.png`}
   canonical={`/articles/${entry.id}`}
   jsonLd={jsonLd}
 >
@@ -56,18 +75,43 @@ const jsonLd: Record<string, unknown> = {
     <header style="text-align: center; margin-bottom: 3rem;">
       <h1>{d.title}</h1>
       <p class="text-muted">
-        Published on <time datetime={dateISO}>{dateHuman}</time>
+        Published on <time datetime={dateISO}>{dateHuman}</time>{minutesRead ? ` · ${minutesRead}` : ''}
       </p>
       {d.badges.length > 0 && (
         <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
-          {d.badges.map((b) => <span class="badge">{b}</span>)}
+          {d.badges.map((b) => (
+            <a href={`/tags/${tagSlug(b)}`} class="badge" style="text-decoration: none;">{b}</a>
+          ))}
         </div>
       )}
     </header>
 
-    <div class="card" style="max-width: 800px; margin: 0 auto;">
-      <slot />
+    <div class="article-grid">
+      <div class="article-main">
+        <div class="card" data-pagefind-body style="margin: 0 auto;">
+          <slot />
+        </div>
+      </div>
+      {toc.length > 1 && (
+        <aside class="article-toc" aria-label="Table of contents">
+          <div class="toc-inner">
+            <p class="toc-title">On this page</p>
+            <ul>
+              {toc.map((h) => (
+                <li class={h.depth === 3 ? 'toc-sub' : ''}><a href={`#${h.slug}`}>{h.text}</a></li>
+              ))}
+            </ul>
+          </div>
+        </aside>
+      )}
     </div>
+
+    {(newer || older) && (
+      <nav class="post-nav" aria-label="More posts">
+        <div>{older && <a href={`/articles/${older.id}`}>← {older.data.title}</a>}</div>
+        <div class="post-nav-next">{newer && <a href={`/articles/${newer.id}`}>{newer.data.title} →</a>}</div>
+      </nav>
+    )}
 
     <!-- Newsletter CTA -->
     <div style="max-width: 800px; margin: 3rem auto 0; padding: 2rem; border: 1px solid var(--border-accent); border-radius: 8px; background: var(--bg-surface);">
@@ -96,12 +140,14 @@ const jsonLd: Record<string, unknown> = {
       <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
         <h3>Related Posts</h3>
         <ul>
-          {related.map((slug) => (
-            <li><a href={`/articles/${slug}`}>{titleBySlug.get(slug)}</a></li>
+          {related.map((r) => (
+            <li><a href={`/articles/${r.id}`}>{r.title}</a></li>
           ))}
         </ul>
       </div>
     )}
+
+    <BlogComments />
 
     <div style="max-width: 800px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(59, 130, 246, 0.2);">
       <p class="text-center">
@@ -110,4 +156,46 @@ const jsonLd: Record<string, unknown> = {
     </div>
 
   </article>
+
+  <style>
+    .article-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 760px) 220px;
+      gap: 2.5rem;
+      justify-content: center;
+      align-items: start;
+    }
+    .article-toc { position: sticky; top: 1.5rem; font-size: 0.85rem; }
+    .toc-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.7;
+      margin: 0 0 0.6rem;
+    }
+    .article-toc ul {
+      list-style: none;
+      margin: 0;
+      padding: 0 0 0 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      border-left: 2px solid var(--border);
+    }
+    .article-toc .toc-sub { padding-left: 0.85rem; }
+    .article-toc a { opacity: 0.85; line-height: 1.35; }
+    .post-nav {
+      max-width: 800px;
+      margin: 2.5rem auto 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      font-size: 0.9rem;
+    }
+    .post-nav-next { text-align: right; }
+    @media (max-width: 1000px) {
+      .article-grid { grid-template-columns: 1fr; }
+      .article-toc { display: none; }
+    }
+  </style>
 </BaseLayout>

@@ -1,0 +1,29 @@
+---
+import BlogLayout from '../../layouts/BlogLayout.astro';
+import { getTags } from '../../lib/blog';
+
+const tags = [...(await getTags()).values()].sort(
+  (a, b) => b.posts.length - a.posts.length || a.name.localeCompare(b.name),
+);
+---
+<BlogLayout
+  title="Tags - Michael Vivirito"
+  description="Browse the blog by topic, FreeBSD, NixOS, SRE, networking, hardware, and more."
+  keywords="tags, topics, blog, FreeBSD, NixOS, SRE, mvivirito"
+  canonical="/tags"
+>
+  <header style="margin-bottom: 2rem;">
+    <h1 style="margin: 0;">Tags</h1>
+    <p class="text-muted">{tags.length} topics across the blog.</p>
+  </header>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 0.6rem;">
+    {tags.map((t) => (
+      <a href={`/tags/${t.slug}`} class="badge" style="text-decoration: none;">{t.name} ({t.posts.length})</a>
+    ))}
+  </div>
+
+  <p style="margin-top: 2.5rem;">
+    <a href="/articles" class="btn btn-secondary">← All posts</a>
+  </p>
+</BlogLayout>
