@@ -53,4 +53,12 @@ export const affiliates: Record<string, AffiliateLink> = {
     url: 'https://amzn.to/4oQZxjX',
     label: 'VIVO electric dual-motor standing desk frame on Amazon',
   },
+  'advantage360': {
+    url: 'https://amzn.to/43C0Nxx',
+    label: 'Kinesis Advantage360 Professional split keyboard on Amazon',
+  },
+  'akg-k240-studio': {
+    url: 'https://amzn.to/4uIrqvL',
+    label: 'AKG K240 Studio semi-open headphones on Amazon',
+  },
 };
