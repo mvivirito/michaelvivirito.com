@@ -1,0 +1,215 @@
+---
+// Full-viewport (below the nav) Mandelbrot dive with psychedelic monument
+// silhouettes (Giza pyramids + Sphinx, Stonehenge) crossfading over it.
+---
+<div class="mb-stage" id="mb-stage">
+  <canvas id="viz-mandel"></canvas>
+
+  <div class="mb-monuments" aria-hidden="true">
+    <svg class="mb-scene mb-giza" viewBox="0 0 1200 380" preserveAspectRatio="xMidYMax meet">
+      <defs>
+        <linearGradient id="mbgrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#ff2bd6"/>
+          <stop offset="0.5" stop-color="#22d3ee"/>
+          <stop offset="1" stop-color="#a3ff12"/>
+        </linearGradient>
+      </defs>
+      <circle cx="610" cy="150" r="74" fill="#ffe600" opacity="0.9"/>
+      <!-- pyramids -->
+      <polygon points="180,360 300,205 420,360" fill="url(#mbgrad)"/>
+      <polygon points="690,360 800,235 910,360" fill="url(#mbgrad)"/>
+      <polygon points="350,360 525,120 700,360" fill="url(#mbgrad)"/>
+      <!-- sphinx (stylized side profile) -->
+      <path d="M470,360 L470,322 Q474,300 496,300 L512,300 L516,282 Q520,270 532,272 L540,288 L548,286 L556,300 L582,300 Q598,302 600,322 L600,360 Z" fill="url(#mbgrad)"/>
+    </svg>
+
+    <svg class="mb-scene mb-henge" viewBox="0 0 1200 380" preserveAspectRatio="xMidYMax meet">
+      <!-- trilithons: uprights + lintel -->
+      <g fill="url(#mbgrad)">
+        <rect x="250" y="200" width="42" height="160"/>
+        <rect x="330" y="200" width="42" height="160"/>
+        <rect x="238" y="172" width="146" height="34"/>
+
+        <rect x="470" y="170" width="48" height="190"/>
+        <rect x="560" y="170" width="48" height="190"/>
+        <rect x="456" y="138" width="166" height="38"/>
+
+        <rect x="700" y="205" width="42" height="155"/>
+        <rect x="780" y="205" width="42" height="155"/>
+        <rect x="688" y="178" width="146" height="32"/>
+
+        <rect x="900" y="225" width="34" height="135" transform="rotate(6 917 290)"/>
+        <rect x="170" y="235" width="32" height="125" transform="rotate(-7 186 297)"/>
+      </g>
+    </svg>
+  </div>
+
+  <span class="viz-hint">drag to pan · scroll to zoom · it dives on its own</span>
+  <span class="viz-fallback" id="viz-mandel-fb" hidden>WebGL unavailable — your browser can't run the Mandelbrot dive.</span>
+</div>
+
+<style>
+  .mb-stage {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    top: 104px; /* refined to just-below-nav by script */
+    z-index: 1;
+    background: #020503;
+    overflow: hidden;
+  }
+  .mb-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: move; touch-action: none; }
+
+  .mb-monuments {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: min(46%, 360px);
+    pointer-events: none;
+    mix-blend-mode: screen;
+    filter: hue-rotate(0deg) drop-shadow(0 0 18px rgba(120,255,180,.35));
+    animation: mb-hue 14s linear infinite, mb-drift 11s ease-in-out infinite;
+  }
+  .mb-scene { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; }
+  .mb-giza  { animation: mb-fadeA 18s ease-in-out infinite; }
+  .mb-henge { animation: mb-fadeB 18s ease-in-out infinite; }
+
+  @keyframes mb-hue   { to { filter: hue-rotate(360deg) drop-shadow(0 0 18px rgba(120,255,180,.35)); } }
+  @keyframes mb-drift { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-10px) scale(1.03); } }
+  @keyframes mb-fadeA { 0%,38% { opacity: .92; } 50%,88% { opacity: 0; } 100% { opacity: .92; } }
+  @keyframes mb-fadeB { 0%,38% { opacity: 0; } 50%,88% { opacity: .92; } 100% { opacity: 0; } }
+
+  .viz-hint { position: absolute; right: .7rem; bottom: .6rem; font-size: .72rem; color: var(--t3); font-family: var(--font-mono); pointer-events: none; z-index: 2; }
+  .viz-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--t2); padding: 1rem; text-align: center; }
+  .viz-fallback[hidden] { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mb-monuments, .mb-giza, .mb-henge { animation: none; }
+    .mb-henge { opacity: 0; }
+  }
+</style>
+
+<script>
+  const stage = document.getElementById('mb-stage');
+  function place() {
+    if (!stage) return;
+    const nav = document.querySelector('nav');
+    const b = nav ? nav.getBoundingClientRect().bottom : 88;
+    stage.style.top = Math.max(0, Math.round(b + 8)) + 'px';
+  }
+  place();
+  window.addEventListener('resize', place);
+  window.addEventListener('scroll', place, { passive: true });
+
+  const canvas = document.getElementById('viz-mandel');
+  if (canvas instanceof HTMLCanvasElement) {
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) {
+      const fb = document.getElementById('viz-mandel-fb');
+      if (fb) fb.hidden = false;
+    } else {
+      const vsSrc = 'attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }';
+      const fsSrc = [
+        'precision highp float;',
+        'uniform vec2 u_res; uniform vec2 u_center; uniform float u_scale; uniform float u_iter; uniform float u_time;',
+        'vec3 palette(float t){',
+        '  vec3 a = vec3(0.05, 0.12, 0.08);',
+        '  vec3 b = vec3(0.45, 0.55, 0.45);',
+        '  vec3 c = vec3(1.0, 1.0, 1.0);',
+        '  vec3 d = vec3(0.30, 0.10, 0.55);',
+        '  return a + b * cos(6.28318 * (c * t + d));',
+        '}',
+        'void main(){',
+        '  vec2 uv = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;',
+        '  vec2 c = u_center + uv * u_scale;',
+        '  vec2 z = vec2(0.0); float i = 0.0;',
+        '  for (int k = 0; k < 1000; k++){',
+        '    if (i >= u_iter) break;',
+        '    z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;',
+        '    if (dot(z, z) > 16.0) break;',
+        '    i += 1.0;',
+        '  }',
+        '  if (i >= u_iter){ gl_FragColor = vec4(0.01, 0.02, 0.015, 1.0); return; }',
+        '  float sn = i + 1.0 - log(log(sqrt(dot(z, z)))) / log(2.0);',
+        '  gl_FragColor = vec4(palette(sn / u_iter * 0.85 + 0.04 + u_time), 1.0);',
+        '}'
+      ].join('\n');
+
+      function compile(type, src) { const sh = gl.createShader(type); gl.shaderSource(sh, src); gl.compileShader(sh); return sh; }
+      const prog = gl.createProgram();
+      gl.attachShader(prog, compile(gl.VERTEX_SHADER, vsSrc));
+      gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fsSrc));
+      gl.linkProgram(prog); gl.useProgram(prog);
+
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(prog, 'p');
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+      const uRes = gl.getUniformLocation(prog, 'u_res');
+      const uCenter = gl.getUniformLocation(prog, 'u_center');
+      const uScale = gl.getUniformLocation(prog, 'u_scale');
+      const uIter = gl.getUniformLocation(prog, 'u_iter');
+      const uTime = gl.getUniformLocation(prog, 'u_time');
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let center = [-0.745, 0.118], scale = 1.5, iter = 280, time = 0;
+      let dragging = false, lastX = 0, lastY = 0, idle = 0, running = false, raf = 0;
+
+      function resize() {
+        const r = canvas.getBoundingClientRect();
+        canvas.width = Math.max(1, Math.floor(r.width * dpr));
+        canvas.height = Math.max(1, Math.floor(r.height * dpr));
+        gl.viewport(0, 0, canvas.width, canvas.height);
+      }
+      function render() {
+        gl.uniform2f(uRes, canvas.width, canvas.height);
+        gl.uniform2f(uCenter, center[0], center[1]);
+        gl.uniform1f(uScale, scale);
+        gl.uniform1f(uIter, iter);
+        gl.uniform1f(uTime, time);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      }
+      function tick() {
+        if (!running) return;
+        if (!reduce) {
+          time += 0.0008;
+          if (!dragging) { idle++; if (idle > 90) { scale *= 0.992; if (scale < 6e-6) scale = 1.5; } }
+        }
+        render();
+        raf = requestAnimationFrame(tick);
+      }
+
+      canvas.addEventListener('pointerdown', (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; idle = 0; try { canvas.setPointerCapture(e.pointerId); } catch (_) {} });
+      canvas.addEventListener('pointerup', () => { dragging = false; });
+      canvas.addEventListener('pointermove', (e) => {
+        if (!dragging) return; idle = 0;
+        const r = canvas.getBoundingClientRect();
+        center[0] -= ((e.clientX - lastX) / r.height) * scale;
+        center[1] += ((e.clientY - lastY) / r.height) * scale;
+        lastX = e.clientX; lastY = e.clientY;
+        if (reduce) render();
+      });
+      canvas.addEventListener('wheel', (e) => {
+        e.preventDefault(); idle = 0;
+        const r = canvas.getBoundingClientRect();
+        const mx = (e.clientX - r.left - r.width / 2) / r.height;
+        const my = -(e.clientY - r.top - r.height / 2) / r.height;
+        const wx = center[0] + mx * scale, wy = center[1] + my * scale;
+        scale = Math.max(5e-6, Math.min(3.0, scale * Math.exp(e.deltaY * 0.0012)));
+        center[0] = wx - mx * scale; center[1] = wy - my * scale;
+        if (reduce) render();
+      }, { passive: false });
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) { if (reduce) { render(); } else if (!running) { running = true; raf = requestAnimationFrame(tick); } }
+          else { running = false; cancelAnimationFrame(raf); }
+        });
+      }, { threshold: 0 });
+      const ro = new ResizeObserver(() => { resize(); render(); });
+      resize(); render(); io.observe(canvas); ro.observe(canvas);
+    }
+  }
+</script>

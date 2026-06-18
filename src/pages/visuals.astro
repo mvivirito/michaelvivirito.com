@@ -1,59 +1,20 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import EscherGeometry from '../components/visuals/EscherGeometry.astro';
-import FractalTree from '../components/visuals/FractalTree.astro';
-import Mandelbrot from '../components/visuals/Mandelbrot.astro';
-import Droste from '../components/visuals/Droste.astro';
+import MandelbrotStage from '../components/visuals/MandelbrotStage.astro';
 ---
 <BaseLayout
   title="Visuals - Michael Vivirito"
-  description="Generative, recursive, Escher-inspired visual experiments: impossible geometry, a fractal tree, an infinite Mandelbrot dive, and a Droste recursion. No images, just math and a little WebGL."
-  keywords="visuals, generative art, fractal, Mandelbrot, Escher, Penrose, recursive, WebGL, canvas, mvivirito"
+  description="A full-screen, infinitely diving Mandelbrot set with psychedelic ancient monuments — the Giza pyramids, the Sphinx, and Stonehenge — drifting through it. Drag, zoom, or let it dive."
+  keywords="visuals, Mandelbrot, fractal, psychedelic, WebGL, Giza, pyramids, Sphinx, Stonehenge, generative art, mvivirito"
   ogTitle="Visuals - Michael Vivirito"
-  ogDescription="Recursive, self-similar, impossible — generative experiments in the browser."
+  ogDescription="A full-screen psychedelic Mandelbrot dive with ancient monuments drifting through it."
   canonical="/visuals"
 >
-  <section>
-    <header style="text-align: center; margin-bottom: 3rem;">
-      <h1>Visuals</h1>
-      <p class="text-muted" style="max-width: 640px; margin: 0 auto;">
-        Recursive, self-similar, impossible. Generative experiments that run in your
-        browser, no images, just math and a little WebGL.
-      </p>
-    </header>
+  <MandelbrotStage />
 
-    <div class="viz-piece">
-      <h2>Impossible Geometry</h2>
-      <p class="text-muted">After M.C. Escher: a Penrose tribar your eye accepts but your brain rejects.</p>
-      <EscherGeometry />
-    </div>
-
-    <div class="viz-piece">
-      <h2>Recursive Tree</h2>
-      <p class="text-muted">Every branch is a smaller copy of the whole. Move to sway it, click to regrow.</p>
-      <FractalTree />
-    </div>
-
-    <div class="viz-piece">
-      <h2>Mandelbrot Dive</h2>
-      <p class="text-muted">Infinite self-similarity. Drag to pan, scroll to fall in, or let it dive on its own.</p>
-      <Mandelbrot />
-    </div>
-
-    <div class="viz-piece">
-      <h2>Droste Recursion</h2>
-      <p class="text-muted">The frame contains the frame contains the frame… Escher's "Print Gallery" in CSS.</p>
-      <Droste />
-    </div>
-
-    <p class="text-muted" style="text-align: center; font-size: 0.8rem; max-width: 640px; margin: 0 auto;">
-      Animations pause when off-screen and respect <code>prefers-reduced-motion</code>.
-    </p>
-  </section>
-
-  <style>
-    .viz-piece { max-width: 900px; margin: 0 auto 4rem; }
-    .viz-piece h2 { margin-bottom: 0.25rem; }
-    .viz-piece > p { margin-top: 0; margin-bottom: 1rem; }
+  <!-- This page only: let the fractal take the full viewport, keep the nav on top. -->
+  <style is:global>
+    nav { position: relative; z-index: 20; }
+    footer { display: none; }
   </style>
 </BaseLayout>
