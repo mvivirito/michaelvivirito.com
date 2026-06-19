@@ -163,7 +163,7 @@
     }
     function drawGround() {
       g.clearRect(0, 0, GW, GH);
-      const groundY = GH - Math.max(16, GH * 0.18);
+      const groundY = GH - Math.max(14, GH * 0.16);
       // sand
       g.fillStyle = '#caa15a'; g.fillRect(0, groundY, GW, GH - groundY);
       g.fillStyle = '#e6c074'; g.fillRect(0, groundY, GW, Math.max(3, GH * 0.03));
@@ -171,12 +171,14 @@
       const span = 420; const off = scrollX % span;
       for (let k = -1; k * span - off < GW + span; k++) {
         const x = k * span - off + 160;
-        pyramid(x, groundY + 2, GH * 0.62, '#b07d3a');
-        pyramid(x + 210, groundY + 2, GH * 0.4, '#9c6d30');
+        pyramid(x, groundY + 2, GH * 0.5, '#b07d3a');
+        pyramid(x + 200, groundY + 2, GH * 0.34, '#9c6d30');
       }
-      // plumber
-      const px = Math.max(2, Math.round((GH * 0.5) / 16));
-      const jumpH = Math.abs(Math.sin(hop)) * GH * 0.42 * (1 + audio.bass * 1.2);
+      // plumber (smaller; jump clamped to headroom so his head never clips)
+      const px = Math.max(2, Math.round((GH * 0.30) / 16));
+      const marioH = px * 16;
+      const avail = Math.max(0, groundY - marioH - 6);
+      const jumpH = Math.abs(Math.sin(hop)) * avail * (0.72 + audio.bass * 0.28);
       drawMario(marioX, groundY + 4 - jumpH, px);
     }
     window.__mbStepGround = (dt) => {
@@ -199,11 +201,11 @@
       const vsSrc = 'attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }';
       const fsSrc = [
         'precision highp float;',
-        'uniform vec2 u_res; uniform vec2 u_center; uniform float u_scale; uniform float u_iter; uniform float u_time;',
+        'uniform vec2 u_res; uniform vec2 u_center; uniform float u_scale; uniform float u_iter; uniform float u_time; uniform float u_warp; uniform float u_wtime;',
         'vec3 palette(float t){ vec3 a=vec3(0.05,0.12,0.08), b=vec3(0.45,0.55,0.45), c=vec3(1.0,1.0,1.0), d=vec3(0.30,0.10,0.55); return a + b*cos(6.28318*(c*t+d)); }',
         'void main(){',
         '  vec2 uv=(gl_FragCoord.xy - 0.5*u_res)/u_res.y;',
-        '  vec2 c=u_center + uv*u_scale; vec2 z=vec2(0.0); float i=0.0;',
+        '  vec2 c=u_center + uv*u_scale; c += u_warp * u_scale * vec2(sin(uv.y*12.0 + u_wtime), cos(uv.x*12.0 + u_wtime)); vec2 z=vec2(0.0); float i=0.0;',
         '  for(int k=0;k<1200;k++){ if(i>=u_iter) break; z=vec2(z.x*z.x-z.y*z.y, 2.0*z.x*z.y)+c; if(dot(z,z)>16.0) break; i+=1.0; }',
         '  if(i>=u_iter){ gl_FragColor=vec4(0.01,0.02,0.015,1.0); return; }',
         '  float sn = i + 1.0 - log(log(sqrt(dot(z,z))))/log(2.0);',
@@ -219,12 +221,13 @@
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
       const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
       const uRes = gl.getUniformLocation(prog, 'u_res'), uCenter = gl.getUniformLocation(prog, 'u_center'),
-        uScale = gl.getUniformLocation(prog, 'u_scale'), uIter = gl.getUniformLocation(prog, 'u_iter'), uTime = gl.getUniformLocation(prog, 'u_time');
+        uScale = gl.getUniformLocation(prog, 'u_scale'), uIter = gl.getUniformLocation(prog, 'u_iter'), uTime = gl.getUniformLocation(prog, 'u_time'),
+        uWarp = gl.getUniformLocation(prog, 'u_warp'), uWtime = gl.getUniformLocation(prog, 'u_wtime');
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
       // classic infinitely-detailed dive targets
       const TARGETS = [[-0.743643887037, 0.131825904205], [-1.74999841099, 0.00000000167], [-0.10109636384, 0.95628651080], [0.001643721971, 0.822467633298], [-0.748, 0.1]];
-      let ti = 0, center = TARGETS[0].slice(), scale = 1.6, iter = 240, time = 0, pulse = 0;
+      let ti = 0, center = TARGETS[0].slice(), scale = 1.6, iter = 240, time = 0, pulse = 0, wtime = 0, warp = 0;
       let dragging = false, lastX = 0, lastY = 0, idle = 0;
       const fade = document.getElementById('mb-fade');
 
@@ -233,6 +236,7 @@
         iter = Math.min(1100, 220 + Math.floor(Math.log2(1.6 / scale)) * 42);
         gl.uniform2f(uRes, canvas.width, canvas.height); gl.uniform2f(uCenter, center[0], center[1]);
         gl.uniform1f(uScale, scale * (1 - pulse * 0.18)); gl.uniform1f(uIter, iter); gl.uniform1f(uTime, time);
+        gl.uniform1f(uWarp, warp); gl.uniform1f(uWtime, wtime);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
       }
       function nextTarget() {
@@ -243,6 +247,8 @@
       function stepFractal(dt) {
         if (!reduce) {
           time += 0.0016 + audio.treble * 0.01;
+          wtime += dt * (1.4 + audio.mid * 5.0);
+          warp = 0.012 + audio.bass * 0.22 + audio.mid * 0.10;
           pulse = audio.bass;
           if (!dragging && !resetting) { idle++; if (idle > 24) { scale *= (0.9965 - audio.bass * 0.004); if (scale < 1.1e-6) { resetting = true; nextTarget(); setTimeout(() => { resetting = false; idle = 0; }, 500); } } }
         }
