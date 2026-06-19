@@ -73,7 +73,6 @@ const monuments = `
     </div>
   </div>
 
-  <span class="viz-hint">drag to pan · scroll to zoom · it dives on its own</span>
   <span class="viz-fallback" id="viz-mandel-fb" hidden>WebGL unavailable — your browser can't run the Mandelbrot dive.</span>
 </div>
 
@@ -81,7 +80,7 @@ const monuments = `
   .mb-stage { position: fixed; left: 0; right: 0; bottom: 0; top: 104px; z-index: 1; background: #020503; overflow: hidden; }
   .mb-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: move; touch-action: none; }
 
-  .mb-monuments { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; overflow: hidden;
+  .mb-monuments { position: absolute; inset: 0; pointer-events: none; overflow: hidden;
     filter: hue-rotate(0deg) drop-shadow(0 0 16px rgba(120,255,180,.3));
     animation: mb-hue 11s linear infinite; }
   @keyframes mb-hue { to { filter: hue-rotate(360deg) drop-shadow(0 0 16px rgba(120,255,180,.3)); } }
@@ -95,14 +94,18 @@ const monuments = `
   @keyframes mb-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
   /* floating glyphs */
-  .mb-sky .g { position: absolute; width: clamp(58px, 8vw, 120px); height: clamp(58px, 8vw, 120px); opacity: .75; will-change: transform; }
-  .g1 { top: 12%; left: 9%;  animation: mb-spin 26s linear infinite, mb-bob 9s ease-in-out infinite; }
-  .g2 { top: 20%; left: 76%; animation: mb-spin 40s linear infinite reverse, mb-bob 12s ease-in-out infinite; }
-  .g3 { top: 30%; left: 30%; animation: mb-spin 32s linear infinite, mb-bob 10s ease-in-out infinite; }
-  .g4 { top: 9%;  left: 50%; animation: mb-spin 60s linear infinite, mb-bob 14s ease-in-out infinite; opacity: .55; }
-  .g5 { top: 26%; left: 60%; animation: mb-spin 22s linear infinite reverse, mb-bob 8s ease-in-out infinite; }
+  .mb-sky .g { position: absolute; width: clamp(58px, 8vw, 120px); height: clamp(58px, 8vw, 120px); opacity: .8; will-change: transform, translate; }
+  .g1 { top: 16%; left: 10%; animation: mb-spin 26s linear infinite, mb-roam1 38s ease-in-out infinite; }
+  .g2 { top: 14%; left: 78%; animation: mb-spin 40s linear infinite reverse, mb-roam2 46s ease-in-out infinite; }
+  .g3 { top: 56%; left: 22%; animation: mb-spin 32s linear infinite, mb-roam3 42s ease-in-out infinite; }
+  .g4 { top: 10%; left: 50%; animation: mb-spin 60s linear infinite, mb-roam4 54s ease-in-out infinite; opacity: .6; }
+  .g5 { top: 48%; left: 72%; animation: mb-spin 22s linear infinite reverse, mb-roam5 32s ease-in-out infinite; }
   @keyframes mb-spin { to { transform: rotate(360deg); } }
-  @keyframes mb-bob { 0%,100% { translate: 0 -14px; } 50% { translate: 0 14px; } }
+  @keyframes mb-roam1 { 0%,100% { translate: 0 0; } 33% { translate: 46vw 24vh; } 66% { translate: 10vw 40vh; } }
+  @keyframes mb-roam2 { 0%,100% { translate: 0 0; } 33% { translate: -42vw 30vh; } 66% { translate: -8vw 6vh; } }
+  @keyframes mb-roam3 { 0%,100% { translate: 0 0; } 33% { translate: 38vw -14vh; } 66% { translate: 60vw 14vh; } }
+  @keyframes mb-roam4 { 0%,100% { translate: 0 0; } 50% { translate: -32vw 38vh; } }
+  @keyframes mb-roam5 { 0%,100% { translate: 0 0; } 33% { translate: -48vw -6vh; } 66% { translate: -18vw 24vh; } }
 
   .viz-hint { position: absolute; right: .7rem; bottom: .6rem; font-size: .72rem; color: var(--t3); font-family: var(--font-mono); pointer-events: none; z-index: 2; }
   .viz-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--t2); padding: 1rem; text-align: center; }
