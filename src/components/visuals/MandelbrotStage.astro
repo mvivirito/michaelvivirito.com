@@ -1,7 +1,7 @@
 ---
-// Full-viewport psychedelic Mandelbrot dive + a Game-Boy-style Egyptian
-// platformer strip (pixel pyramids + a hopping plumber) + sacred-geometry
-// glyphs that bounce off each other. Optional microphone sound-reactivity.
+// Full-viewport psychedelic Mandelbrot dive (color-band flow reacts to sound) +
+// an auto-playing Game-Boy Egyptian platformer (coins, mushrooms, stars,
+// platforms) + sacred-geometry glyphs that bounce off each other.
 ---
 <div class="mb-stage" id="mb-stage">
   <canvas id="viz-mandel"></canvas>
@@ -24,7 +24,6 @@
   </div>
 
   <canvas id="viz-ground"></canvas>
-
   <button id="mb-sound" class="mb-sound" type="button">🔊 react to sound</button>
   <span class="viz-fallback" id="viz-mandel-fb" hidden>WebGL unavailable — your browser can't run the Mandelbrot dive.</span>
 </div>
@@ -34,165 +33,140 @@
   .mb-stage canvas#viz-mandel { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: move; touch-action: none; }
   .mb-fade { position: absolute; inset: 0; background: #020503; opacity: 0; transition: opacity .45s ease; pointer-events: none; z-index: 2; }
   .mb-defs { position: absolute; }
-
   .mb-sky { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; z-index: 2;
     filter: hue-rotate(0deg) drop-shadow(0 0 14px rgba(120,255,180,.3)); animation: mb-hue 11s linear infinite; }
   @keyframes mb-hue { to { filter: hue-rotate(360deg) drop-shadow(0 0 14px rgba(120,255,180,.3)); } }
   .mb-sky .g { position: absolute; top: 0; left: 0; width: clamp(54px, 7vw, 110px); height: clamp(54px, 7vw, 110px); opacity: .8; will-change: transform; }
-
-  #viz-ground { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: clamp(120px, 22vh, 240px); display: block; z-index: 2; pointer-events: none; image-rendering: pixelated; }
-
-  .mb-sound { position: absolute; left: .8rem; bottom: .7rem; z-index: 4; cursor: pointer;
-    font-family: var(--font-mono); font-size: .72rem; color: var(--t2);
+  #viz-ground { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: clamp(140px, 26vh, 280px); display: block; z-index: 2; pointer-events: none; image-rendering: pixelated; }
+  .mb-sound { position: absolute; left: .8rem; bottom: .7rem; z-index: 4; cursor: pointer; font-family: var(--font-mono); font-size: .72rem; color: var(--t2);
     background: rgba(4,8,6,.7); border: 1px solid var(--border); border-radius: 8px; padding: .35rem .6rem; backdrop-filter: blur(6px); }
   .mb-sound.on { color: #a3ff12; border-color: rgba(163,255,18,.5); }
   .viz-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--t2); padding: 1rem; text-align: center; z-index: 3; }
   .viz-fallback[hidden] { display: none; }
-
   @media (prefers-reduced-motion: reduce) { .mb-sky { animation: none; } }
 </style>
 
 <script>
   const stage = document.getElementById('mb-stage');
-  function place() {
-    if (!stage) return;
-    const nav = document.querySelector('nav');
-    const b = nav ? nav.getBoundingClientRect().bottom : 88;
-    stage.style.top = Math.max(0, Math.round(b + 8)) + 'px';
-  }
-  place();
-  window.addEventListener('resize', place);
-  window.addEventListener('scroll', place, { passive: true });
+  function place() { if (!stage) return; const nav = document.querySelector('nav'); const b = nav ? nav.getBoundingClientRect().bottom : 88; stage.style.top = Math.max(0, Math.round(b + 8)) + 'px'; }
+  place(); window.addEventListener('resize', place); window.addEventListener('scroll', place, { passive: true });
 
-  // shared audio energy (0..1), driven by the mic when enabled
   const audio = { on: false, bass: 0, mid: 0, treble: 0 };
   let analyser = null, freq = null;
   const soundBtn = document.getElementById('mb-sound');
-  if (soundBtn) {
-    soundBtn.addEventListener('click', async () => {
-      if (audio.on) { audio.on = false; soundBtn.classList.remove('on'); soundBtn.textContent = '🔊 react to sound'; return; }
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const src = ctx.createMediaStreamSource(stream);
-        analyser = ctx.createAnalyser(); analyser.fftSize = 256; analyser.smoothingTimeConstant = 0.8;
-        freq = new Uint8Array(analyser.frequencyBinCount);
-        src.connect(analyser);
-        audio.on = true; soundBtn.classList.add('on'); soundBtn.textContent = '🔊 listening';
-      } catch (err) { soundBtn.textContent = '🔇 mic blocked'; }
-    });
-  }
+  if (soundBtn) soundBtn.addEventListener('click', async () => {
+    if (audio.on) { audio.on = false; soundBtn.classList.remove('on'); soundBtn.textContent = '🔊 react to sound'; return; }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const src = ctx.createMediaStreamSource(stream);
+      analyser = ctx.createAnalyser(); analyser.fftSize = 256; analyser.smoothingTimeConstant = 0.8;
+      freq = new Uint8Array(analyser.frequencyBinCount); src.connect(analyser);
+      audio.on = true; soundBtn.classList.add('on'); soundBtn.textContent = '🔊 listening';
+    } catch (err) { soundBtn.textContent = '🔇 mic blocked'; }
+  });
   function readAudio() {
     if (audio.on && analyser) {
-      analyser.getByteFrequencyData(freq);
-      let lo = 0, mi = 0, hi = 0, n = freq.length;
+      analyser.getByteFrequencyData(freq); let lo = 0, mi = 0, hi = 0, n = freq.length;
       for (let i = 0; i < n; i++) { const v = freq[i] / 255; if (i < n * 0.12) lo += v; else if (i < n * 0.45) mi += v; else hi += v; }
-      audio.bass = Math.min(1, lo / (n * 0.12));
-      audio.mid = Math.min(1, mi / (n * 0.33));
-      audio.treble = Math.min(1, hi / (n * 0.55));
-    } else {
-      audio.bass *= 0.92; audio.mid *= 0.92; audio.treble *= 0.92;
-    }
+      audio.bass = Math.min(1, lo / (n * 0.12)); audio.mid = Math.min(1, mi / (n * 0.33)); audio.treble = Math.min(1, hi / (n * 0.55));
+    } else { audio.bass *= 0.92; audio.mid *= 0.92; audio.treble *= 0.92; }
   }
 
   /* ---------- glyphs: bounce off each other + walls ---------- */
-  let glyphs = [];
   try {
     const sky = document.getElementById('mb-sky');
     const els = sky ? Array.from(sky.querySelectorAll('.g')) : [];
-    function bounds() { return stage.getBoundingClientRect(); }
+    const bounds = () => stage.getBoundingClientRect();
     const B0 = bounds();
-    glyphs = els.map((el) => {
-      const s = el.getBoundingClientRect().width || 80;
-      return { el, r: s / 2, x: Math.random() * (B0.width - s), y: Math.random() * (B0.height - s),
-        vx: (Math.random() * 2 - 1) * 60, vy: (Math.random() * 2 - 1) * 60, a: Math.random() * 360, va: (Math.random() * 2 - 1) * 30 };
-    });
-    function stepGlyphs(dt) {
-      const B = bounds(); const W = B.width, H = B.height;
-      const boost = 1 + audio.mid * 2.2;
-      for (const g of glyphs) {
-        g.x += g.vx * dt * boost; g.y += g.vy * dt * boost; g.a += g.va * dt * boost;
-        const d = g.r * 2;
-        if (g.x < 0) { g.x = 0; g.vx = Math.abs(g.vx); } else if (g.x + d > W) { g.x = W - d; g.vx = -Math.abs(g.vx); }
-        if (g.y < 0) { g.y = 0; g.vy = Math.abs(g.vy); } else if (g.y + d > H) { g.y = H - d; g.vy = -Math.abs(g.vy); }
+    const glyphs = els.map((el) => { const s = el.getBoundingClientRect().width || 80; return { el, r: s / 2, x: Math.random() * Math.max(1, B0.width - s), y: Math.random() * Math.max(1, B0.height - s), vx: (Math.random() * 2 - 1) * 60, vy: (Math.random() * 2 - 1) * 60, a: Math.random() * 360, va: (Math.random() * 2 - 1) * 30 }; });
+    window.__mbStepGlyphs = (dt) => {
+      const B = bounds(), W = B.width, H = B.height, boost = 1 + audio.mid * 2.2;
+      for (const gg of glyphs) {
+        gg.x += gg.vx * dt * boost; gg.y += gg.vy * dt * boost; gg.a += gg.va * dt * boost; const d = gg.r * 2;
+        if (gg.x < 0) { gg.x = 0; gg.vx = Math.abs(gg.vx); } else if (gg.x + d > W) { gg.x = W - d; gg.vx = -Math.abs(gg.vx); }
+        if (gg.y < 0) { gg.y = 0; gg.vy = Math.abs(gg.vy); } else if (gg.y + d > H) { gg.y = H - d; gg.vy = -Math.abs(gg.vy); }
       }
-      for (let i = 0; i < glyphs.length; i++) {
-        for (let j = i + 1; j < glyphs.length; j++) {
-          const a = glyphs[i], b = glyphs[j];
-          const ax = a.x + a.r, ay = a.y + a.r, bx = b.x + b.r, by = b.y + b.r;
-          let dx = bx - ax, dy = by - ay, dist = Math.hypot(dx, dy) || 0.01, min = a.r + b.r;
-          if (dist < min) {
-            const nx = dx / dist, ny = dy / dist, overlap = (min - dist) / 2;
-            a.x -= nx * overlap; a.y -= ny * overlap; b.x += nx * overlap; b.y += ny * overlap;
-            const avn = a.vx * nx + a.vy * ny, bvn = b.vx * nx + b.vy * ny;
-            a.vx += (bvn - avn) * nx; a.vy += (bvn - avn) * ny;
-            b.vx += (avn - bvn) * nx; b.vy += (avn - bvn) * ny;
-          }
-        }
+      for (let i = 0; i < glyphs.length; i++) for (let j = i + 1; j < glyphs.length; j++) {
+        const a = glyphs[i], b = glyphs[j]; const ax = a.x + a.r, ay = a.y + a.r, bx = b.x + b.r, by = b.y + b.r;
+        let dx = bx - ax, dy = by - ay, dist = Math.hypot(dx, dy) || 0.01, min = a.r + b.r;
+        if (dist < min) { const nx = dx / dist, ny = dy / dist, ov = (min - dist) / 2; a.x -= nx * ov; a.y -= ny * ov; b.x += nx * ov; b.y += ny * ov; const avn = a.vx * nx + a.vy * ny, bvn = b.vx * nx + b.vy * ny; a.vx += (bvn - avn) * nx; a.vy += (bvn - avn) * ny; b.vx += (avn - bvn) * nx; b.vy += (avn - bvn) * ny; }
       }
-      for (const g of glyphs) g.el.style.transform = 'translate(' + g.x.toFixed(1) + 'px,' + g.y.toFixed(1) + 'px) rotate(' + g.a.toFixed(1) + 'deg)';
-    }
-    window.__mbStepGlyphs = stepGlyphs;
-  } catch (e) { /* glyphs optional */ }
-
-  /* ---------- Game-Boy Egyptian platformer ground ---------- */
-  try {
-    const gc = document.getElementById('viz-ground');
-    const g = gc.getContext('2d');
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    let GW = 0, GH = 0;
-    function gResize() { const r = gc.getBoundingClientRect(); GW = r.width; GH = r.height; gc.width = Math.floor(GW * dpr); gc.height = Math.floor(GH * dpr); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.imageSmoothingEnabled = false; }
-    // small pixel-plumber map (12 x 16)
-    const MAP = [
-      "...rrrrr....","..rrrrrrrr..","..hhhsss.s..",".hshssss.ss.",".hshhsss.ss.",".hhsssssss..",
-      "...sssss....","..rroorr....",".rrrooorrr..","rrrooooorrr.","ssrooooorss.","ssoooooooss.",
-      "..ooo..ooo..",".hhh...hhh..","hhhh...hhhh.","hhh.....hhh."
-    ];
-    const PAL = { r: '#e52521', s: '#f3b78b', h: '#5c3b1e', o: '#3d63c9' };
-    let scrollX = 0, marioX = 40, hop = 0;
-    function pyramid(px, baseY, size, col) {
-      const step = Math.max(3, Math.floor(size / 8));
-      g.fillStyle = col;
-      for (let i = 0; i < 8; i++) { const w = size - i * (size / 8); const h = step; g.fillRect(Math.round(px - w / 2), Math.round(baseY - (i + 1) * step), Math.round(w), Math.ceil(h)); }
-    }
-    function drawMario(x, baseY, px) {
-      for (let row = 0; row < MAP.length; row++) for (let col = 0; col < 12; col++) {
-        const ch = MAP[row][col]; if (ch === '.' || !PAL[ch]) continue;
-        g.fillStyle = PAL[ch]; g.fillRect(Math.round(x + col * px), Math.round(baseY - (16 - row) * px), Math.ceil(px), Math.ceil(px));
-      }
-    }
-    function drawGround() {
-      g.clearRect(0, 0, GW, GH);
-      const groundY = GH - Math.max(14, GH * 0.16);
-      // sand
-      g.fillStyle = '#caa15a'; g.fillRect(0, groundY, GW, GH - groundY);
-      g.fillStyle = '#e6c074'; g.fillRect(0, groundY, GW, Math.max(3, GH * 0.03));
-      // parallax pyramids
-      const span = 420; const off = scrollX % span;
-      for (let k = -1; k * span - off < GW + span; k++) {
-        const x = k * span - off + 160;
-        pyramid(x, groundY + 2, GH * 0.5, '#b07d3a');
-        pyramid(x + 200, groundY + 2, GH * 0.34, '#9c6d30');
-      }
-      // plumber (smaller; jump clamped to headroom so his head never clips)
-      const px = Math.max(2, Math.round((GH * 0.30) / 16));
-      const marioH = px * 16;
-      const avail = Math.max(0, groundY - marioH - 6);
-      const jumpH = Math.abs(Math.sin(hop)) * avail * (0.72 + audio.bass * 0.28);
-      drawMario(marioX, groundY + 4 - jumpH, px);
-    }
-    window.__mbStepGround = (dt) => {
-      const sp = 1 + audio.mid * 2;
-      scrollX += 26 * dt * sp;
-      marioX += 70 * dt * sp; if (marioX > GW + 30) marioX = -40;
-      hop += dt * (3.4 + audio.bass * 5);
-      drawGround();
+      for (const gg of glyphs) gg.el.style.transform = 'translate(' + gg.x.toFixed(1) + 'px,' + gg.y.toFixed(1) + 'px) rotate(' + gg.a.toFixed(1) + 'deg)';
     };
-    window.__mbGroundResize = gResize;
-    gResize();
-  } catch (e) { /* ground optional */ }
+  } catch (e) {}
 
-  /* ---------- Mandelbrot dive (deep, varied, fades between targets) ---------- */
+  /* ---------- auto-playing Game-Boy Egyptian platformer ---------- */
+  try {
+    const gc = document.getElementById('viz-ground'); const g = gc.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const MAP = ["...rrrrr....","..rrrrrrrr..","..hhhsss.s..",".hshssss.ss.",".hshhsss.ss.",".hhsssssss..","...sssss....","..rroorr....",".rrrooorrr..","rrrooooorrr.","ssrooooorss.","ssoooooooss.","..ooo..ooo..",".hhh...hhh..","hhhh...hhhh.","hhh.....hhh."];
+    const PAL = { r: '#e52521', s: '#f3b78b', h: '#5c3b1e', o: '#3d63c9' };
+    let GW = 0, GH = 0, groundY = 0, px = 4, marioH = 64;
+    let platforms = [], coins = [], items = [], pops = [];
+    let mx = 0, my = 0, vy = 0, onGround = true, scroll = 0, dist = 0, bigUntil = 0, starUntil = 0, jumpTimer = 0, coinScore = 0, now = 0;
+
+    function spawnSegment(x) {
+      const r = Math.random();
+      if (r < 0.6) {
+        const py = groundY - (GH * (0.34 + Math.random() * 0.16)), w = 56 + Math.random() * 64;
+        platforms.push({ x, y: py, w });
+        for (let i = 0; i < 3; i++) coins.push({ x: x + 12 + i * 22, y: py - 26, got: false });
+        if (Math.random() < 0.4) items.push({ x: x + w * 0.5 - 8, y: py - 22, type: Math.random() < 0.5 ? 'mush' : 'star', got: false });
+      } else { for (let i = 0; i < 5; i++) coins.push({ x: x + i * 24, y: groundY - 28 - Math.sin(i / 4 * Math.PI) * 64, got: false }); }
+    }
+    function reset() {
+      groundY = GH - Math.max(12, GH * 0.14); px = Math.max(2, Math.round((GH * 0.28) / 16)); marioH = px * 16;
+      mx = GW * 0.26; my = groundY; vy = 0; onGround = true; platforms = []; coins = []; items = []; pops = []; scroll = 0; dist = 0; bigUntil = 0; starUntil = 0;
+      for (let x = GW * 0.55; x < GW * 1.9; x += 230) spawnSegment(x);
+    }
+    function gResize() { const r = gc.getBoundingClientRect(); GW = r.width; GH = r.height; gc.width = Math.floor(GW * dpr); gc.height = Math.floor(GH * dpr); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.imageSmoothingEnabled = false; reset(); }
+
+    function pyramid(cx, baseY, size, col) { const step = Math.max(3, Math.floor(size / 8)); g.fillStyle = col; for (let i = 0; i < 8; i++) { const w = size - i * (size / 8); g.fillRect(Math.round(cx - w / 2), Math.round(baseY - (i + 1) * step), Math.round(w), Math.ceil(step)); } }
+    function drawMario(x, feetY, sc) { const p = px * sc; for (let row = 0; row < 16; row++) for (let col = 0; col < 12; col++) { const ch = MAP[row][col]; if (ch === '.' || !PAL[ch]) continue; g.fillStyle = PAL[ch]; g.fillRect(Math.round(x + col * p), Math.round(feetY - (16 - row) * p), Math.ceil(p), Math.ceil(p)); } }
+    function drawCoin(c) { if (c.got) return; g.fillStyle = '#ffd400'; g.beginPath(); g.arc(c.x, c.y, 7, 0, 6.283); g.fill(); g.fillStyle = '#fff6b0'; g.fillRect(c.x - 1.5, c.y - 4, 3, 8); }
+    function star5(cx, cy, R) { g.beginPath(); for (let i = 0; i < 10; i++) { const ang = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? R * 0.45 : R, x = cx + Math.cos(ang) * rr, y = cy + Math.sin(ang) * rr; i ? g.lineTo(x, y) : g.moveTo(x, y); } g.closePath(); g.fill(); }
+    function drawItem(it) { if (it.got) return; if (it.type === 'mush') { g.fillStyle = '#e23b2e'; g.fillRect(it.x - 9, it.y - 9, 18, 10); g.fillStyle = '#fff'; g.fillRect(it.x - 6, it.y - 7, 4, 4); g.fillRect(it.x + 3, it.y - 7, 4, 4); g.fillStyle = '#f3d9a6'; g.fillRect(it.x - 6, it.y + 1, 12, 9); } else { g.fillStyle = '#ffe23a'; star5(it.x, it.y, 10); } }
+    function drawPlatform(p) { g.fillStyle = '#b5742f'; g.fillRect(p.x, p.y, p.w, 12); g.fillStyle = '#8a5520'; for (let x = p.x; x < p.x + p.w; x += 14) g.fillRect(x, p.y, 2, 12); g.fillStyle = '#d89a4a'; g.fillRect(p.x, p.y, p.w, 3); }
+
+    window.__mbGroundResize = gResize;
+    window.__mbStepGround = (dt) => {
+      now += dt;
+      const dx = (92 + audio.mid * 120) * dt; scroll += dx; dist += dx;
+      for (const e of platforms) e.x -= dx; for (const c of coins) c.x -= dx; for (const it of items) it.x -= dx;
+      platforms = platforms.filter(p => p.x + p.w > -20); coins = coins.filter(c => c.x > -20); items = items.filter(it => it.x > -20);
+      while (dist > 230) { dist -= 230; spawnSegment(GW + 40); }
+      const big = now < bigUntil, mh = marioH * (big ? 1.35 : 1), mw = px * (big ? 1.35 : 1) * 12;
+      const G = GH * 6, JV = Math.sqrt(2 * G * Math.max(20, Math.min(GH * 0.52, groundY - mh - 8)));
+      vy += G * dt; const prevFeet = my; my += vy * dt; onGround = false;
+      if (my >= groundY) { my = groundY; vy = 0; onGround = true; }
+      for (const p of platforms) if (vy >= 0 && prevFeet <= p.y + 4 && my >= p.y && my <= p.y + 20 && mx + mw > p.x && mx < p.x + p.w) { my = p.y; vy = 0; onGround = true; }
+      if (my - mh < 6) { my = mh + 6; if (vy < 0) vy = 0; }
+      jumpTimer -= dt;
+      if (onGround) {
+        let want = jumpTimer <= 0;
+        for (const c of coins) if (!c.got && c.x > mx && c.x < mx + 150 && c.y < groundY - 24) { want = true; break; }
+        for (const it of items) if (!it.got && it.x > mx && it.x < mx + 160 && it.y < groundY - 24) { want = true; break; }
+        if (want) { vy = -JV; onGround = false; jumpTimer = 0.5 + Math.random() * 0.8; }
+      }
+      const bx = mx, by = my - mh;
+      for (const c of coins) if (!c.got && c.x > bx - 8 && c.x < bx + mw + 8 && c.y > by - 8 && c.y < by + mh + 8) { c.got = true; coinScore++; pops.push({ x: c.x, y: c.y, life: 1, txt: '+' }); }
+      for (const it of items) if (!it.got && it.x > bx - 10 && it.x < bx + mw + 10 && it.y > by - 10 && it.y < by + mh + 10) { it.got = true; if (it.type === 'mush') bigUntil = now + 7; else starUntil = now + 6; pops.push({ x: it.x, y: it.y - 6, life: 1, txt: it.type === 'mush' ? '1UP' : '★' }); }
+      // draw
+      g.clearRect(0, 0, GW, GH);
+      const span = 420, off = (scroll * 0.5) % span;
+      for (let k = -1; k * span - off < GW + span; k++) { const x = k * span - off + 160; pyramid(x, groundY + 2, GH * 0.5, '#b07d3a'); pyramid(x + 200, groundY + 2, GH * 0.34, '#9c6d30'); }
+      g.fillStyle = '#caa15a'; g.fillRect(0, groundY, GW, GH - groundY); g.fillStyle = '#e6c074'; g.fillRect(0, groundY, GW, Math.max(3, GH * 0.03));
+      for (const p of platforms) drawPlatform(p); for (const c of coins) drawCoin(c); for (const it of items) drawItem(it);
+      if (!(now < starUntil && Math.floor(now * 16) % 2 === 0)) drawMario(mx, my, big ? 1.35 : 1);
+      for (const pop of pops) { pop.y -= 30 * dt; pop.life -= dt; g.globalAlpha = Math.max(0, pop.life); g.fillStyle = '#fff'; g.font = 'bold 12px monospace'; g.fillText(pop.txt, pop.x - 6, pop.y); g.globalAlpha = 1; }
+      pops = pops.filter(p => p.life > 0);
+      g.fillStyle = '#ffd400'; g.beginPath(); g.arc(15, 15, 6, 0, 6.283); g.fill(); g.fillStyle = '#fff'; g.font = 'bold 13px monospace'; g.fillText('x' + coinScore, 25, 19);
+    };
+    gResize();
+  } catch (e) {}
+
+  /* ---------- Mandelbrot dive: color bands flow along the tendrils (sound-reactive) ---------- */
   const canvas = document.getElementById('viz-mandel');
   if (canvas instanceof HTMLCanvasElement) {
     const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
@@ -201,66 +175,43 @@
       const vsSrc = 'attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }';
       const fsSrc = [
         'precision highp float;',
-        'uniform vec2 u_res; uniform vec2 u_center; uniform float u_scale; uniform float u_iter; uniform float u_time; uniform float u_warp; uniform float u_wtime;',
+        'uniform vec2 u_res; uniform vec2 u_center; uniform float u_scale; uniform float u_iter; uniform float u_flow;',
         'vec3 palette(float t){ vec3 a=vec3(0.05,0.12,0.08), b=vec3(0.45,0.55,0.45), c=vec3(1.0,1.0,1.0), d=vec3(0.30,0.10,0.55); return a + b*cos(6.28318*(c*t+d)); }',
         'void main(){',
         '  vec2 uv=(gl_FragCoord.xy - 0.5*u_res)/u_res.y;',
-        '  vec2 c=u_center + uv*u_scale; c += u_warp * u_scale * vec2(sin(uv.y*12.0 + u_wtime), cos(uv.x*12.0 + u_wtime)); vec2 z=vec2(0.0); float i=0.0;',
+        '  vec2 c=u_center + uv*u_scale; vec2 z=vec2(0.0); float i=0.0;',
         '  for(int k=0;k<1200;k++){ if(i>=u_iter) break; z=vec2(z.x*z.x-z.y*z.y, 2.0*z.x*z.y)+c; if(dot(z,z)>16.0) break; i+=1.0; }',
         '  if(i>=u_iter){ gl_FragColor=vec4(0.01,0.02,0.015,1.0); return; }',
         '  float sn = i + 1.0 - log(log(sqrt(dot(z,z))))/log(2.0);',
-        '  gl_FragColor=vec4(palette(sn/u_iter*0.85 + 0.04 + u_time), 1.0);',
+        '  gl_FragColor=vec4(palette(sn*0.02 + u_flow), 1.0);',  // bands keyed to iteration; u_flow makes them stream along the tendrils
         '}'
       ].join('\n');
       function compile(t, s) { const sh = gl.createShader(t); gl.shaderSource(sh, s); gl.compileShader(sh); return sh; }
-      const prog = gl.createProgram();
-      gl.attachShader(prog, compile(gl.VERTEX_SHADER, vsSrc));
-      gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fsSrc));
-      gl.linkProgram(prog); gl.useProgram(prog);
-      const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      const prog = gl.createProgram(); gl.attachShader(prog, compile(gl.VERTEX_SHADER, vsSrc)); gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fsSrc)); gl.linkProgram(prog); gl.useProgram(prog);
+      const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
       const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      const uRes = gl.getUniformLocation(prog, 'u_res'), uCenter = gl.getUniformLocation(prog, 'u_center'),
-        uScale = gl.getUniformLocation(prog, 'u_scale'), uIter = gl.getUniformLocation(prog, 'u_iter'), uTime = gl.getUniformLocation(prog, 'u_time'),
-        uWarp = gl.getUniformLocation(prog, 'u_warp'), uWtime = gl.getUniformLocation(prog, 'u_wtime');
+      const uRes = gl.getUniformLocation(prog, 'u_res'), uCenter = gl.getUniformLocation(prog, 'u_center'), uScale = gl.getUniformLocation(prog, 'u_scale'), uIter = gl.getUniformLocation(prog, 'u_iter'), uFlow = gl.getUniformLocation(prog, 'u_flow');
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      // classic infinitely-detailed dive targets
       const TARGETS = [[-0.743643887037, 0.131825904205], [-1.74999841099, 0.00000000167], [-0.10109636384, 0.95628651080], [0.001643721971, 0.822467633298], [-0.748, 0.1]];
-      let ti = 0, center = TARGETS[0].slice(), scale = 1.6, iter = 240, time = 0, pulse = 0, wtime = 0, warp = 0;
-      let dragging = false, lastX = 0, lastY = 0, idle = 0;
+      let ti = 0, center = TARGETS[0].slice(), scale = 1.6, iter = 240, flow = 0, dragging = false, lastX = 0, lastY = 0, idle = 0, resetting = false;
       const fade = document.getElementById('mb-fade');
-
       function resize() { const r = canvas.getBoundingClientRect(); canvas.width = Math.max(1, Math.floor(r.width * dpr)); canvas.height = Math.max(1, Math.floor(r.height * dpr)); gl.viewport(0, 0, canvas.width, canvas.height); }
-      function render() {
-        iter = Math.min(1100, 220 + Math.floor(Math.log2(1.6 / scale)) * 42);
-        gl.uniform2f(uRes, canvas.width, canvas.height); gl.uniform2f(uCenter, center[0], center[1]);
-        gl.uniform1f(uScale, scale * (1 - pulse * 0.18)); gl.uniform1f(uIter, iter); gl.uniform1f(uTime, time);
-        gl.uniform1f(uWarp, warp); gl.uniform1f(uWtime, wtime);
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
-      }
-      function nextTarget() {
-        if (fade) fade.style.opacity = '1';
-        setTimeout(() => { ti = (ti + 1) % TARGETS.length; center = TARGETS[ti].slice(); scale = 1.6; if (fade) fade.style.opacity = '0'; }, 450);
-      }
-      let resetting = false;
+      function render() { iter = Math.min(1100, 220 + Math.floor(Math.log2(1.6 / scale)) * 42); gl.uniform2f(uRes, canvas.width, canvas.height); gl.uniform2f(uCenter, center[0], center[1]); gl.uniform1f(uScale, scale); gl.uniform1f(uIter, iter); gl.uniform1f(uFlow, flow); gl.drawArrays(gl.TRIANGLES, 0, 3); }
+      function nextTarget() { if (fade) fade.style.opacity = '1'; setTimeout(() => { ti = (ti + 1) % TARGETS.length; center = TARGETS[ti].slice(); scale = 1.6; if (fade) fade.style.opacity = '0'; }, 450); }
       function stepFractal(dt) {
         if (!reduce) {
-          time += 0.0016 + audio.treble * 0.01;
-          wtime += dt * (1.4 + audio.mid * 5.0);
-          warp = 0.012 + audio.bass * 0.22 + audio.mid * 0.10;
-          pulse = audio.bass;
-          if (!dragging && !resetting) { idle++; if (idle > 24) { scale *= (0.9965 - audio.bass * 0.004); if (scale < 1.1e-6) { resetting = true; nextTarget(); setTimeout(() => { resetting = false; idle = 0; }, 500); } } }
+          flow += dt * (0.04 + audio.bass * 0.9 + audio.mid * 0.5); // color bands stream along the tendrils, faster with sound
+          if (!dragging && !resetting) { idle++; if (idle > 24) { scale *= 0.9965; if (scale < 1.1e-6) { resetting = true; nextTarget(); setTimeout(() => { resetting = false; idle = 0; }, 500); } } }
         }
         render();
       }
       canvas.addEventListener('pointerdown', (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; idle = 0; try { canvas.setPointerCapture(e.pointerId); } catch (_) {} });
       canvas.addEventListener('pointerup', () => { dragging = false; });
       canvas.addEventListener('pointermove', (e) => { if (!dragging) return; idle = 0; const r = canvas.getBoundingClientRect(); center[0] -= ((e.clientX - lastX) / r.height) * scale; center[1] += ((e.clientY - lastY) / r.height) * scale; lastX = e.clientX; lastY = e.clientY; });
-      canvas.addEventListener('wheel', (e) => { e.preventDefault(); idle = 0; const r = canvas.getBoundingClientRect(); const mx = (e.clientX - r.left - r.width / 2) / r.height; const my = -(e.clientY - r.top - r.height / 2) / r.height; const wx = center[0] + mx * scale, wy = center[1] + my * scale; scale = Math.max(1e-6, Math.min(3.0, scale * Math.exp(e.deltaY * 0.0012))); center[0] = wx - mx * scale; center[1] = wy - my * scale; }, { passive: false });
+      canvas.addEventListener('wheel', (e) => { e.preventDefault(); idle = 0; const r = canvas.getBoundingClientRect(); const ax = (e.clientX - r.left - r.width / 2) / r.height, ay = -(e.clientY - r.top - r.height / 2) / r.height; const wx = center[0] + ax * scale, wy = center[1] + ay * scale; scale = Math.max(1e-6, Math.min(3.0, scale * Math.exp(e.deltaY * 0.0012))); center[0] = wx - ax * scale; center[1] = wy - ay * scale; }, { passive: false });
       const ro = new ResizeObserver(() => { resize(); if (window.__mbGroundResize) window.__mbGroundResize(); });
-      resize(); ro.observe(canvas);
-      window.__mbStepFractal = stepFractal;
+      resize(); ro.observe(canvas); window.__mbStepFractal = stepFractal;
     }
   }
 
@@ -276,8 +227,5 @@
     raf = requestAnimationFrame(loop);
   }
   raf = requestAnimationFrame(loop);
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { alive = false; cancelAnimationFrame(raf); }
-    else if (!alive) { alive = true; last = 0; raf = requestAnimationFrame(loop); }
-  });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { alive = false; cancelAnimationFrame(raf); } else if (!alive) { alive = true; last = 0; raf = requestAnimationFrame(loop); } });
 </script>
