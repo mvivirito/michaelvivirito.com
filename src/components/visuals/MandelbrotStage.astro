@@ -1,119 +1,55 @@
 ---
-// Full-viewport (below the nav) Mandelbrot dive with a slow-scrolling skyline of
-// big, properly-proportioned ancient monuments + floating sacred-geometry glyphs.
-const monuments = `
-<svg class="mon" viewBox="0 0 560 300" preserveAspectRatio="xMidYMax meet">
-  <circle cx="300" cy="92" r="64" fill="#ffe600"/>
-  <polygon points="60,300 168,152 276,300" fill="url(#mbgrad)"/>
-  <polygon points="150,300 300,64 450,300" fill="url(#mbgrad)"/>
-  <polygon points="330,300 422,170 514,300" fill="url(#mbgrad)"/>
-</svg>
-<svg class="mon" viewBox="0 0 300 240" preserveAspectRatio="xMidYMax meet">
-  <polygon points="22,240 150,40 278,240" fill="url(#mbgrad)"/>
-</svg>
-<svg class="mon mon-sphinx" viewBox="0 0 420 240" preserveAspectRatio="xMidYMax meet">
-  <g fill="url(#mbgrad)">
-    <circle cx="80" cy="152" r="60"/>
-    <rect x="52" y="152" width="268" height="88" rx="16"/>
-    <rect x="250" y="200" width="156" height="40" rx="6"/>
-    <polygon points="248,158 250,108 324,108 332,210"/>
-    <polygon points="238,116 270,50 318,50 350,116"/>
-    <polygon points="346,78 396,96 396,130 350,142"/>
-  </g>
-</svg>
-<svg class="mon" viewBox="0 0 120 320" preserveAspectRatio="xMidYMax meet">
-  <g fill="url(#mbgrad)">
-    <rect x="44" y="46" width="30" height="274"/>
-    <polygon points="44,46 59,8 74,46"/>
-  </g>
-</svg>
-<svg class="mon" viewBox="0 0 440 260" preserveAspectRatio="xMidYMax meet">
-  <g fill="url(#mbgrad)">
-    <rect x="60" y="96" width="34" height="164"/>
-    <rect x="150" y="96" width="34" height="164"/>
-    <rect x="48" y="66" width="148" height="34"/>
-    <rect x="236" y="84" width="38" height="176"/>
-    <rect x="330" y="84" width="38" height="176"/>
-    <rect x="224" y="52" width="156" height="36"/>
-    <rect x="402" y="120" width="26" height="140" transform="rotate(8 415 190)"/>
-  </g>
-</svg>
-<svg class="mon" viewBox="0 0 200 300" preserveAspectRatio="xMidYMax meet">
-  <g fill="url(#mbgrad)">
-    <path d="M52,300 L52,118 Q52,40 100,36 Q148,40 148,118 L148,300 Z"/>
-    <rect x="52" y="112" width="96" height="22"/>
-    <polygon points="86,140 114,140 106,214 94,214"/>
-  </g>
-</svg>`;
+// Full-viewport psychedelic Mandelbrot dive + a Game-Boy-style Egyptian
+// platformer strip (pixel pyramids + a hopping plumber) + sacred-geometry
+// glyphs that bounce off each other. Optional microphone sound-reactivity.
 ---
 <div class="mb-stage" id="mb-stage">
   <canvas id="viz-mandel"></canvas>
+  <div class="mb-fade" id="mb-fade"></div>
 
-  <div class="mb-monuments" aria-hidden="true">
-    <svg class="mb-defs" width="0" height="0"><defs>
-      <linearGradient id="mbgrad" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#ff2bd6"/>
-        <stop offset="0.5" stop-color="#22d3ee"/>
-        <stop offset="1" stop-color="#a3ff12"/>
-      </linearGradient>
-    </defs></svg>
+  <svg class="mb-defs" width="0" height="0"><defs>
+    <linearGradient id="mbgrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff2bd6"/>
+      <stop offset="0.5" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#a3ff12"/>
+    </linearGradient>
+  </defs></svg>
 
-    <!-- floating sacred-geometry glyphs over the fractal -->
-    <div class="mb-sky">
-      <svg class="g g1" viewBox="0 0 100 100"><polygon points="50,6 94,90 6,90" fill="none" stroke="url(#mbgrad)" stroke-width="3"/><circle cx="50" cy="62" r="16" fill="none" stroke="url(#mbgrad)" stroke-width="3"/></svg>
-      <svg class="g g2" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="url(#mbgrad)" stroke-width="2.5"/><circle cx="50" cy="50" r="28" fill="none" stroke="url(#mbgrad)" stroke-width="2.5"/><circle cx="50" cy="50" r="12" fill="none" stroke="url(#mbgrad)" stroke-width="2.5"/></svg>
-      <svg class="g g3" viewBox="0 0 100 100"><polygon points="50,4 92,27 92,73 50,96 8,73 8,27" fill="none" stroke="url(#mbgrad)" stroke-width="3"/></svg>
-      <svg class="g g4" viewBox="0 0 100 100"><g fill="none" stroke="url(#mbgrad)" stroke-width="2.5"><circle cx="50" cy="50" r="18"/><circle cx="32" cy="50" r="18"/><circle cx="68" cy="50" r="18"/><circle cx="41" cy="34" r="18"/><circle cx="59" cy="34" r="18"/><circle cx="41" cy="66" r="18"/><circle cx="59" cy="66" r="18"/></g></svg>
-      <svg class="g g5" viewBox="0 0 100 100"><polygon points="50,8 90,50 50,92 10,50" fill="none" stroke="url(#mbgrad)" stroke-width="3"/><polygon points="50,28 72,50 50,72 28,50" fill="url(#mbgrad)" opacity="0.5"/></svg>
-    </div>
-
-    <!-- slow-scrolling monument skyline (two copies = seamless loop) -->
-    <div class="mb-skyline">
-      <div class="mb-track"><Fragment set:html={monuments} /><Fragment set:html={monuments} /></div>
-    </div>
+  <div class="mb-sky" id="mb-sky">
+    <svg class="g" viewBox="0 0 100 100"><polygon points="50,6 94,90 6,90" fill="none" stroke="url(#mbgrad)" stroke-width="3"/><circle cx="50" cy="62" r="16" fill="none" stroke="url(#mbgrad)" stroke-width="3"/></svg>
+    <svg class="g" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="url(#mbgrad)" stroke-width="2.5"/><circle cx="50" cy="50" r="28" fill="none" stroke="url(#mbgrad)" stroke-width="2.5"/><circle cx="50" cy="50" r="12" fill="none" stroke="url(#mbgrad)" stroke-width="2.5"/></svg>
+    <svg class="g" viewBox="0 0 100 100"><polygon points="50,4 92,27 92,73 50,96 8,73 8,27" fill="none" stroke="url(#mbgrad)" stroke-width="3"/></svg>
+    <svg class="g" viewBox="0 0 100 100"><g fill="none" stroke="url(#mbgrad)" stroke-width="2.5"><circle cx="50" cy="50" r="18"/><circle cx="32" cy="50" r="18"/><circle cx="68" cy="50" r="18"/><circle cx="41" cy="34" r="18"/><circle cx="59" cy="34" r="18"/><circle cx="41" cy="66" r="18"/><circle cx="59" cy="66" r="18"/></g></svg>
+    <svg class="g" viewBox="0 0 100 100"><polygon points="50,8 90,50 50,92 10,50" fill="none" stroke="url(#mbgrad)" stroke-width="3"/><polygon points="50,28 72,50 50,72 28,50" fill="url(#mbgrad)" opacity="0.5"/></svg>
   </div>
 
+  <canvas id="viz-ground"></canvas>
+
+  <button id="mb-sound" class="mb-sound" type="button">🔊 react to sound</button>
   <span class="viz-fallback" id="viz-mandel-fb" hidden>WebGL unavailable — your browser can't run the Mandelbrot dive.</span>
 </div>
 
 <style>
   .mb-stage { position: fixed; left: 0; right: 0; bottom: 0; top: 104px; z-index: 1; background: #020503; overflow: hidden; }
-  .mb-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: move; touch-action: none; }
-
-  .mb-monuments { position: absolute; inset: 0; pointer-events: none; overflow: hidden;
-    filter: hue-rotate(0deg) drop-shadow(0 0 16px rgba(120,255,180,.3));
-    animation: mb-hue 11s linear infinite; }
-  @keyframes mb-hue { to { filter: hue-rotate(360deg) drop-shadow(0 0 16px rgba(120,255,180,.3)); } }
+  .mb-stage canvas#viz-mandel { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: move; touch-action: none; }
+  .mb-fade { position: absolute; inset: 0; background: #020503; opacity: 0; transition: opacity .45s ease; pointer-events: none; z-index: 2; }
   .mb-defs { position: absolute; }
 
-  /* big, undistorted monuments on a slow seamless scroll */
-  .mb-skyline { position: absolute; left: 0; right: 0; bottom: 0; height: 50%; overflow: hidden; }
-  .mb-track { display: flex; align-items: flex-end; height: 100%; width: max-content; padding-left: 6vw; will-change: transform; animation: mb-scroll 55s linear infinite; }
-  .mb-track .mon { height: 90%; width: auto; display: block; margin-right: 9vw; }
-  .mb-track .mon-sphinx { height: 70%; } /* sphinx sits lower/longer */
-  @keyframes mb-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .mb-sky { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; z-index: 2;
+    filter: hue-rotate(0deg) drop-shadow(0 0 14px rgba(120,255,180,.3)); animation: mb-hue 11s linear infinite; }
+  @keyframes mb-hue { to { filter: hue-rotate(360deg) drop-shadow(0 0 14px rgba(120,255,180,.3)); } }
+  .mb-sky .g { position: absolute; top: 0; left: 0; width: clamp(54px, 7vw, 110px); height: clamp(54px, 7vw, 110px); opacity: .8; will-change: transform; }
 
-  /* floating glyphs */
-  .mb-sky .g { position: absolute; width: clamp(58px, 8vw, 120px); height: clamp(58px, 8vw, 120px); opacity: .8; will-change: transform, translate; }
-  .g1 { top: 16%; left: 10%; animation: mb-spin 26s linear infinite, mb-roam1 38s ease-in-out infinite; }
-  .g2 { top: 14%; left: 78%; animation: mb-spin 40s linear infinite reverse, mb-roam2 46s ease-in-out infinite; }
-  .g3 { top: 56%; left: 22%; animation: mb-spin 32s linear infinite, mb-roam3 42s ease-in-out infinite; }
-  .g4 { top: 10%; left: 50%; animation: mb-spin 60s linear infinite, mb-roam4 54s ease-in-out infinite; opacity: .6; }
-  .g5 { top: 48%; left: 72%; animation: mb-spin 22s linear infinite reverse, mb-roam5 32s ease-in-out infinite; }
-  @keyframes mb-spin { to { transform: rotate(360deg); } }
-  @keyframes mb-roam1 { 0%,100% { translate: 0 0; } 33% { translate: 46vw 24vh; } 66% { translate: 10vw 40vh; } }
-  @keyframes mb-roam2 { 0%,100% { translate: 0 0; } 33% { translate: -42vw 30vh; } 66% { translate: -8vw 6vh; } }
-  @keyframes mb-roam3 { 0%,100% { translate: 0 0; } 33% { translate: 38vw -14vh; } 66% { translate: 60vw 14vh; } }
-  @keyframes mb-roam4 { 0%,100% { translate: 0 0; } 50% { translate: -32vw 38vh; } }
-  @keyframes mb-roam5 { 0%,100% { translate: 0 0; } 33% { translate: -48vw -6vh; } 66% { translate: -18vw 24vh; } }
+  #viz-ground { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: clamp(120px, 22vh, 240px); display: block; z-index: 2; pointer-events: none; image-rendering: pixelated; }
 
-  .viz-hint { position: absolute; right: .7rem; bottom: .6rem; font-size: .72rem; color: var(--t3); font-family: var(--font-mono); pointer-events: none; z-index: 2; }
-  .viz-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--t2); padding: 1rem; text-align: center; }
+  .mb-sound { position: absolute; left: .8rem; bottom: .7rem; z-index: 4; cursor: pointer;
+    font-family: var(--font-mono); font-size: .72rem; color: var(--t2);
+    background: rgba(4,8,6,.7); border: 1px solid var(--border); border-radius: 8px; padding: .35rem .6rem; backdrop-filter: blur(6px); }
+  .mb-sound.on { color: #a3ff12; border-color: rgba(163,255,18,.5); }
+  .viz-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--t2); padding: 1rem; text-align: center; z-index: 3; }
   .viz-fallback[hidden] { display: none; }
 
-  @media (prefers-reduced-motion: reduce) {
-    .mb-monuments, .mb-track, .mb-sky .g { animation: none; }
-  }
+  @media (prefers-reduced-motion: reduce) { .mb-sky { animation: none; } }
 </style>
 
 <script>
@@ -128,117 +64,214 @@ const monuments = `
   window.addEventListener('resize', place);
   window.addEventListener('scroll', place, { passive: true });
 
+  // shared audio energy (0..1), driven by the mic when enabled
+  const audio = { on: false, bass: 0, mid: 0, treble: 0 };
+  let analyser = null, freq = null;
+  const soundBtn = document.getElementById('mb-sound');
+  if (soundBtn) {
+    soundBtn.addEventListener('click', async () => {
+      if (audio.on) { audio.on = false; soundBtn.classList.remove('on'); soundBtn.textContent = '🔊 react to sound'; return; }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const src = ctx.createMediaStreamSource(stream);
+        analyser = ctx.createAnalyser(); analyser.fftSize = 256; analyser.smoothingTimeConstant = 0.8;
+        freq = new Uint8Array(analyser.frequencyBinCount);
+        src.connect(analyser);
+        audio.on = true; soundBtn.classList.add('on'); soundBtn.textContent = '🔊 listening';
+      } catch (err) { soundBtn.textContent = '🔇 mic blocked'; }
+    });
+  }
+  function readAudio() {
+    if (audio.on && analyser) {
+      analyser.getByteFrequencyData(freq);
+      let lo = 0, mi = 0, hi = 0, n = freq.length;
+      for (let i = 0; i < n; i++) { const v = freq[i] / 255; if (i < n * 0.12) lo += v; else if (i < n * 0.45) mi += v; else hi += v; }
+      audio.bass = Math.min(1, lo / (n * 0.12));
+      audio.mid = Math.min(1, mi / (n * 0.33));
+      audio.treble = Math.min(1, hi / (n * 0.55));
+    } else {
+      audio.bass *= 0.92; audio.mid *= 0.92; audio.treble *= 0.92;
+    }
+  }
+
+  /* ---------- glyphs: bounce off each other + walls ---------- */
+  let glyphs = [];
+  try {
+    const sky = document.getElementById('mb-sky');
+    const els = sky ? Array.from(sky.querySelectorAll('.g')) : [];
+    function bounds() { return stage.getBoundingClientRect(); }
+    const B0 = bounds();
+    glyphs = els.map((el) => {
+      const s = el.getBoundingClientRect().width || 80;
+      return { el, r: s / 2, x: Math.random() * (B0.width - s), y: Math.random() * (B0.height - s),
+        vx: (Math.random() * 2 - 1) * 60, vy: (Math.random() * 2 - 1) * 60, a: Math.random() * 360, va: (Math.random() * 2 - 1) * 30 };
+    });
+    function stepGlyphs(dt) {
+      const B = bounds(); const W = B.width, H = B.height;
+      const boost = 1 + audio.mid * 2.2;
+      for (const g of glyphs) {
+        g.x += g.vx * dt * boost; g.y += g.vy * dt * boost; g.a += g.va * dt * boost;
+        const d = g.r * 2;
+        if (g.x < 0) { g.x = 0; g.vx = Math.abs(g.vx); } else if (g.x + d > W) { g.x = W - d; g.vx = -Math.abs(g.vx); }
+        if (g.y < 0) { g.y = 0; g.vy = Math.abs(g.vy); } else if (g.y + d > H) { g.y = H - d; g.vy = -Math.abs(g.vy); }
+      }
+      for (let i = 0; i < glyphs.length; i++) {
+        for (let j = i + 1; j < glyphs.length; j++) {
+          const a = glyphs[i], b = glyphs[j];
+          const ax = a.x + a.r, ay = a.y + a.r, bx = b.x + b.r, by = b.y + b.r;
+          let dx = bx - ax, dy = by - ay, dist = Math.hypot(dx, dy) || 0.01, min = a.r + b.r;
+          if (dist < min) {
+            const nx = dx / dist, ny = dy / dist, overlap = (min - dist) / 2;
+            a.x -= nx * overlap; a.y -= ny * overlap; b.x += nx * overlap; b.y += ny * overlap;
+            const avn = a.vx * nx + a.vy * ny, bvn = b.vx * nx + b.vy * ny;
+            a.vx += (bvn - avn) * nx; a.vy += (bvn - avn) * ny;
+            b.vx += (avn - bvn) * nx; b.vy += (avn - bvn) * ny;
+          }
+        }
+      }
+      for (const g of glyphs) g.el.style.transform = 'translate(' + g.x.toFixed(1) + 'px,' + g.y.toFixed(1) + 'px) rotate(' + g.a.toFixed(1) + 'deg)';
+    }
+    window.__mbStepGlyphs = stepGlyphs;
+  } catch (e) { /* glyphs optional */ }
+
+  /* ---------- Game-Boy Egyptian platformer ground ---------- */
+  try {
+    const gc = document.getElementById('viz-ground');
+    const g = gc.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let GW = 0, GH = 0;
+    function gResize() { const r = gc.getBoundingClientRect(); GW = r.width; GH = r.height; gc.width = Math.floor(GW * dpr); gc.height = Math.floor(GH * dpr); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.imageSmoothingEnabled = false; }
+    // small pixel-plumber map (12 x 16)
+    const MAP = [
+      "...rrrrr....","..rrrrrrrr..","..hhhsss.s..",".hshssss.ss.",".hshhsss.ss.",".hhsssssss..",
+      "...sssss....","..rroorr....",".rrrooorrr..","rrrooooorrr.","ssrooooorss.","ssoooooooss.",
+      "..ooo..ooo..",".hhh...hhh..","hhhh...hhhh.","hhh.....hhh."
+    ];
+    const PAL = { r: '#e52521', s: '#f3b78b', h: '#5c3b1e', o: '#3d63c9' };
+    let scrollX = 0, marioX = 40, hop = 0;
+    function pyramid(px, baseY, size, col) {
+      const step = Math.max(3, Math.floor(size / 8));
+      g.fillStyle = col;
+      for (let i = 0; i < 8; i++) { const w = size - i * (size / 8); const h = step; g.fillRect(Math.round(px - w / 2), Math.round(baseY - (i + 1) * step), Math.round(w), Math.ceil(h)); }
+    }
+    function drawMario(x, baseY, px) {
+      for (let row = 0; row < MAP.length; row++) for (let col = 0; col < 12; col++) {
+        const ch = MAP[row][col]; if (ch === '.' || !PAL[ch]) continue;
+        g.fillStyle = PAL[ch]; g.fillRect(Math.round(x + col * px), Math.round(baseY - (16 - row) * px), Math.ceil(px), Math.ceil(px));
+      }
+    }
+    function drawGround() {
+      g.clearRect(0, 0, GW, GH);
+      const groundY = GH - Math.max(16, GH * 0.18);
+      // sand
+      g.fillStyle = '#caa15a'; g.fillRect(0, groundY, GW, GH - groundY);
+      g.fillStyle = '#e6c074'; g.fillRect(0, groundY, GW, Math.max(3, GH * 0.03));
+      // parallax pyramids
+      const span = 420; const off = scrollX % span;
+      for (let k = -1; k * span - off < GW + span; k++) {
+        const x = k * span - off + 160;
+        pyramid(x, groundY + 2, GH * 0.62, '#b07d3a');
+        pyramid(x + 210, groundY + 2, GH * 0.4, '#9c6d30');
+      }
+      // plumber
+      const px = Math.max(2, Math.round((GH * 0.5) / 16));
+      const jumpH = Math.abs(Math.sin(hop)) * GH * 0.42 * (1 + audio.bass * 1.2);
+      drawMario(marioX, groundY + 4 - jumpH, px);
+    }
+    window.__mbStepGround = (dt) => {
+      const sp = 1 + audio.mid * 2;
+      scrollX += 26 * dt * sp;
+      marioX += 70 * dt * sp; if (marioX > GW + 30) marioX = -40;
+      hop += dt * (3.4 + audio.bass * 5);
+      drawGround();
+    };
+    window.__mbGroundResize = gResize;
+    gResize();
+  } catch (e) { /* ground optional */ }
+
+  /* ---------- Mandelbrot dive (deep, varied, fades between targets) ---------- */
   const canvas = document.getElementById('viz-mandel');
   if (canvas instanceof HTMLCanvasElement) {
     const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-    if (!gl) {
-      const fb = document.getElementById('viz-mandel-fb');
-      if (fb) fb.hidden = false;
-    } else {
+    if (!gl) { const fb = document.getElementById('viz-mandel-fb'); if (fb) fb.hidden = false; }
+    else {
       const vsSrc = 'attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }';
       const fsSrc = [
         'precision highp float;',
         'uniform vec2 u_res; uniform vec2 u_center; uniform float u_scale; uniform float u_iter; uniform float u_time;',
-        'vec3 palette(float t){',
-        '  vec3 a = vec3(0.05, 0.12, 0.08);',
-        '  vec3 b = vec3(0.45, 0.55, 0.45);',
-        '  vec3 c = vec3(1.0, 1.0, 1.0);',
-        '  vec3 d = vec3(0.30, 0.10, 0.55);',
-        '  return a + b * cos(6.28318 * (c * t + d));',
-        '}',
+        'vec3 palette(float t){ vec3 a=vec3(0.05,0.12,0.08), b=vec3(0.45,0.55,0.45), c=vec3(1.0,1.0,1.0), d=vec3(0.30,0.10,0.55); return a + b*cos(6.28318*(c*t+d)); }',
         'void main(){',
-        '  vec2 uv = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;',
-        '  vec2 c = u_center + uv * u_scale;',
-        '  vec2 z = vec2(0.0); float i = 0.0;',
-        '  for (int k = 0; k < 1000; k++){',
-        '    if (i >= u_iter) break;',
-        '    z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;',
-        '    if (dot(z, z) > 16.0) break;',
-        '    i += 1.0;',
-        '  }',
-        '  if (i >= u_iter){ gl_FragColor = vec4(0.01, 0.02, 0.015, 1.0); return; }',
-        '  float sn = i + 1.0 - log(log(sqrt(dot(z, z)))) / log(2.0);',
-        '  gl_FragColor = vec4(palette(sn / u_iter * 0.85 + 0.04 + u_time), 1.0);',
+        '  vec2 uv=(gl_FragCoord.xy - 0.5*u_res)/u_res.y;',
+        '  vec2 c=u_center + uv*u_scale; vec2 z=vec2(0.0); float i=0.0;',
+        '  for(int k=0;k<1200;k++){ if(i>=u_iter) break; z=vec2(z.x*z.x-z.y*z.y, 2.0*z.x*z.y)+c; if(dot(z,z)>16.0) break; i+=1.0; }',
+        '  if(i>=u_iter){ gl_FragColor=vec4(0.01,0.02,0.015,1.0); return; }',
+        '  float sn = i + 1.0 - log(log(sqrt(dot(z,z))))/log(2.0);',
+        '  gl_FragColor=vec4(palette(sn/u_iter*0.85 + 0.04 + u_time), 1.0);',
         '}'
       ].join('\n');
-
-      function compile(type, src) { const sh = gl.createShader(type); gl.shaderSource(sh, src); gl.compileShader(sh); return sh; }
+      function compile(t, s) { const sh = gl.createShader(t); gl.shaderSource(sh, s); gl.compileShader(sh); return sh; }
       const prog = gl.createProgram();
       gl.attachShader(prog, compile(gl.VERTEX_SHADER, vsSrc));
       gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fsSrc));
       gl.linkProgram(prog); gl.useProgram(prog);
-
-      const buf = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-      const loc = gl.getAttribLocation(prog, 'p');
-      gl.enableVertexAttribArray(loc);
-      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-
-      const uRes = gl.getUniformLocation(prog, 'u_res');
-      const uCenter = gl.getUniformLocation(prog, 'u_center');
-      const uScale = gl.getUniformLocation(prog, 'u_scale');
-      const uIter = gl.getUniformLocation(prog, 'u_iter');
-      const uTime = gl.getUniformLocation(prog, 'u_time');
-
+      const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      const uRes = gl.getUniformLocation(prog, 'u_res'), uCenter = gl.getUniformLocation(prog, 'u_center'),
+        uScale = gl.getUniformLocation(prog, 'u_scale'), uIter = gl.getUniformLocation(prog, 'u_iter'), uTime = gl.getUniformLocation(prog, 'u_time');
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      let center = [-0.745, 0.118], scale = 1.5, iter = 280, time = 0;
-      let dragging = false, lastX = 0, lastY = 0, idle = 0, running = false, raf = 0;
+      // classic infinitely-detailed dive targets
+      const TARGETS = [[-0.743643887037, 0.131825904205], [-1.74999841099, 0.00000000167], [-0.10109636384, 0.95628651080], [0.001643721971, 0.822467633298], [-0.748, 0.1]];
+      let ti = 0, center = TARGETS[0].slice(), scale = 1.6, iter = 240, time = 0, pulse = 0;
+      let dragging = false, lastX = 0, lastY = 0, idle = 0;
+      const fade = document.getElementById('mb-fade');
 
-      function resize() {
-        const r = canvas.getBoundingClientRect();
-        canvas.width = Math.max(1, Math.floor(r.width * dpr));
-        canvas.height = Math.max(1, Math.floor(r.height * dpr));
-        gl.viewport(0, 0, canvas.width, canvas.height);
-      }
+      function resize() { const r = canvas.getBoundingClientRect(); canvas.width = Math.max(1, Math.floor(r.width * dpr)); canvas.height = Math.max(1, Math.floor(r.height * dpr)); gl.viewport(0, 0, canvas.width, canvas.height); }
       function render() {
-        gl.uniform2f(uRes, canvas.width, canvas.height);
-        gl.uniform2f(uCenter, center[0], center[1]);
-        gl.uniform1f(uScale, scale);
-        gl.uniform1f(uIter, iter);
-        gl.uniform1f(uTime, time);
+        iter = Math.min(1100, 220 + Math.floor(Math.log2(1.6 / scale)) * 42);
+        gl.uniform2f(uRes, canvas.width, canvas.height); gl.uniform2f(uCenter, center[0], center[1]);
+        gl.uniform1f(uScale, scale * (1 - pulse * 0.18)); gl.uniform1f(uIter, iter); gl.uniform1f(uTime, time);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
       }
-      function tick() {
-        if (!running) return;
+      function nextTarget() {
+        if (fade) fade.style.opacity = '1';
+        setTimeout(() => { ti = (ti + 1) % TARGETS.length; center = TARGETS[ti].slice(); scale = 1.6; if (fade) fade.style.opacity = '0'; }, 450);
+      }
+      let resetting = false;
+      function stepFractal(dt) {
         if (!reduce) {
-          time += 0.0016;
-          if (!dragging) { idle++; if (idle > 30) { scale *= 0.990; if (scale < 6e-6) scale = 1.5; } }
+          time += 0.0016 + audio.treble * 0.01;
+          pulse = audio.bass;
+          if (!dragging && !resetting) { idle++; if (idle > 24) { scale *= (0.9965 - audio.bass * 0.004); if (scale < 1.1e-6) { resetting = true; nextTarget(); setTimeout(() => { resetting = false; idle = 0; }, 500); } } }
         }
         render();
-        raf = requestAnimationFrame(tick);
       }
-
       canvas.addEventListener('pointerdown', (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; idle = 0; try { canvas.setPointerCapture(e.pointerId); } catch (_) {} });
       canvas.addEventListener('pointerup', () => { dragging = false; });
-      canvas.addEventListener('pointermove', (e) => {
-        if (!dragging) return; idle = 0;
-        const r = canvas.getBoundingClientRect();
-        center[0] -= ((e.clientX - lastX) / r.height) * scale;
-        center[1] += ((e.clientY - lastY) / r.height) * scale;
-        lastX = e.clientX; lastY = e.clientY;
-        if (reduce) render();
-      });
-      canvas.addEventListener('wheel', (e) => {
-        e.preventDefault(); idle = 0;
-        const r = canvas.getBoundingClientRect();
-        const mx = (e.clientX - r.left - r.width / 2) / r.height;
-        const my = -(e.clientY - r.top - r.height / 2) / r.height;
-        const wx = center[0] + mx * scale, wy = center[1] + my * scale;
-        scale = Math.max(5e-6, Math.min(3.0, scale * Math.exp(e.deltaY * 0.0012)));
-        center[0] = wx - mx * scale; center[1] = wy - my * scale;
-        if (reduce) render();
-      }, { passive: false });
-
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach((en) => {
-          if (en.isIntersecting) { if (reduce) { render(); } else if (!running) { running = true; raf = requestAnimationFrame(tick); } }
-          else { running = false; cancelAnimationFrame(raf); }
-        });
-      }, { threshold: 0 });
-      const ro = new ResizeObserver(() => { resize(); render(); });
-      resize(); render(); io.observe(canvas); ro.observe(canvas);
+      canvas.addEventListener('pointermove', (e) => { if (!dragging) return; idle = 0; const r = canvas.getBoundingClientRect(); center[0] -= ((e.clientX - lastX) / r.height) * scale; center[1] += ((e.clientY - lastY) / r.height) * scale; lastX = e.clientX; lastY = e.clientY; });
+      canvas.addEventListener('wheel', (e) => { e.preventDefault(); idle = 0; const r = canvas.getBoundingClientRect(); const mx = (e.clientX - r.left - r.width / 2) / r.height; const my = -(e.clientY - r.top - r.height / 2) / r.height; const wx = center[0] + mx * scale, wy = center[1] + my * scale; scale = Math.max(1e-6, Math.min(3.0, scale * Math.exp(e.deltaY * 0.0012))); center[0] = wx - mx * scale; center[1] = wy - my * scale; }, { passive: false });
+      const ro = new ResizeObserver(() => { resize(); if (window.__mbGroundResize) window.__mbGroundResize(); });
+      resize(); ro.observe(canvas);
+      window.__mbStepFractal = stepFractal;
     }
   }
+
+  /* ---------- master loop ---------- */
+  let last = 0, raf = 0, alive = true;
+  function loop(ts) {
+    if (!alive) return;
+    const dt = last ? Math.min(0.05, (ts - last) / 1000) : 0.016; last = ts;
+    readAudio();
+    try { if (window.__mbStepFractal) window.__mbStepFractal(dt); } catch (e) {}
+    try { if (window.__mbStepGlyphs) window.__mbStepGlyphs(dt); } catch (e) {}
+    try { if (window.__mbStepGround) window.__mbStepGround(dt); } catch (e) {}
+    raf = requestAnimationFrame(loop);
+  }
+  raf = requestAnimationFrame(loop);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { alive = false; cancelAnimationFrame(raf); }
+    else if (!alive) { alive = true; last = 0; raf = requestAnimationFrame(loop); }
+  });
 </script>
