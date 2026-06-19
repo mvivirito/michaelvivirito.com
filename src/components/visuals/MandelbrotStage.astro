@@ -1,47 +1,88 @@
 ---
-// Full-viewport (below the nav) Mandelbrot dive with psychedelic monument
-// silhouettes (Giza pyramids + Sphinx, Stonehenge) crossfading over it.
+// Full-viewport (below the nav) Mandelbrot dive with a scrolling parallax
+// skyline of ancient monuments + floating sacred-geometry glyphs over it.
+const skylineFront = `
+<svg viewBox="0 0 1600 380" preserveAspectRatio="none" class="sky-svg">
+  <g fill="url(#mbgrad)">
+    <!-- ziggurat -->
+    <polygon points="70,360 92,322 250,322 272,360"/>
+    <polygon points="96,322 114,290 228,290 246,322"/>
+    <polygon points="118,290 132,262 210,262 224,290"/>
+    <!-- pyramids -->
+    <polygon points="300,360 372,250 444,360"/>
+    <polygon points="330,360 470,150 610,360"/>
+    <!-- sphinx (facing right) -->
+    <g>
+      <rect x="600" y="338" width="300" height="22"/>
+      <ellipse cx="636" cy="320" rx="44" ry="44"/>
+      <rect x="612" y="300" width="220" height="46" rx="12"/>
+      <polygon points="792,346 806,252 846,252 858,346"/>
+      <polygon points="784,256 796,210 866,210 878,256"/>
+      <polygon points="860,250 902,260 902,294 866,300"/>
+      <rect x="874" y="298" width="12" height="20"/>
+    </g>
+    <!-- obelisk + small pyramid -->
+    <rect x="948" y="168" width="26" height="192"/>
+    <polygon points="948,168 961,146 974,168"/>
+    <polygon points="996,360 1060,256 1124,360"/>
+    <!-- stonehenge -->
+    <g>
+      <rect x="1170" y="212" width="38" height="148"/>
+      <rect x="1238" y="212" width="38" height="148"/>
+      <rect x="1158" y="184" width="130" height="32"/>
+      <rect x="1308" y="226" width="32" height="134" transform="rotate(7 1324 293)"/>
+      <rect x="1372" y="206" width="38" height="154"/>
+      <rect x="1440" y="206" width="38" height="154"/>
+      <rect x="1360" y="178" width="130" height="32"/>
+    </g>
+    <!-- moai -->
+    <path d="M1520,360 L1520,250 Q1520,206 1560,200 Q1600,206 1600,250 L1600,360 Z"/>
+    <rect x="1520" y="246" width="80" height="16"/>
+    <polygon points="1552,262 1570,262 1564,322 1556,322"/>
+  </g>
+</svg>`;
+
+const skylineBack = `
+<svg viewBox="0 0 1600 300" preserveAspectRatio="none" class="sky-svg">
+  <g fill="url(#mbgrad)">
+    <polygon points="120,300 180,210 240,300"/>
+    <polygon points="360,300 450,170 540,300"/>
+    <rect x="680" y="150" width="16" height="150"/>
+    <polygon points="800,300 880,196 960,300"/>
+    <g>
+      <rect x="1120" y="196" width="24" height="104"/>
+      <rect x="1170" y="196" width="24" height="104"/>
+      <rect x="1112" y="178" width="90" height="22"/>
+    </g>
+    <polygon points="1320,300 1390,200 1460,300"/>
+  </g>
+</svg>`;
 ---
 <div class="mb-stage" id="mb-stage">
   <canvas id="viz-mandel"></canvas>
 
   <div class="mb-monuments" aria-hidden="true">
-    <svg class="mb-scene mb-giza" viewBox="0 0 1200 380" preserveAspectRatio="xMidYMax meet">
-      <defs>
-        <linearGradient id="mbgrad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#ff2bd6"/>
-          <stop offset="0.5" stop-color="#22d3ee"/>
-          <stop offset="1" stop-color="#a3ff12"/>
-        </linearGradient>
-      </defs>
-      <circle cx="610" cy="150" r="74" fill="#ffe600" opacity="0.9"/>
-      <!-- pyramids -->
-      <polygon points="180,360 300,205 420,360" fill="url(#mbgrad)"/>
-      <polygon points="690,360 800,235 910,360" fill="url(#mbgrad)"/>
-      <polygon points="350,360 525,120 700,360" fill="url(#mbgrad)"/>
-      <!-- sphinx (stylized side profile) -->
-      <path d="M470,360 L470,322 Q474,300 496,300 L512,300 L516,282 Q520,270 532,272 L540,288 L548,286 L556,300 L582,300 Q598,302 600,322 L600,360 Z" fill="url(#mbgrad)"/>
-    </svg>
+    <svg class="mb-defs" width="0" height="0"><defs>
+      <linearGradient id="mbgrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ff2bd6"/>
+        <stop offset="0.5" stop-color="#22d3ee"/>
+        <stop offset="1" stop-color="#a3ff12"/>
+      </linearGradient>
+    </defs></svg>
 
-    <svg class="mb-scene mb-henge" viewBox="0 0 1200 380" preserveAspectRatio="xMidYMax meet">
-      <!-- trilithons: uprights + lintel -->
-      <g fill="url(#mbgrad)">
-        <rect x="250" y="200" width="42" height="160"/>
-        <rect x="330" y="200" width="42" height="160"/>
-        <rect x="238" y="172" width="146" height="34"/>
+    <!-- floating sacred-geometry glyphs over the fractal -->
+    <div class="mb-sky">
+      <svg class="g g1" viewBox="0 0 100 100"><polygon points="50,6 94,90 6,90" fill="none" stroke="url(#mbgrad)" stroke-width="3"/><circle cx="50" cy="62" r="16" fill="none" stroke="url(#mbgrad)" stroke-width="3"/></svg>
+      <svg class="g g2" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="url(#mbgrad)" stroke-width="2.5"/><circle cx="50" cy="50" r="28" fill="none" stroke="url(#mbgrad)" stroke-width="2.5"/><circle cx="50" cy="50" r="12" fill="none" stroke="url(#mbgrad)" stroke-width="2.5"/></svg>
+      <svg class="g g3" viewBox="0 0 100 100"><polygon points="50,4 92,27 92,73 50,96 8,73 8,27" fill="none" stroke="url(#mbgrad)" stroke-width="3"/></svg>
+      <svg class="g g4" viewBox="0 0 100 100"><g fill="none" stroke="url(#mbgrad)" stroke-width="2.5"><circle cx="50" cy="50" r="18"/><circle cx="32" cy="50" r="18"/><circle cx="68" cy="50" r="18"/><circle cx="41" cy="34" r="18"/><circle cx="59" cy="34" r="18"/><circle cx="41" cy="66" r="18"/><circle cx="59" cy="66" r="18"/></g></svg>
+      <svg class="g g5" viewBox="0 0 100 100"><polygon points="50,8 90,50 50,92 10,50" fill="none" stroke="url(#mbgrad)" stroke-width="3"/><polygon points="50,28 72,50 50,72 28,50" fill="url(#mbgrad)" opacity="0.5"/></svg>
+      <svg class="g g6" viewBox="0 0 100 100"><polygon points="50,6 94,90 6,90" fill="url(#mbgrad)" opacity="0.4"/></svg>
+    </div>
 
-        <rect x="470" y="170" width="48" height="190"/>
-        <rect x="560" y="170" width="48" height="190"/>
-        <rect x="456" y="138" width="166" height="38"/>
-
-        <rect x="700" y="205" width="42" height="155"/>
-        <rect x="780" y="205" width="42" height="155"/>
-        <rect x="688" y="178" width="146" height="32"/>
-
-        <rect x="900" y="225" width="34" height="135" transform="rotate(6 917 290)"/>
-        <rect x="170" y="235" width="32" height="125" transform="rotate(-7 186 297)"/>
-      </g>
-    </svg>
+    <!-- parallax monument skyline (back = slow/distant, front = fast/large) -->
+    <div class="mb-band mb-band-back"><div class="mb-row mb-row-slow"><Fragment set:html={skylineBack} /><Fragment set:html={skylineBack} /></div></div>
+    <div class="mb-band mb-band-front"><div class="mb-row mb-row-fast"><Fragment set:html={skylineFront} /><Fragment set:html={skylineFront} /></div></div>
   </div>
 
   <span class="viz-hint">drag to pan · scroll to zoom · it dives on its own</span>
@@ -49,41 +90,42 @@
 </div>
 
 <style>
-  .mb-stage {
-    position: fixed;
-    left: 0; right: 0; bottom: 0;
-    top: 104px; /* refined to just-below-nav by script */
-    z-index: 1;
-    background: #020503;
-    overflow: hidden;
-  }
+  .mb-stage { position: fixed; left: 0; right: 0; bottom: 0; top: 104px; z-index: 1; background: #020503; overflow: hidden; }
   .mb-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: move; touch-action: none; }
 
-  .mb-monuments {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    height: min(46%, 360px);
-    pointer-events: none;
-    mix-blend-mode: screen;
-    filter: hue-rotate(0deg) drop-shadow(0 0 18px rgba(120,255,180,.35));
-    animation: mb-hue 14s linear infinite, mb-drift 11s ease-in-out infinite;
-  }
-  .mb-scene { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; }
-  .mb-giza  { animation: mb-fadeA 18s ease-in-out infinite; }
-  .mb-henge { animation: mb-fadeB 18s ease-in-out infinite; }
+  .mb-monuments { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; overflow: hidden;
+    filter: hue-rotate(0deg) drop-shadow(0 0 16px rgba(120,255,180,.3));
+    animation: mb-hue 9s linear infinite; }
+  @keyframes mb-hue { to { filter: hue-rotate(360deg) drop-shadow(0 0 16px rgba(120,255,180,.3)); } }
+  .mb-defs { position: absolute; }
 
-  @keyframes mb-hue   { to { filter: hue-rotate(360deg) drop-shadow(0 0 18px rgba(120,255,180,.35)); } }
-  @keyframes mb-drift { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-10px) scale(1.03); } }
-  @keyframes mb-fadeA { 0%,38% { opacity: .92; } 50%,88% { opacity: 0; } 100% { opacity: .92; } }
-  @keyframes mb-fadeB { 0%,38% { opacity: 0; } 50%,88% { opacity: .92; } 100% { opacity: 0; } }
+  /* scrolling skyline */
+  .mb-band { position: absolute; left: 0; right: 0; bottom: 0; overflow: hidden; }
+  .mb-band-back { height: 32%; opacity: .45; }
+  .mb-band-front { height: 48%; opacity: .9; }
+  .mb-row { display: flex; width: 200%; height: 100%; will-change: transform; }
+  .mb-row .sky-svg { flex: 0 0 50%; width: 50%; height: 100%; }
+  .mb-row-fast { animation: mb-scroll 38s linear infinite; }
+  .mb-row-slow { animation: mb-scroll 70s linear infinite; }
+  @keyframes mb-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* floating glyphs */
+  .mb-sky .g { position: absolute; width: clamp(60px, 9vw, 130px); height: clamp(60px, 9vw, 130px); opacity: .8; will-change: transform; }
+  .g1 { top: 12%; left: 8%;  animation: mb-spin 26s linear infinite, mb-bob 9s ease-in-out infinite; }
+  .g2 { top: 22%; left: 74%; animation: mb-spin 40s linear infinite reverse, mb-bob 12s ease-in-out infinite; }
+  .g3 { top: 54%; left: 22%; animation: mb-spin 32s linear infinite, mb-bob 10s ease-in-out infinite; }
+  .g4 { top: 8%;  left: 46%; animation: mb-spin 60s linear infinite, mb-bob 14s ease-in-out infinite; opacity: .6; }
+  .g5 { top: 60%; left: 84%; animation: mb-spin 22s linear infinite reverse, mb-bob 8s ease-in-out infinite; }
+  .g6 { top: 40%; left: 58%; animation: mb-spin 48s linear infinite, mb-bob 11s ease-in-out infinite; opacity: .5; }
+  @keyframes mb-spin { to { transform: rotate(360deg); } }
+  @keyframes mb-bob { 0%,100% { translate: 0 -14px; } 50% { translate: 0 14px; } }
 
   .viz-hint { position: absolute; right: .7rem; bottom: .6rem; font-size: .72rem; color: var(--t3); font-family: var(--font-mono); pointer-events: none; z-index: 2; }
   .viz-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--t2); padding: 1rem; text-align: center; }
   .viz-fallback[hidden] { display: none; }
 
   @media (prefers-reduced-motion: reduce) {
-    .mb-monuments, .mb-giza, .mb-henge { animation: none; }
-    .mb-henge { opacity: 0; }
+    .mb-monuments, .mb-row, .mb-sky .g { animation: none; }
   }
 </style>
 
@@ -174,8 +216,8 @@
       function tick() {
         if (!running) return;
         if (!reduce) {
-          time += 0.0008;
-          if (!dragging) { idle++; if (idle > 90) { scale *= 0.992; if (scale < 6e-6) scale = 1.5; } }
+          time += 0.0016;
+          if (!dragging) { idle++; if (idle > 30) { scale *= 0.990; if (scale < 6e-6) scale = 1.5; } }
         }
         render();
         raf = requestAnimationFrame(tick);
