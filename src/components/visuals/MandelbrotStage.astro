@@ -30,7 +30,8 @@
 
 <style>
   .mb-stage { position: fixed; left: 0; right: 0; bottom: 0; top: 104px; z-index: 1; background: #020503; overflow: hidden; }
-  .mb-stage canvas#viz-mandel { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .mb-stage canvas#viz-mandel { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+  .mb-stage canvas#viz-mandel:active { cursor: grabbing; }
   .mb-fade { position: absolute; inset: 0; background: #020503; opacity: 0; transition: opacity .45s ease; pointer-events: none; z-index: 2; }
   .mb-defs { position: absolute; }
   .mb-sky { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; z-index: 2; filter: hue-rotate(0deg) drop-shadow(0 0 14px rgba(120,255,180,.3)); animation: mb-hue 11s linear infinite; }
@@ -146,16 +147,15 @@
       'void main(){',
       '  vec2 uv = (gl_FragCoord.xy - 0.5*u_res)/u_res.y;',
       '  vec2 dc = uv * u_scale;',           // delta-c for this pixel (small, FP32 ok)
-      '  vec2 dz = vec2(0.0); int ri = 0; float n = 0.0; vec2 z = vec2(0.0); bool esc = false;',
+      '  vec2 dz = vec2(0.0); int ri = 0; float n = 0.0; vec2 z = vec2(0.0); bool esc = false; vec2 Zc = R(0);',
       '  for(int k=0;k<2200;k++){',
       '    if(n >= u_iter) break;',
-      '    vec2 Z = R(ri);',
-      '    dz = cm(2.0*Z, dz) + cm(dz, dz) + dc;',   // delta iteration
-      '    ri++;',
-      '    z = R(ri) + dz;',                          // full z = reference + delta
+      '    dz = cm(2.0*Zc, dz) + cm(dz, dz) + dc;',
+      '    ri++; Zc = R(ri);',
+      '    z = Zc + dz;',
       '    n += 1.0;',
       '    if(dot(z,z) > 256.0){ esc = true; break; }',
-      '    if(ri >= u_refLen-1 || dot(z,z) < dot(dz,dz)){ dz = z; ri = 0; }',  // rebase
+      '    if(ri >= u_refLen-1 || dot(z,z) < dot(dz,dz)){ dz = z; ri = 0; Zc = R(0); }',
       '  }',
       '  if(!esc){ outColor = vec4(0.01,0.02,0.015,1.0); return; }',
       '  float sn = n + 1.0 - log(log(sqrt(dot(z,z))))/log(2.0);',
@@ -171,22 +171,25 @@
     const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.uniform1i(uRef, 0);
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    let q = 0.7, fAcc = 0, fCnt = 0; const qMax = Math.min(1.25, window.devicePixelRatio || 1);
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     // high-precision dive targets (points on the set boundary, ~33 sig digits)
     const TARGETS = [
       { re: '-0.743643887037158704752191506114774', im: '0.131825904205311970493132056385139' }
     ];
     const MAXREF = 2600;
-    let ti = 0, scale = 1.6, iter = 320, flow = 0, refLen = 0, resetting = false;
+    let scale = 1.6, iter = 320, flow = 0, refLen = 0, idle = 200, dragging = false, lastX = 0, lastY = 0, recompT = 0;
+    let cx = new Decimal(TARGETS[0].re), cy = new Decimal(TARGETS[0].im);
     const fade = document.getElementById('mb-fade');
 
-    function computeRef(t) {
-      const cx = new Decimal(t.re), cy = new Decimal(t.im);
+    function refPrecision() { return Math.max(40, Math.ceil(-Math.log10(Math.max(1e-300, scale))) + 18); }
+    function computeRef() {
+      Decimal.set({ precision: refPrecision() });
+      const RX = new Decimal(cx), RY = new Decimal(cy);
       let zx = new Decimal(0), zy = new Decimal(0); const data = new Float32Array(MAXREF * 2); let len = MAXREF;
       for (let nn = 0; nn < MAXREF; nn++) {
         data[nn * 2] = Number(zx); data[nn * 2 + 1] = Number(zy);
-        const nzx = zx.times(zx).minus(zy.times(zy)).plus(cx); const nzy = zx.times(zy).times(2).plus(cy);
+        const nzx = zx.times(zx).minus(zy.times(zy)).plus(RX); const nzy = zx.times(zy).times(2).plus(RY);
         zx = nzx; zy = nzy;
         if (zx.times(zx).plus(zy.times(zy)).gt(4)) { len = nn + 1; break; }
       }
@@ -194,15 +197,31 @@
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG32F, len, 1, 0, gl.RG, gl.FLOAT, data.subarray(0, len * 2));
       refLen = len;
     }
-    computeRef(TARGETS[0]);
+    function scheduleRecompute() { clearTimeout(recompT); recompT = setTimeout(computeRef, 130); }
+    computeRef();
 
-    function resize() { const r = canvas.getBoundingClientRect(); canvas.width = Math.max(1, Math.floor(r.width * dpr)); canvas.height = Math.max(1, Math.floor(r.height * dpr)); gl.viewport(0, 0, canvas.width, canvas.height); }
-    function render() { iter = Math.min(2000, 320 + Math.floor(Math.log2(1.6 / scale)) * 45); gl.uniform2f(uRes, canvas.width, canvas.height); gl.uniform1f(uScale, scale); gl.uniform1f(uIter, iter); gl.uniform1i(uRefLen, refLen); gl.uniform1f(uFlow, flow); gl.drawArrays(gl.TRIANGLES, 0, 3); }
-    function nextTarget() { if (fade) fade.style.opacity = '1'; setTimeout(() => { ti = (ti + 1) % TARGETS.length; computeRef(TARGETS[ti]); scale = 1.6; if (fade) fade.style.opacity = '0'; resetting = false; }, 460); }
+    function resize() { const r = canvas.getBoundingClientRect(); canvas.width = Math.max(1, Math.floor(r.width * q)); canvas.height = Math.max(1, Math.floor(r.height * q)); gl.viewport(0, 0, canvas.width, canvas.height); }
+    function render() { iter = Math.min(1200, 300 + Math.floor(Math.log2(1.6 / scale)) * 42); gl.uniform2f(uRes, canvas.width, canvas.height); gl.uniform1f(uScale, scale); gl.uniform1f(uIter, iter); gl.uniform1i(uRefLen, refLen); gl.uniform1f(uFlow, flow); gl.drawArrays(gl.TRIANGLES, 0, 3); }
+
+    // drag to pan, wheel to zoom: move the high-precision center, then re-derive the reference orbit
+    canvas.addEventListener('pointerdown', (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; idle = 0; try { canvas.setPointerCapture(e.pointerId); } catch (_) {} });
+    canvas.addEventListener('pointerup', () => { dragging = false; scheduleRecompute(); });
+    canvas.addEventListener('pointercancel', () => { dragging = false; });
+    canvas.addEventListener('pointermove', (e) => { if (!dragging) return; idle = 0; const r = canvas.getBoundingClientRect(); const k = scale / r.height; cx = cx.minus((e.clientX - lastX) * k); cy = cy.plus((e.clientY - lastY) * k); lastX = e.clientX; lastY = e.clientY; });
+    canvas.addEventListener('wheel', (e) => { e.preventDefault(); idle = 0; const r = canvas.getBoundingClientRect(); const ax = (e.clientX - r.left - r.width / 2) / r.height, ay = -(e.clientY - r.top - r.height / 2) / r.height; const ns = Math.min(3.0, Math.max(1e-300, scale * Math.exp(e.deltaY * 0.0012))); cx = cx.plus(ax * (scale - ns)); cy = cy.plus(ay * (scale - ns)); scale = ns; scheduleRecompute(); }, { passive: false });
+
     function stepFractal(dt) {
+      fAcc += dt; fCnt++;
+      if (fCnt >= 45) { const avg = fAcc / fCnt; if (avg > 0.0215 && q > 0.4) { q = Math.max(0.4, q - 0.12); resize(); } else if (avg < 0.016 && q < qMax) { q = Math.min(qMax, q + 0.08); resize(); } fAcc = 0; fCnt = 0; }
       if (!reduce) {
         flow += dt * (0.04 + audio.bass * 0.9 + audio.mid * 0.5);
-        if (!resetting) { scale *= 0.9965; if (scale < 2e-24) { resetting = true; nextTarget(); } }
+        if (!dragging) {
+          idle++;
+          if (idle > 90) {
+            scale *= 0.9965;
+            if (scale < 2e-24) { cx = new Decimal(TARGETS[0].re); cy = new Decimal(TARGETS[0].im); scale = 1.6; if (fade) fade.style.opacity = '1'; setTimeout(() => { computeRef(); if (fade) fade.style.opacity = '0'; }, 460); }
+          }
+        }
       }
       render();
     }
