@@ -34,9 +34,9 @@
   .mb-stage canvas#viz-mandel { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
   .mb-stage canvas#viz-mandel:active { cursor: grabbing; }
   .mb-fade { position: absolute; inset: 0; background: #020503; opacity: 0; transition: opacity .45s ease; pointer-events: none; z-index: 2; }
-  .mb-hypno { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: .18; mix-blend-mode: screen; overflow: hidden; }
-  .mb-hypno svg { position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: center; animation: mb-spin-spiral 26s linear infinite; }
-  #mb-spiral { fill: none; stroke: #bfead0; stroke-width: 3.2; }
+  .mb-hypno { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: .22; mix-blend-mode: screen; overflow: hidden; }
+  .mb-hypno svg { position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: center; animation: mb-spin-spiral 7s linear infinite; }
+  #mb-spiral { fill: none; stroke: #bfead0; stroke-width: 2.6; }
   @keyframes mb-spin-spiral { to { transform: rotate(360deg); } }
   .mb-defs { position: absolute; }
   .mb-sky { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; z-index: 2; filter: hue-rotate(0deg) drop-shadow(0 0 14px rgba(120,255,180,.3)); animation: mb-hue 11s linear infinite; }
@@ -59,7 +59,7 @@
   place(); window.addEventListener('resize', place); window.addEventListener('scroll', place, { passive: true });
 
   // hypnosis spiral: build a logarithmic-ish Archimedean spiral path (CSS rotates it)
-  try { const sp = document.getElementById('mb-spiral'); if (sp) { let d = ''; const turns = 8, A = 72 / (turns * 6.28318); for (let t = 0; t <= turns * 6.28318; t += 0.1) { const r = A * t; d += (d ? 'L' : 'M') + (Math.cos(t) * r).toFixed(2) + ' ' + (Math.sin(t) * r).toFixed(2); } sp.setAttribute('d', d); } } catch (e) {}
+  try { const sp = document.getElementById('mb-spiral'); if (sp) { let d = ''; const turns = 18, A = 110 / (turns * 6.28318); for (let t = 0; t <= turns * 6.28318; t += 0.08) { const r = A * t; d += (d ? 'L' : 'M') + (Math.cos(t) * r).toFixed(2) + ' ' + (Math.sin(t) * r).toFixed(2); } sp.setAttribute('d', d); } } catch (e) {}
 
   const audio = { on: false, bass: 0, mid: 0, treble: 0 };
   let analyser = null, freq = null;
@@ -168,7 +168,7 @@
       '  if(!esc){ outColor = vec4(0.01,0.02,0.015,1.0); return; }',
       '  float sn = n + 1.0 - log(log(sqrt(dot(z,z))))/log(2.0);',
       '  vec3 a=vec3(0.05,0.12,0.08), b=vec3(0.45,0.55,0.45), c=vec3(1.0,1.0,1.0), d=vec3(0.30,0.10,0.55);',
-      '  outColor = vec4(a + b*cos(6.28318*(c*(sn*0.02 + u_flow)+d)), 1.0);',
+      '  outColor = vec4(a + b*cos(6.28318*(c*(sn*0.045 + u_flow)+d)), 1.0);',
       '}'
     ].join('\n');
     function sh(t, s) { const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); return o; }
