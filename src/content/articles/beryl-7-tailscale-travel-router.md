@@ -24,14 +24,14 @@ That's the payoff. Getting there took a dedicated exit node, three firewall fixe
   <figcaption class="text-muted" style="font-size: 0.85rem; text-align: center; margin-top: 0.5rem;">The Beryl 7: my home network, packed into something the size of a deck of cards.</figcaption>
 </figure>
 
-## What I actually wanted
+## What I actually want
 
 Two things people lump together as "VPN back home," but they're really separate:
 
 - **Reach my home devices:** open `10.0.0.x` and hit the NAS, Proxmox, or the firewall UI as if I were on the couch. In Tailscale terms that's a [subnet route](https://tailscale.com/docs/features/subnet-routers).
 - **Look like I'm home:** push my internet traffic out through my house, so I carry my home IP and get a trusted exit on sketchy public Wi-Fi. That's an [exit node](https://tailscale.com/docs/features/exit-nodes).
 
-I wanted both, for **any** device, without installing anything on each gadget. That last part is what a travel router buys you: join its Wi-Fi and you're home, with no per-device setup.
+I want both, for **any** device, without installing anything on each gadget. That last part is what a travel router buys you: join its Wi-Fi and you're home, with no per-device setup.
 
 ## The home side: one boring little VM
 
@@ -47,9 +47,9 @@ Advertising isn't enough on its own; both have to be approved once in the Tailsc
 
 ### 1. Reachable, but only the slow way
 
-Tailscale always prefers a **direct** peer-to-peer connection and only falls back to a relay (its encrypted "DERP" servers) when it can't punch through. My home firewall's NAT was *symmetric*: it handed out a different external port for every destination, so the travel router could never find a stable path in. Everything fell back to a relay, which is fine for a quick SSH but miserable when you're trying to push a whole internet connection through it.
+Tailscale always prefers a **direct** peer-to-peer connection and only falls back to a relay (its encrypted "DERP" servers) when it can't punch through. My home firewall's NAT is *symmetric*: it hands out a different external port for every destination, so the travel router could never find a stable path in. Everything fell back to a relay, which is fine for a quick SSH but miserable when you're trying to push a whole internet connection through it.
 
-The fix, on my FreeBSD/pf firewall, was to give the exit node a stable, forwarded port and stop the NAT from scrambling it:
+The fix, on my FreeBSD/pf firewall, is to give the exit node a stable, forwarded port and stop the NAT from scrambling it:
 
 ```
 # Forward Tailscale's port straight to the exit-node VM
@@ -58,13 +58,13 @@ rdr pass on $ext_if inet proto udp from any to ($ext_if) port 41641 -> 10.0.0.10
 nat on $ext_if inet proto udp from 10.0.0.10 port 41641 to any -> ($ext_if) static-port
 ```
 
-Flush the stale states (`pfctl -k 10.0.0.10`) and the travel router connected **directly**, around 5 ms instead of a relay halfway across the country.
+Flush the stale states (`pfctl -k 10.0.0.10`) and the travel router connects **directly**, around 5 ms instead of a relay halfway across the country.
 
 ### 2. The firewall's DNS lockdown caught the exit traffic
 
-My network forces all DNS through my home resolver (Unbound) and blocks queries to outside DNS servers, a privacy measure I set up long ago. That same rule applies to the exit node: when it forwarded a traveling device's lookup to `8.8.8.8`, the firewall dropped it like any other outbound DNS query.
+My network forces all DNS through my home resolver (Unbound) and blocks queries to outside DNS servers, a privacy measure I set up long ago. That same rule catches the exit node: when it forwards a traveling device's lookup to `8.8.8.8`, the firewall drops it like any other outbound DNS query.
 
-The symptom was a familiar one: pages wouldn't load, but pinging raw IPs worked. The fix is to let that traffic through, transparently redirecting the exit node's DNS to my home resolver instead of dropping it:
+The symptom is a familiar one: pages won't load, but pinging raw IPs still works. The fix is to let that traffic through, transparently redirecting the exit node's DNS to my home resolver instead of dropping it:
 
 ```
 # Send the exit node's forwarded DNS to home Unbound instead of dropping it
@@ -81,7 +81,7 @@ The actual answer came from a GL.iNet subreddit thread. In the router's LUCI adm
 
 > **Network → Firewall**, edit the **wan** zone, open **Advanced Settings**, and add **`tailscale0`** to the covered devices.
 
-That one change tells OpenWrt to actually **forward and masquerade** traffic between the LAN and the Tailscale tunnel. Without it, the router happily sent my requests out the tunnel but had no return path for the replies. The instant I added it, real traffic flowed both ways. Full credit to [this r/GLinet comment](https://www.reddit.com/r/GlInet/s/JSfxl70Jtc); it's the only place I found the fix.
+That one change tells OpenWrt to actually **forward and masquerade** traffic between the LAN and the Tailscale tunnel. Without it, the router happily sends my requests out the tunnel but has no return path for the replies. The instant I added it, real traffic flowed both ways. Full credit to [this r/GLinet comment](https://www.reddit.com/r/GlInet/s/JSfxl70Jtc); it's the only place I found the fix.
 
 <figure style="margin: 1.5rem 0;">
   <img src="/pix/beryl-7-tailscale-2.jpg" alt="The LUCI firewall page on the Beryl 7 with tailscale0 added to the wan zone's covered devices" width="1600" height="1200" loading="lazy" style="width: 100%; height: auto; border-radius: 8px;" />
@@ -90,7 +90,7 @@ That one change tells OpenWrt to actually **forward and masquerade** traffic bet
 
 ## The payoff
 
-With those three fixed, the Beryl 7 just works as a pocket gateway:
+With those three fixes in place, the Beryl 7 just works as a pocket gateway:
 
 - **Join its Wi-Fi and you're on my home network.** No app, no config, on any device.
 - **My home IP, anywhere:** great for services that get suspicious of new locations, or anything geo-locked to home.
