@@ -98,8 +98,8 @@ With those three fixed, the Beryl 7 just works as a pocket gateway:
 - **A trusted, encrypted exit** on hotel, airport, café, and (apparently) car-dealership Wi-Fi.
 
 <figure style="margin: 1.5rem 0;">
-  <img src="/pix/beryl-7-tailscale-3.jpg" alt="A what's-my-IP page open on the road, showing my home public IP address" width="1600" height="1200" loading="lazy" style="width: 100%; height: auto; border-radius: 8px;" />
-  <figcaption class="text-muted" style="font-size: 0.85rem; text-align: center; margin-top: 0.5rem;">On the dealership's Wi-Fi — but the internet sees my house.</figcaption>
+  <img src="/pix/beryl-7-tailscale-3.jpg" alt="The Tailscale exit-node selector showing net-gateway active, routing this device's traffic home" width="1600" height="1200" loading="lazy" style="width: 100%; height: auto; border-radius: 8px;" />
+  <figcaption class="text-muted" style="font-size: 0.85rem; text-align: center; margin-top: 0.5rem;">Exit node set to home — every byte routes through the house. (And no, I'm not going to screenshot my actual home IP.)</figcaption>
 </figure>
 
 ## Why a travel router instead of just the app
