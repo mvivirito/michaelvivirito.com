@@ -1,9 +1,9 @@
 ---
-title: "Carrying My Home Network in My Pocket: Beryl 7 + Tailscale"
+title: "Take Your Home Network With You: Beryl 7 + Tailscale"
 description: "How a GL.iNet Beryl 7 travel router and a Tailscale exit node give me secure access to my entire home LAN, and my home IP, from any hotel, café, or dealership Wi-Fi. The full struggle and the fixes that finally made it work."
 date: 2026-06-20
 keywords: "Beryl 7, GL-MT3600BE, GL.iNet, Tailscale, exit node, subnet router, travel router, home network remote access, Proxmox, pf, WireGuard, VPN, homelab"
-ogTitle: "Carrying My Home Network in My Pocket: Beryl 7 + Tailscale"
+ogTitle: "Take Your Home Network With You: Beryl 7 + Tailscale"
 ogDescription: "A GL.iNet Beryl 7 plus a Tailscale exit node equals my whole home network, anywhere. The full struggle, the fixes, and why a travel router earns its spot in the bag."
 ogImage: "/pix/beryl-7-tailscale-1.jpg"
 badges: ["Networking", "Tailscale", "Homelab", "Travel"]
