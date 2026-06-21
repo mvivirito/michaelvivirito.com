@@ -17,7 +17,7 @@ draft: false
 
 I'm writing this from a car-dealership service lounge, on their open guest Wi-Fi, and my laptop is convinced it's sitting on my desk at home. It carries my home IP out to the internet and reaches my NAS and my Proxmox box on their normal home addresses. A little travel router in my bag is quietly tunneling everything back to the house.
 
-That's the payoff. Getting there took a dedicated exit node, three firewall fixes, one genuinely humbling self-own, and a random Reddit comment that finally cracked the last problem. Here's the whole thing.
+That's the payoff. Getting there took a dedicated exit node, three firewall fixes, and a random Reddit comment that finally cracked the last problem. Here's the whole thing.
 
 <figure style="margin: 1.5rem 0;">
   <img src="/pix/beryl-7-tailscale-1.jpg" alt="The GL.iNet Beryl 7 travel router on a table, in use on the road" width="1600" height="1200" loading="lazy" style="width: 100%; height: auto; border-radius: 8px;" />
@@ -60,11 +60,11 @@ nat on $ext_if inet proto udp from 10.0.0.10 port 41641 to any -> ($ext_if) stat
 
 Flush the stale states (`pfctl -k 10.0.0.10`) and the travel router connected **directly**, around 5 ms instead of a relay halfway across the country.
 
-### 2. My own firewall ate the DNS
+### 2. The firewall's DNS lockdown caught the exit traffic
 
-This one's embarrassing. A while back I'd locked my network down so that *all* DNS is forced through my home resolver (Unbound), with queries to outside DNS servers blocked, a privacy measure. It worked great until the exit node forwarded a traveling device's DNS lookup to `8.8.8.8` and my own firewall promptly dropped it.
+My network forces all DNS through my home resolver (Unbound) and blocks queries to outside DNS servers, a privacy measure I set up long ago. That same rule applies to the exit node: when it forwarded a traveling device's lookup to `8.8.8.8`, the firewall dropped it like any other outbound DNS query.
 
-The symptom was maddening: pages wouldn't load, but pinging raw IPs worked. Classic "DNS is down," except I'd done it to myself. The fix is to transparently redirect the exit node's DNS to my home resolver instead of blocking it:
+The symptom was a familiar one: pages wouldn't load, but pinging raw IPs worked. The fix is to let that traffic through, transparently redirecting the exit node's DNS to my home resolver instead of dropping it:
 
 ```
 # Send the exit node's forwarded DNS to home Unbound instead of dropping it
