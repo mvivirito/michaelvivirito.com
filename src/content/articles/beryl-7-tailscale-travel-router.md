@@ -81,7 +81,7 @@ The actual answer came from a GL.iNet subreddit thread. In the router's LUCI adm
 
 > **Network → Firewall**, edit the **wan** zone, open **Advanced Settings**, and add **`tailscale0`** to the covered devices.
 
-That one change tells OpenWrt to actually **forward and masquerade** traffic between the LAN and the Tailscale tunnel. Without it, the router happily sends my requests out the tunnel but has no return path for the replies. The instant I added it, real traffic flowed both ways. Full credit to [this r/GLinet comment](https://www.reddit.com/r/GlInet/s/JSfxl70Jtc); it's the only place I found the fix.
+That one change tells OpenWrt to actually **forward and masquerade** traffic between the LAN and the Tailscale tunnel. Without it, the router happily sends my requests out the tunnel but has no return path for the replies. The instant I added it, real traffic flowed both ways. Credit to [this r/GLinet comment](https://www.reddit.com/r/GlInet/s/JSfxl70Jtc); it's the first place I came across the fix when I went looking.
 
 <figure style="margin: 1.5rem 0;">
   <img src="/pix/beryl-7-tailscale-2.jpg" alt="The LUCI firewall page on the Beryl 7 with tailscale0 added to the wan zone's covered devices" width="1600" height="1200" loading="lazy" style="width: 100%; height: auto; border-radius: 8px;" />
