@@ -132,4 +132,4 @@ That's the whole thing. My laptop and phone both do exactly that as a backup. So
 - **[Tailscale](https://tailscale.com)**: free for personal use, the mesh-VPN backbone that ties it all together.
 - **Any always-on box at home** for the exit node: a spare PC, a Raspberry Pi, or in my case a tiny Proxmox VM. It just has to stay powered on and reachable.
 
-The hardest part wasn't the router or the VPN. Both are genuinely friendly. It was my own years-deep firewall rules fighting me. If you're running the same kind of locked-down home network and hit the same wall, or you're stuck on that wan-zone gotcha, [drop me a line](../contact).
+The router and the VPN are both genuinely friendly. The rest was just adjusting my own setup to fit the new piece, and learning as I went. My DNS is locked down on purpose and I like it that way; the exit node simply had to be taught to play by those rules. If you run a similarly hardened home network, or you hit that wan-zone gotcha, [drop me a line](../contact).
