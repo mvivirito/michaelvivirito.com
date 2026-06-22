@@ -58,6 +58,6 @@ Pick locks you own, or ones you have explicit permission to pick. That's the who
 
 ## The gear
 
-- <a href="/go/goso-lock-pick-kit/" rel="sponsored noopener noreferrer" target="_blank">The GOSO lock pick set</a>: the kit in these photos. Compact, cheap, and it comes with the picks and tension wrenches you need to get started. If you want to actually see what you're doing while you learn, a clear acrylic practice lock is a great companion.
+- <a href="/go/lock-pick-kit/" rel="sponsored noopener noreferrer" target="_blank">A lock pick set like mine</a>: the exact GOSO set in these photos has since vanished from Amazon, but this is a close equivalent. Compact, cheap, and it comes with the picks and tension wrenches you need to get started. If you want to actually see what you're doing while you learn, a clear acrylic practice lock is a great companion.
 
 Cheap, surprisingly useful, and honestly a little bit fun. If a pick set has saved you a locksmith bill too, or you want a practice-lock recommendation, [drop me a line](../contact).
