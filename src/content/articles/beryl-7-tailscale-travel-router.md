@@ -20,7 +20,7 @@ I'm writing this from a car-dealership service lounge, on their open guest Wi-Fi
 That's the payoff. Getting there took a dedicated exit node, three firewall fixes, and a random Reddit comment that finally cracked the last problem. Here's the whole thing.
 
 <figure style="margin: 1.5rem 0;">
-  <img src="/pix/beryl-7-tailscale-1.jpg" alt="The GL.iNet Beryl 7 travel router on a table, in use on the road" width="1600" height="1200" loading="lazy" style="width: 100%; height: auto; border-radius: 8px;" />
+  <img src="/pix/beryl-7-tailscale-1.webp" alt="The GL.iNet Beryl 7 travel router on a table, in use on the road" width="1541" height="1156" loading="lazy" style="width: 100%; height: auto; border-radius: 8px;" />
   <figcaption class="text-muted" style="font-size: 0.85rem; text-align: center; margin-top: 0.5rem;">The Beryl 7: my home network, packed into something the size of a deck of cards.</figcaption>
 </figure>
 
@@ -42,6 +42,11 @@ tailscale up --advertise-exit-node --advertise-routes=10.0.0.0/24
 ```
 
 Advertising isn't enough on its own; both have to be approved once in the Tailscale admin console. Open the `net-gateway` machine, approve its **exit node**, and approve its advertised **`10.0.0.0/24` subnet route**. After that, anything on my tailnet can ride home through it. In theory.
+
+<figure style="margin: 1.5rem 0;">
+  <img src="/pix/beryl-7-tailscale-2.png" alt="The Tailscale admin console showing the net-gateway machine with its exit node allowed and the 10.0.0.0/24 subnet route approved" width="1537" height="884" loading="lazy" style="width: 100%; height: auto; border-radius: 8px;" />
+  <figcaption class="text-muted" style="font-size: 0.85rem; text-align: center; margin-top: 0.5rem;">net-gateway in the Tailscale admin: exit node allowed and the 10.0.0.0/24 subnet route approved, tagged <code>tag:infra</code> with key expiry off.</figcaption>
+</figure>
 
 ## Then the struggle
 
@@ -84,8 +89,8 @@ The actual answer came from a GL.iNet subreddit thread. In the router's LUCI adm
 That one change tells OpenWrt to actually **forward and masquerade** traffic between the LAN and the Tailscale tunnel. Without it, the router happily sends my requests out the tunnel but has no return path for the replies. The instant I added it, real traffic flowed both ways. Credit to [this r/GLinet comment](https://www.reddit.com/r/GlInet/s/JSfxl70Jtc); it's the first place I came across the fix when I went looking.
 
 <figure style="margin: 1.5rem 0;">
-  <img src="/pix/beryl-7-tailscale-2.jpg" alt="The LUCI firewall page on the Beryl 7 with tailscale0 added to the wan zone's covered devices" width="1600" height="1200" loading="lazy" style="width: 100%; height: auto; border-radius: 8px;" />
-  <figcaption class="text-muted" style="font-size: 0.85rem; text-align: center; margin-top: 0.5rem;">The fix: <code>tailscale0</code> added to the wan zone's covered devices in LUCI.</figcaption>
+  <img src="/pix/beryl-7-tailscale-3.png" alt="The Beryl's LUCI firewall zone settings for the wan zone, with tailscale0 wired into it" width="1514" height="1167" loading="lazy" style="width: 100%; height: auto; border-radius: 8px;" />
+  <figcaption class="text-muted" style="font-size: 0.85rem; text-align: center; margin-top: 0.5rem;">The fix: the Beryl's <code>wan</code> firewall zone in LUCI, with <code>tailscale0</code> wired in.</figcaption>
 </figure>
 
 ## The payoff
@@ -96,11 +101,6 @@ With those three fixes in place, the Beryl 7 just works as a pocket gateway:
 - **My home IP, anywhere:** great for services that get suspicious of new locations, or anything geo-locked to home.
 - **Full reach into the LAN:** the NAS, Proxmox, the firewall, everything by its normal `10.0.0.x` address.
 - **A trusted, encrypted exit** on hotel, airport, café, and (apparently) car-dealership Wi-Fi.
-
-<figure style="margin: 1.5rem 0;">
-  <img src="/pix/beryl-7-tailscale-3.jpg" alt="The Tailscale exit-node selector showing net-gateway active, routing this device's traffic home" width="1600" height="1200" loading="lazy" style="width: 100%; height: auto; border-radius: 8px;" />
-  <figcaption class="text-muted" style="font-size: 0.85rem; text-align: center; margin-top: 0.5rem;">Exit node set to home. Every byte routes through the house. (And no, I'm not going to screenshot my actual home IP.)</figcaption>
-</figure>
 
 ## Travel router, or just the app?
 
