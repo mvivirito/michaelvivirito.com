@@ -165,6 +165,7 @@ const jsonLd: Record<string, unknown> = {
       justify-content: center;
       align-items: start;
     }
+    .article-main { min-width: 0; }
     .article-toc { position: sticky; top: 1.5rem; font-size: 0.85rem; }
     .toc-title {
       font-size: 0.8rem;
@@ -194,7 +195,7 @@ const jsonLd: Record<string, unknown> = {
     }
     .post-nav-next { text-align: right; }
     @media (max-width: 1000px) {
-      .article-grid { grid-template-columns: 1fr; }
+      .article-grid { grid-template-columns: minmax(0, 1fr); }
       .article-toc { display: none; }
     }
   </style>
