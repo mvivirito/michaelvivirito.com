@@ -96,32 +96,34 @@
   /* ---------- auto-playing Game-Boy Egyptian platformer ---------- */
   try {
     const gc = document.getElementById('viz-ground'); const g = gc.getContext('2d'); const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const MAP = ["...rrrrr....","..rrrrrrrr..","..hhhsss.s..",".hshssss.ss.",".hshhsss.ss.",".hhsssssss..","...sssss....","..rroorr....",".rrrooorrr..","rrrooooorrr.","ssrooooorss.","ssoooooooss.","..ooo..ooo..",".hhh...hhh..","hhhh...hhhh.","hhh.....hhh."];
+    const BODY = ["...rrrrr....","..rrrrrrrr..","..hhhsss.s..",".hshssss.ss.",".hshhsss.ss.",".hhsssssss..","...sssss....","..rroorr....",".rrrooorrr..","rrrooooorrr.","ssrooooorss.","ssoooooooss.","..ooo..ooo.."];
+    const LEGS = { run: [[".hhh...hhh..","hhhh...hhhh.","hhh.....hhh."], ["...hhhhhh...","...hhhhhh...","...hh.hh...."]], jump: [".hh....hh...","hh......hh..","............"] };
     const PAL = { r: '#e52521', s: '#f3b78b', h: '#5c3b1e', o: '#3d63c9' };
     let GW = 0, GH = 0, groundY = 0, px = 4, marioH = 64;
     let platforms = [], coins = [], items = [], pops = [];
-    let mx = 0, my = 0, vy = 0, onGround = true, scroll = 0, dist = 0, bigUntil = 0, starUntil = 0, jumpTimer = 0, coinScore = 0, now = 0;
+    let mx = 0, my = 0, vy = 0, onGround = true, scroll = 0, dist = 0, bigUntil = 0, starUntil = 0, jumpTimer = 0, coinScore = 0, now = 0, runPhase = 0, squashT = 0;
     function spawnSegment(x) { const r = Math.random(); if (r < 0.6) { const py = groundY - (GH * (0.34 + Math.random() * 0.16)), w = 56 + Math.random() * 64; platforms.push({ x, y: py, w }); for (let i = 0; i < 3; i++) coins.push({ x: x + 12 + i * 22, y: py - 26, got: false }); if (Math.random() < 0.4) items.push({ x: x + w * 0.5 - 8, y: py - 22, type: Math.random() < 0.5 ? 'mush' : 'star', got: false }); } else { for (let i = 0; i < 5; i++) coins.push({ x: x + i * 24, y: groundY - 28 - Math.sin(i / 4 * Math.PI) * 64, got: false }); } }
     function reset() { groundY = GH - Math.max(12, GH * 0.14); px = Math.max(2, Math.round((GH * 0.28) / 16)); marioH = px * 16; mx = GW * 0.26; my = groundY; vy = 0; onGround = true; platforms = []; coins = []; items = []; pops = []; scroll = 0; dist = 0; bigUntil = 0; starUntil = 0; for (let x = GW * 0.55; x < GW * 1.9; x += 230) spawnSegment(x); }
     function gResize() { const r = gc.getBoundingClientRect(); GW = r.width; GH = r.height; gc.width = Math.floor(GW * dpr); gc.height = Math.floor(GH * dpr); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.imageSmoothingEnabled = false; reset(); }
     function pyramid(cx, baseY, size, col) { const step = Math.max(3, Math.floor(size / 8)); g.fillStyle = col; for (let i = 0; i < 8; i++) { const w = size - i * (size / 8); g.fillRect(Math.round(cx - w / 2), Math.round(baseY - (i + 1) * step), Math.round(w), Math.ceil(step)); } }
-    function drawMario(x, feetY, sc) { const p = px * sc; for (let row = 0; row < 16; row++) for (let col = 0; col < 12; col++) { const ch = MAP[row][col]; if (ch === '.' || !PAL[ch]) continue; g.fillStyle = PAL[ch]; g.fillRect(Math.round(x + col * p), Math.round(feetY - (16 - row) * p), Math.ceil(p), Math.ceil(p)); } }
+    function drawMario(cxp, feetY, bp, legs, sx, sy) { const pw = bp * sx, ph = bp * sy, x0 = cxp - 6 * pw, frame = BODY.concat(legs); for (let row = 0; row < 16; row++) for (let col = 0; col < 12; col++) { const ch = frame[row][col]; if (ch === '.' || !PAL[ch]) continue; g.fillStyle = PAL[ch]; g.fillRect(Math.round(x0 + col * pw), Math.round(feetY - (16 - row) * ph), Math.ceil(pw), Math.ceil(ph)); } }
     function drawCoin(c) { if (c.got) return; g.fillStyle = '#ffd400'; g.beginPath(); g.arc(c.x, c.y, 7, 0, 6.283); g.fill(); g.fillStyle = '#fff6b0'; g.fillRect(c.x - 1.5, c.y - 4, 3, 8); }
     function star5(cx, cy, R) { g.beginPath(); for (let i = 0; i < 10; i++) { const ang = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? R * 0.45 : R, x = cx + Math.cos(ang) * rr, y = cy + Math.sin(ang) * rr; i ? g.lineTo(x, y) : g.moveTo(x, y); } g.closePath(); g.fill(); }
     function drawItem(it) { if (it.got) return; if (it.type === 'mush') { g.fillStyle = '#e23b2e'; g.fillRect(it.x - 9, it.y - 9, 18, 10); g.fillStyle = '#fff'; g.fillRect(it.x - 6, it.y - 7, 4, 4); g.fillRect(it.x + 3, it.y - 7, 4, 4); g.fillStyle = '#f3d9a6'; g.fillRect(it.x - 6, it.y + 1, 12, 9); } else { g.fillStyle = '#ffe23a'; star5(it.x, it.y, 10); } }
     function drawPlatform(p) { g.fillStyle = '#b5742f'; g.fillRect(p.x, p.y, p.w, 12); g.fillStyle = '#8a5520'; for (let x = p.x; x < p.x + p.w; x += 14) g.fillRect(x, p.y, 2, 12); g.fillStyle = '#d89a4a'; g.fillRect(p.x, p.y, p.w, 3); }
     window.__mbGroundResize = gResize;
     window.__mbStepGround = (dt) => {
-      now += dt; const dx = (92 + audio.mid * 120) * dt; scroll += dx; dist += dx;
+      now += dt; const dx = (92 + audio.mid * 120) * dt; scroll += dx; dist += dx; runPhase += dx * 0.06; squashT = Math.max(0, squashT - dt);
       for (const e of platforms) e.x -= dx; for (const c of coins) c.x -= dx; for (const it of items) it.x -= dx;
       platforms = platforms.filter(p => p.x + p.w > -20); coins = coins.filter(c => c.x > -20); items = items.filter(it => it.x > -20);
       while (dist > 230) { dist -= 230; spawnSegment(GW + 40); }
       const big = now < bigUntil, mh = marioH * (big ? 1.35 : 1), mw = px * (big ? 1.35 : 1) * 12;
       const G = GH * 6, JV = Math.sqrt(2 * G * Math.max(20, Math.min(GH * 0.52, groundY - mh - 8)));
-      vy += G * dt; const prevFeet = my; my += vy * dt; onGround = false;
+      const wasAir = !onGround; vy += G * dt; const prevFeet = my; my += vy * dt; onGround = false;
       if (my >= groundY) { my = groundY; vy = 0; onGround = true; }
       for (const p of platforms) if (vy >= 0 && prevFeet <= p.y + 4 && my >= p.y && my <= p.y + 20 && mx + mw > p.x && mx < p.x + p.w) { my = p.y; vy = 0; onGround = true; }
       if (my - mh < 6) { my = mh + 6; if (vy < 0) vy = 0; }
+      if (wasAir && onGround) squashT = 0.14;
       jumpTimer -= dt;
       if (onGround) { let want = jumpTimer <= 0; for (const c of coins) if (!c.got && c.x > mx && c.x < mx + 150 && c.y < groundY - 24) { want = true; break; } for (const it of items) if (!it.got && it.x > mx && it.x < mx + 160 && it.y < groundY - 24) { want = true; break; } if (want) { vy = -JV; onGround = false; jumpTimer = 0.5 + Math.random() * 0.8; } }
       const bx = mx, by = my - mh;
@@ -132,7 +134,12 @@
       for (let k = -1; k * span - off < GW + span; k++) { const x = k * span - off + 160; pyramid(x, groundY + 2, GH * 0.5, '#b07d3a'); pyramid(x + 200, groundY + 2, GH * 0.34, '#9c6d30'); }
       g.fillStyle = '#caa15a'; g.fillRect(0, groundY, GW, GH - groundY); g.fillStyle = '#e6c074'; g.fillRect(0, groundY, GW, Math.max(3, GH * 0.03));
       for (const p of platforms) drawPlatform(p); for (const c of coins) drawCoin(c); for (const it of items) drawItem(it);
-      if (!(now < starUntil && Math.floor(now * 16) % 2 === 0)) drawMario(mx, my, big ? 1.35 : 1);
+      let sx = 1, sy = 1;
+      if (!onGround) { sy = 1 + Math.min(0.22, Math.abs(vy) * 0.0009); sx = 2 - sy; }
+      else if (squashT > 0) { const u = squashT / 0.14; sy = 1 - 0.2 * u; sx = 1 + 0.2 * u; }
+      const bp = px * (big ? 1.35 : 1);
+      const legs = !onGround ? LEGS.jump : LEGS.run[Math.floor(runPhase) % 2];
+      if (!(now < starUntil && Math.floor(now * 16) % 2 === 0)) drawMario(mx + 6 * bp, my, bp, legs, sx, sy);
       for (const pop of pops) { pop.y -= 30 * dt; pop.life -= dt; g.globalAlpha = Math.max(0, pop.life); g.fillStyle = '#fff'; g.font = 'bold 12px monospace'; g.fillText(pop.txt, pop.x - 6, pop.y); g.globalAlpha = 1; }
       pops = pops.filter(p => p.life > 0);
       g.fillStyle = '#ffd400'; g.beginPath(); g.arc(15, 15, 6, 0, 6.283); g.fill(); g.fillStyle = '#fff'; g.font = 'bold 13px monospace'; g.fillText('x' + coinScore, 25, 19);
