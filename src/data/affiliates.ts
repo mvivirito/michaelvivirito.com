@@ -81,4 +81,8 @@ export const affiliates: Record<string, AffiliateLink> = {
     url: 'https://amzn.to/4fSzB4S',
     label: 'GL.iNet Beryl 7 (GL-MT3600BE) Wi-Fi 7 travel router on Amazon',
   },
+  'lock-pick-kit': {
+    url: 'https://amzn.to/4w4s4Vo',
+    label: 'lock pick set on Amazon',
+  },
 };
