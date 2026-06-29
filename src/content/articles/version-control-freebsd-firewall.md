@@ -1,9 +1,9 @@
 ---
-title: "Version-Controlling a FreeBSD Firewall: Git, a Makefile, and No Symlinks"
-description: "How I put a FreeBSD 15 router's entire config under Git without symlinks or etckeeper: a path-mirrored repo, a copy-deploy Makefile, a permissions manifest, validate-before-reload, and a Gitea-to-GitHub mirror."
+title: "Backing Up My FreeBSD Firewall"
+description: "How I back up a FreeBSD 15 router by putting its entire config under Git, without symlinks or etckeeper: a path-mirrored repo, a copy-deploy Makefile, a permissions manifest, validate-before-reload, and a Gitea-to-GitHub mirror."
 date: 2026-06-28
-keywords: "FreeBSD, pf, firewall, git, version control, config management, Gitea, GitHub mirror, Makefile, GNU stow, chezmoi, etckeeper, PkgBase, boot environments, bectl, unbound, dhcpd, homelab"
-ogTitle: "Version-Controlling a FreeBSD Firewall Without Symlinks"
+keywords: "FreeBSD, pf, firewall, backup, git, version control, config management, Gitea, GitHub mirror, Makefile, GNU stow, chezmoi, etckeeper, PkgBase, boot environments, bectl, unbound, dhcpd, homelab"
+ogTitle: "Backing Up My FreeBSD Firewall with Git"
 ogDescription: "A path-mirrored Git repo, a copy-deploy Makefile, and a permissions manifest put a FreeBSD router's config under version control. Validate before reload, mirror Gitea to GitHub, update with PkgBase."
 badges: ["FreeBSD", "Git", "Config Management", "pf", "Homelab"]
 related: ["freebsd-pf-router", "pf-firewall-rules", "zfs-send-recv-replication", "why-i-run-nixos"]
@@ -144,7 +144,7 @@ The lesson is the boring one everybody learns once: **secrets do not belong in a
 
 ## Updating the Box: PkgBase, Not freebsd-update
 
-A detail specific to this machine, because it surprised me. This router runs **PkgBase**: the FreeBSD base system itself is installed as packages (`FreeBSD-kernel-generic`, `FreeBSD-runtime`, and friends) rather than managed by `freebsd-update`. The two are mutually exclusive. On a PkgBase system, `freebsd-update` is not just unnecessary, it is wrong, and running it will fight the package database.
+A detail worth calling out, because it changes how you update. I built this router on **PkgBase**: the FreeBSD base system itself delivered as packages (`FreeBSD-kernel-generic`, `FreeBSD-runtime`, and friends) rather than the traditional monolithic base managed by `freebsd-update`. That was a deliberate choice at install time, and it has one consequence worth stating plainly: the two update paths are mutually exclusive. On a PkgBase system, `freebsd-update` is not just unnecessary, it is wrong, and running it will fight the package database.
 
 The upside is that one tool updates everything:
 

@@ -176,7 +176,7 @@ The pieces are not exotic: a reverse proxy, a wildcard cert, and a split-horizon
 
 ## Next Steps
 
--   [Version-Controlling a FreeBSD Firewall](version-control-freebsd-firewall): where the Unbound and Caddy configs live, under Git
+-   [Backing Up My FreeBSD Firewall](version-control-freebsd-firewall): where the Unbound and Caddy configs live, under Git
 -   [Building a FreeBSD pf Router behind XGS-PON](freebsd-pf-router): the router running the split-horizon Unbound
 -   [The Beryl Tailscale Travel Router](beryl-7-tailscale-travel-router): how these names follow me off the LAN
 
