@@ -23,11 +23,11 @@ dhcpd.conf.sample.orig
 
 Each file is a moment I was about to change something load-bearing, got nervous, and copied it first. It is version control by hand, badly: no history, no diffs, and no way to tell which `pf.conf` backup actually booted.
 
-A firewall is the worst place to do this. A bad edit doesn't throw an error, it just stops passing traffic, and you find out when the whole house loses the internet. So I put the entire config of my [FreeBSD pf router](freebsd-pf-router) into Git. The interesting part was deciding *how*, because the popular answers are all wrong for this machine.
+A firewall is the worst place to do this. A bad edit doesn't throw an error, it just stops passing traffic, and you find out when the whole house loses the internet. So I put the entire config of my [FreeBSD pf router](freebsd-pf-router) into Git. The interesting part was deciding *how*.
 
 ## What Actually Needs Tracking
 
-The router runs FreeBSD 15 on an N100 with a ZFS root. The custom state that makes it *this* router rather than a fresh install is short:
+The router runs FreeBSD 15 on an N100 with a ZFS root. The set of config files you actually edit to turn a fresh FreeBSD install into a working router is pretty minimal:
 
 -   `/etc/pf.conf`, `/etc/rc.conf`, `/etc/sysctl.conf` : the firewall, interfaces, kernel knobs
 -   `/etc/ntp.conf`, `/etc/fstab`, `/etc/hosts`, `/etc/crontab`, `/etc/ssh/sshd_config`
