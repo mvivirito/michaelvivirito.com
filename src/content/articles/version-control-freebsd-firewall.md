@@ -126,22 +126,6 @@ So Gitea is the primary, and it push-mirrors to a private GitHub repo automatica
 homefw  ──push──►  Gitea (LAN, private)  ──mirror──►  GitHub (off-site, private)
 ```
 
-## Scrubbing a Secret From History
-
-I will admit a mistake here, because it is instructive. An early version of the repo had my public WAN IP written into a network-topology doc. Putting that in Git is not catastrophic, but a public IP plus a list of open services is more of a map than I want to hand out, and I planned to make notes from this repo public eventually.
-
-The wrong fix is a new commit that deletes the line. Git is history; the IP is still right there in every prior revision, one `git log -p` away. Because the repo was young and the history was not precious, I took the blunt, correct route: remove the IP from the working tree, delete the `.git` directory entirely, and re-initialize with a single fresh commit. Then I deleted and recreated the Gitea and GitHub repos so their stored history was purged too, not just the local copy.
-
-```
-# nuke local history, start clean
-rm -rf .git
-git init -b main
-git add .
-git commit -m "Initial import"
-```
-
-The lesson is the boring one everybody learns once: **secrets do not belong in a commit, because a commit is forever unless you do violence to the history.** For a young repo, the cleanest violence is a clean slate. For an old one with history you care about, you reach for `git filter-repo`, but the better move is to never let it happen, which is what the `.gitignore` is now for.
-
 ## Updating the Box: PkgBase, Not freebsd-update
 
 A detail worth calling out, because it changes how you update. I built this router on **PkgBase**: the FreeBSD base system itself delivered as packages (`FreeBSD-kernel-generic`, `FreeBSD-runtime`, and friends) rather than the traditional monolithic base managed by `freebsd-update`. That was a deliberate choice at install time, and it has one consequence worth stating plainly: the two update paths are mutually exclusive. On a PkgBase system, `freebsd-update` is not just unnecessary, it is wrong, and running it will fight the package database.
