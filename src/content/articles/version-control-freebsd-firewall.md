@@ -11,7 +11,7 @@ related: ["freebsd-pf-router", "pf-firewall-rules", "zfs-send-recv-replication",
 
 ## The /root Graveyard
 
-Here is what `/root` looked like on my router before I did this:
+Here is what `/root` looked like on my router before I fixed this:
 
 ```
 pf.conf_bak_oldversion
@@ -21,41 +21,39 @@ unbound_bak.conf
 dhcpd.conf.sample.orig
 ```
 
-Every one of those files is a small confession. Each is a moment where I was about to change something load-bearing, got nervous, and copied the file before touching it. That is version control implemented by hand, badly: no history, no diffs, no message explaining *why* the December 18th unbound config was worth keeping, and no way to tell which of the two `pf.conf` backups is the one that actually booted.
+Each file is a moment I was about to change something load-bearing, got nervous, and copied it first. It is version control by hand, badly: no history, no diffs, and no way to tell which `pf.conf` backup actually booted.
 
-A firewall is the worst possible place to manage config this way. It is the one box where a bad edit doesn't throw an error, it just quietly stops passing traffic, and you find out when the whole house loses the internet. So I finally did the obvious thing and put the entire configuration of my [FreeBSD pf router](freebsd-pf-router) into Git. The interesting part was deciding *how*, because the popular answers are all wrong for this particular machine.
+A firewall is the worst place to do this. A bad edit doesn't throw an error, it just stops passing traffic, and you find out when the whole house loses the internet. So I put the entire config of my [FreeBSD pf router](freebsd-pf-router) into Git. The interesting part was deciding *how*, because the popular answers are all wrong for this machine.
 
 ## What Actually Needs Tracking
 
-The router runs FreeBSD 15 on an N100 with a ZFS root. The custom state that makes it *this* router, rather than a fresh install, is a short list:
+The router runs FreeBSD 15 on an N100 with a ZFS root. The custom state that makes it *this* router rather than a fresh install is short:
 
--   `/etc/pf.conf`, `/etc/rc.conf`, `/etc/sysctl.conf` : the firewall, the interfaces, the kernel knobs
+-   `/etc/pf.conf`, `/etc/rc.conf`, `/etc/sysctl.conf` : the firewall, interfaces, kernel knobs
 -   `/etc/ntp.conf`, `/etc/fstab`, `/etc/hosts`, `/etc/crontab`, `/etc/ssh/sshd_config`
 -   `/boot/loader.conf`
--   `/usr/local/etc/unbound/` : the resolver, ACLs, local zones, blocklist include
--   `/usr/local/etc/dhcpd.conf` : the DHCP scopes and static leases
+-   `/usr/local/etc/unbound/` : resolver, ACLs, local zones, blocklist include
+-   `/usr/local/etc/dhcpd.conf` : DHCP scopes and static leases
 -   `/usr/local/etc/doas.conf` : the privilege policy
--   `/usr/local/sbin/update-*-blocklists.sh` : the scripts that refresh the DNS blocklists
+-   `/usr/local/sbin/update-*-blocklists.sh` : the scripts that refresh the blocklists
 
-That is the whole surface. Everything else on the box is either a fresh-install default or generated at runtime, and tracking generated state is how you get a repo full of noise.
-
-What stays *out* of the repo matters just as much. DNSSEC keys, the unbound control keys, SSH host keys, `master.passwd`, the DHCP lease database, the 3.5 MB blocklist file the scripts build: all generated or secret, all ignored. The rule of thumb is that if a file is produced by a daemon or a script, the script belongs in Git and its output does not.
+Everything else is a fresh-install default or generated at runtime, and tracking generated state just fills the repo with noise. What stays *out* matters as much: DNSSEC keys, unbound control keys, SSH host keys, `master.passwd`, the lease database, the 3.5 MB blocklist the scripts build. The rule of thumb: if a daemon or a script produces the file, the script belongs in Git and its output does not.
 
 ## Why Not Stow, Chezmoi, or etckeeper
 
 This is the part I actually thought about, because the internet has three confident answers and I rejected all of them.
 
-**GNU Stow** manages dotfiles by symlinking them out of a repo into their target locations. It is elegant for a home directory. It is a quiet hazard for a router. The moment `/etc/pf.conf` becomes a symlink into `/root/firewall-repo/...`, the repo checkout is load-bearing infrastructure. Blow away that directory, restore onto a fresh disk in the wrong order, or have the repo live on a filesystem that mounts late, and you have a firewall whose core config is a dangling link. A router's config files should be *real files* that exist whether or not a Git repo does.
+**GNU Stow** symlinks files out of a repo into place. Elegant for a home directory, a quiet hazard for a router. The moment `/etc/pf.conf` is a symlink into `/root/firewall-repo/...`, the repo checkout is load-bearing: blow it away, restore onto a fresh disk in the wrong order, or mount it late, and your firewall's core config is a dangling link. A router's config files should be *real files* that exist whether or not a repo does.
 
-**Chezmoi** is a genuinely good dotfile manager, and people reach for it here because it can template and it can run as root. But its whole model is "the source of truth lives in the repo, and I render it into place." Pointing that at `/etc` on a system daemon's behalf is off-label: you are now asking a tool designed for `~/.config` to own the files that decide whether the box routes packets. The impedance mismatch is not worth it.
+**Chezmoi** is a good dotfile manager, and it can run as root, but its model is "the repo is the source of truth and I render it into place." Pointing that at `/etc` on a daemon's behalf is off-label: you are asking a tool built for `~/.config` to own the files that decide whether the box routes packets.
 
-**etckeeper** is the closest fit, since it versions `/etc` in place and hooks your package manager so every `pkg` operation auto-commits. I would have used it. It is not packaged for FreeBSD anymore; the port was retired. That settled it.
+**etckeeper** is the closest fit, since it versions `/etc` in place and auto-commits on every `pkg` operation. I would have used it. It is not packaged for FreeBSD anymore; the port was retired. That settled it.
 
-So none of the off-the-shelf tools fit a FreeBSD firewall cleanly. The requirement underneath all three rejections is the same: **the running config must not depend on the repo existing.** Once you take that seriously, the design falls out on its own.
+The requirement underneath all three rejections is the same: **the running config must not depend on the repo existing.** Take that seriously and the design falls out on its own.
 
 ## The Shape: A Repo That Mirrors the Filesystem
 
-The repo is just a tree that mirrors the absolute paths it manages:
+The repo is just a tree mirroring the absolute paths it manages:
 
 ```
 homefw/
@@ -75,9 +73,9 @@ homefw/
 └── README.md
 ```
 
-`etc/pf.conf` in the repo corresponds to `/etc/pf.conf` on disk. No symlinks, no templating, no magic: deploying is *copying*, and the repo is a staging area you review before you copy.
+`etc/pf.conf` maps to `/etc/pf.conf`. No symlinks, no templating, no magic: deploying is *copying*, and the repo is a staging area you review first.
 
-The one thing a plain copy loses is permissions. `git` does not record owner, group, or the fact that `doas.conf` must be mode `0600` or doas refuses to run. So the repo carries a `manifest.tsv` that does:
+A plain copy loses permissions, though. Git does not record owner, group, or the fact that `doas.conf` must be `0600` or doas refuses to run. So a `manifest.tsv` carries them:
 
 ```
 # path                              mode  owner  group
@@ -86,11 +84,11 @@ usr/local/etc/doas.conf             0600  root   wheel
 usr/local/sbin/update-oisd-blocklists.sh  0755  root  wheel
 ```
 
-The deploy step reads the manifest and `chmod`/`chown`s each file after copying it. That is the piece etckeeper and Stow give you for free and a copy-based approach has to do explicitly. It is also documentation: the manifest is a single place that says exactly how every managed file should look on disk.
+The deploy step applies the manifest after copying. It is the piece Stow and etckeeper give you for free, and it doubles as documentation: one place that says exactly how every file should look on disk.
 
 ## The Makefile Is the Interface
 
-I never run `cp` by hand. A Makefile wraps every operation so the verbs are consistent and safe:
+I never run `cp` by hand. A Makefile wraps every operation so the verbs stay consistent:
 
 ```
 make status     # what's deployed vs what's in the repo, per file
@@ -101,11 +99,11 @@ make reload     # reload the services that changed
 make capture    # pull live files back INTO the repo (for ad-hoc edits)
 ```
 
-Two of those are the ones I lean on. `make diff` is the answer to "did I change something on the box and forget to commit it," which on a hand-managed router is always eventually yes. `make capture` is the escape hatch: when I'm debugging at 1am and edit `/etc/pf.conf` in place like a normal person, `capture` pulls the live file back into the repo so the next commit reflects reality instead of fighting it. The repo accommodates how I actually work instead of demanding discipline I won't have at 1am.
+`make diff` answers "did I change something on the box and forget to commit it," which is always eventually yes. `make capture` is the escape hatch: when I edit `/etc/pf.conf` in place at 1am like a normal person, it pulls the live file back into the repo so the next commit matches reality instead of fighting it.
 
 ## Validate Before You Reload
 
-The single most valuable line in the whole setup is that `make check` validates *before* anything reloads, and `make install` refuses to proceed if it fails. FreeBSD ships the validators for free:
+The most valuable habit here is that `make check` validates *before* anything reloads, and `make install` refuses to proceed if it fails. FreeBSD ships the validators for free:
 
 ```
 pfctl -nf /etc/pf.conf           # parse pf rules, don't load them
@@ -114,13 +112,13 @@ dhcpd -t -cf /usr/local/etc/dhcpd.conf   # test the DHCP config
 sshd -t                          # test sshd_config
 ```
 
-`pfctl -n` is the hero. It parses the ruleset and reports errors without loading it, which means a typo in a firewall rule becomes a message on your terminal instead of a house with no internet and a router you can't SSH into. Reloading a firewall config you haven't dry-run first is a coin flip, and the coin is weighted toward your spouse asking why the TV won't load.
+`pfctl -n` is the hero: it parses the ruleset and reports errors without loading it, so a typo becomes a message on your terminal instead of a router you can't SSH into. Reloading a firewall you haven't dry-run is a coin flip, and the losing side is the whole house asking why the internet is down.
 
 ## Two Remotes: Gitea First, GitHub for the 3am Scenario
 
-The repo pushes to my self-hosted [Gitea](https://about.gitea.com/), which is where all my private code lives. But a firewall repo has a specific disaster-recovery problem: **Gitea lives behind the firewall.** If the router is down badly enough that I'm restoring its config from Git, the Git server may be exactly as unreachable as the router.
+The repo pushes to my self-hosted [Gitea](https://about.gitea.com/), where my private code lives. But a firewall repo has a specific problem: **Gitea lives behind the firewall.** If the router is down badly enough that I am restoring from Git, the Git server may be just as unreachable.
 
-So Gitea is the primary, and it push-mirrors to a private GitHub repo automatically. The firewall only ever talks to Gitea on the LAN; Gitea forwards each commit to GitHub on a sync hook. No GitHub credentials ever touch the router, and I still get an off-site copy I can `git clone` from a coffee shop while the homelab is a brick. The mirror is configured once, in Gitea, and then it is invisible.
+So Gitea is primary and push-mirrors to a private GitHub repo. The firewall only talks to Gitea on the LAN; Gitea forwards each commit to GitHub on a hook. No GitHub credentials touch the router, and I still get an off-site copy I can clone from a coffee shop while the homelab is a brick.
 
 ```
 homefw  ──push──►  Gitea (LAN, private)  ──mirror──►  GitHub (off-site, private)
@@ -128,36 +126,32 @@ homefw  ──push──►  Gitea (LAN, private)  ──mirror──►  GitHub
 
 ## Updating the Box: PkgBase, Not freebsd-update
 
-A detail worth calling out, because it changes how you update. I built this router on **PkgBase**: the FreeBSD base system itself delivered as packages (`FreeBSD-kernel-generic`, `FreeBSD-runtime`, and friends) rather than the traditional monolithic base managed by `freebsd-update`. That was a deliberate choice at install time, and it has one consequence worth stating plainly: the two update paths are mutually exclusive. On a PkgBase system, `freebsd-update` is not just unnecessary, it is wrong, and running it will fight the package database.
-
-The upside is that one tool updates everything:
+One detail changes how you update. I built this router on **PkgBase**: the base system delivered as packages (`FreeBSD-kernel-generic`, `FreeBSD-runtime`, and friends) rather than the monolithic base `freebsd-update` manages. The two are mutually exclusive, so on a PkgBase box `freebsd-update` is not just unnecessary, it is wrong and will fight the package database. The upside is one tool for everything:
 
 ```
 pkg update
-pkg upgrade        # updates base system AND ports together
+pkg upgrade        # base system AND ports, one transaction
 ```
 
-Kernel, userland, and the unbound/dhcpd packages all move in one transaction. A new kernel means a reboot to activate it, and that is where ZFS boot environments earn their keep again:
+A new kernel needs a reboot to activate, which is where ZFS boot environments earn their keep:
 
 ```
 bectl create pre-upgrade-2026-06-28    # snapshot the whole BE first
 pkg upgrade
-# if the new kernel panics or misbehaves, pick the old BE at the loader
+# if the new kernel misbehaves, pick the old BE at the loader
 ```
 
-I take a boot environment before every upgrade. It is the same insurance I use before a risky pf change: a single reboot reverts the entire system to a known-good state, no restore-from-backup required. The config repo and the boot environment cover two different failure modes. The repo versions my *deliberate* changes; the boot environment versions the *whole system* across an update I didn't write.
+I take one before every upgrade. The repo and the boot environment cover different failure modes: the repo versions my *deliberate* changes, the boot environment reverts the *whole system* across an update I didn't write.
 
 ## What Version Control Surfaced
 
-The best argument for doing this is what it found. While inventorying the config to import it, I discovered that the cron job refreshing my DNS blocklists pointed at a script that did not exist: a rename months earlier had quietly broken the update, and the blocklist had been frozen ever since. Nothing alerted me, because a blocklist that fails to update doesn't error, it just stops getting better.
-
-Putting the config under version control is what forced me to actually read every file instead of trusting that the box was doing what I thought. The repo did not just preserve the config, it made me audit it, and the audit is where the value was. Repointing the cron and watching 478,000 fresh rules load was the moment the whole exercise paid for itself.
+The best argument for doing this is what it found. Inventorying the config to import it, I discovered the cron job refreshing my DNS blocklists pointed at a script that no longer existed: a rename months earlier had quietly broken it, and the blocklist had been frozen ever since. Nothing alerted me, because a blocklist that fails to update doesn't error, it just stops getting better. Version control forced me to read every file instead of trusting the box was doing what I thought, and repointing that cron to watch 478,000 fresh rules load was the moment it paid for itself.
 
 ## The Payoff
 
-Every change to the firewall is now a reviewed diff with a message explaining why. Rolling back is `git revert` and `make install`. Standing the router back up on fresh hardware is a clone, a `make install`, and a reboot. The `/root` graveyard is gone, archived into a single tarball and deleted, because the thing it was a sad imitation of finally exists.
+Every change is now a reviewed diff with a message. Rolling back is `git revert` and `make install`. Rebuilding on fresh hardware is a clone, a `make install`, and a reboot. The `/root` graveyard is gone, archived to a tarball and deleted, because the thing it was imitating finally exists.
 
-None of this required a fancy tool. It required *rejecting* the fancy tools, because a firewall's constraint, that the running config cannot depend on the repo, rules them out. A directory of real files, a Makefile, and a permissions manifest is less clever than Stow and exactly right for the job.
+None of this needed a fancy tool. It needed *rejecting* the fancy tools, because a firewall's one constraint, that the running config cannot depend on the repo, rules them out. A directory of real files, a Makefile, and a permissions manifest is less clever than Stow and exactly right for the job.
 
 ## Next Steps
 
