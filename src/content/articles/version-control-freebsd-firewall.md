@@ -126,7 +126,7 @@ homefw  ──push──►  Gitea (LAN, private)  ──mirror──►  GitHub
 
 ## Updating with PkgBase
 
-FreeBSD now ships **PkgBase**: the base system, kernel and userland, delivered as regular packages instead of one monolithic blob. I built this router on it, and it is worth knowing about if you run FreeBSD.
+FreeBSD now ships **PkgBase**: the base system, kernel and userland, delivered as regular packages instead of one monolithic blob.
 
 Traditionally the base system and your installed packages were two separate worlds, with `freebsd-update` handling the base and `pkg` handling everything on top. PkgBase folds the base into `pkg`, so a single command updates the whole system:
 
