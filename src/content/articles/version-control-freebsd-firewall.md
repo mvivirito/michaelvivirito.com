@@ -45,7 +45,7 @@ I originally wanted to use [GNU Stow](https://www.gnu.org/software/stow/), since
 
 **GNU Stow** symlinks files out of a repo into place. The moment `/etc/pf.conf` is a symlink into `/root/firewall-repo/...`, the repo checkout is load-bearing: blow it away, restore onto a fresh disk in the wrong order, or mount it late, and your firewall's core config is a dangling link. A router's config files should be *real files* that exist whether or not a repo does.
 
-**Chezmoi** is a good dotfile manager, and it can run as root, but its model is "the repo is the source of truth and I render it into place." Pointing that at `/etc` on a daemon's behalf is off-label: you are asking a tool built for `~/.config` to own the files that decide whether the box routes packets.
+**Chezmoi** is a good dotfile manager, and it can run as root, but its model is "the repo is the source of truth and I render it into place." Pointing it at `/etc` means asking a tool built for `~/.config` to own the files that decide whether the box routes packets.
 
 **etckeeper** is the closest fit, since it versions `/etc` in place and auto-commits on every `pkg` operation. I would have used it. It is not packaged for FreeBSD anymore; the port was retired. That settled it.
 
