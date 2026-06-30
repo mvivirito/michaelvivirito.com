@@ -118,7 +118,7 @@ sshd -t                          # test sshd_config
 
 The repo pushes to my self-hosted [Gitea](https://about.gitea.com/), where my private code lives. But a firewall repo has a specific problem: **Gitea lives behind the firewall.** If the router is down badly enough that I am restoring from Git, the Git server may be just as unreachable.
 
-So Gitea is primary and push-mirrors to a private GitHub repo. The firewall only talks to Gitea on the LAN; Gitea forwards each commit to GitHub on a hook. No GitHub credentials touch the router, and I still get an off-site copy I can clone from a coffee shop while the homelab is a brick.
+So Gitea is primary and push-mirrors to a private GitHub repo. The firewall only talks to Gitea on the LAN; Gitea forwards each commit to GitHub on a hook. No GitHub credentials touch the router, and the off-site copy stays reachable even when the whole homelab, Gitea included, is down, which is exactly when I need it.
 
 ```
 homefw  ──push──►  Gitea (LAN, private)  ──mirror──►  GitHub (off-site, private)
