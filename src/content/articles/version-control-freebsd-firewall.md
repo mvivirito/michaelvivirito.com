@@ -138,10 +138,6 @@ pkg upgrade
 
 Between the two, the firewall is fully recoverable: the repo restores the config I wrote, and a boot environment restores the system I didn't. More on PkgBase in the [FreeBSD wiki](https://wiki.freebsd.org/PkgBase).
 
-## What Version Control Surfaced
-
-The best argument for doing this is what it found. Inventorying the config to import it, I discovered the cron job refreshing my DNS blocklists pointed at a script that no longer existed: a rename months earlier had quietly broken it, and the blocklist had been frozen ever since. Nothing alerted me, because a blocklist that fails to update doesn't error, it just stops getting better. Version control forced me to read every file instead of trusting the box was doing what I thought, and repointing that cron to watch 478,000 fresh rules load was the moment it paid for itself.
-
 ## The Payoff
 
 Every change is now a reviewed diff with a message. Rolling back is `git revert` and `make install`. Rebuilding on fresh hardware is a clone, a `make install`, and a reboot. The `/root` graveyard is gone, archived to a tarball and deleted, because the thing it was imitating finally exists.
