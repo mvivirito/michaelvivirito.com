@@ -140,7 +140,7 @@ Between the two, the firewall is fully recoverable: the repo restores the config
 
 ## The Payoff
 
-Every change is now a reviewed diff with a message. Rolling back is `git revert` and `make install`. Rebuilding on fresh hardware is a clone, a `make install`, and a reboot. The `/root` graveyard is gone, archived to a tarball and deleted, because the thing it was imitating finally exists.
+Every change is now a reviewed diff with a message. Rolling back is `git revert` and `make install`. Rebuilding on fresh hardware is a clone, a `make install`, and a reboot.
 
 None of this needed a fancy tool. It needed *rejecting* the fancy tools, because a firewall's one constraint, that the running config cannot depend on the repo, rules them out. A directory of real files, a Makefile, and a permissions manifest is less clever than Stow and exactly right for the job.
 
