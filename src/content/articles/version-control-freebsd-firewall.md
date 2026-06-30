@@ -124,25 +124,19 @@ So Gitea is primary and push-mirrors to a private GitHub repo. The firewall only
 homefw  ──push──►  Gitea (LAN, private)  ──mirror──►  GitHub (off-site, private)
 ```
 
-## Updating with PkgBase
+## Backing Up the System, Not Just the Config
 
-FreeBSD now ships **PkgBase**: the base system, kernel and userland, delivered as regular packages instead of one monolithic blob.
+The repo backs up the config I write. It does nothing for the rest of the box, the base OS and the installed packages, which also change every time I update. ZFS boot environments cover that half.
 
-Traditionally the base system and your installed packages were two separate worlds, with `freebsd-update` handling the base and `pkg` handling everything on top. PkgBase folds the base into `pkg`, so a single command updates the whole system:
-
-```
-pkg update
-pkg upgrade        # kernel, userland, and ports in one transaction
-```
-
-A new kernel needs a reboot to activate, so I snapshot a ZFS boot environment first and can roll back to it at the loader if anything misbehaves:
+FreeBSD now ships **PkgBase**, with the base system, kernel and userland, delivered as regular packages instead of a separate monolithic blob, so a single `pkg upgrade` moves the whole system at once. That is the moment to take a snapshot. Before any upgrade I clone a boot environment, and if a new kernel misbehaves I pick the old one at the loader and reboot into a known-good system:
 
 ```
 bectl create pre-upgrade-2026-06-28
 pkg upgrade
+# misbehaves? select the old BE at the loader and reboot
 ```
 
-See the [FreeBSD PkgBase wiki](https://wiki.freebsd.org/PkgBase) for the full picture.
+Between the two, the firewall is fully recoverable: the repo restores the config I wrote, and a boot environment restores the system I didn't. More on PkgBase in the [FreeBSD wiki](https://wiki.freebsd.org/PkgBase).
 
 ## What Version Control Surfaced
 
