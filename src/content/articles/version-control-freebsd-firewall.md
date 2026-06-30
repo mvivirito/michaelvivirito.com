@@ -11,7 +11,7 @@ related: ["freebsd-pf-router", "pf-firewall-rules", "zfs-send-recv-replication",
 
 ## The /root Graveyard
 
-Here is what `/root` looked like on my router before I fixed this:
+Here is what `/root` looked like on my router before I came up with a proper backup solution:
 
 ```
 pf.conf_bak_oldversion
