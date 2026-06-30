@@ -37,7 +37,7 @@ The router runs FreeBSD 15 on an N100 with a ZFS root. The set of config files y
 -   `/usr/local/etc/doas.conf` : the privilege policy
 -   `/usr/local/sbin/update-*-blocklists.sh` : the scripts that refresh the blocklists
 
-Everything else is a fresh-install default or generated at runtime, and tracking generated state just fills the repo with noise. What stays *out* matters as much: DNSSEC keys, unbound control keys, SSH host keys, `master.passwd`, the lease database, the 3.5 MB blocklist the scripts build. The rule of thumb: if a daemon or a script produces the file, the script belongs in Git and its output does not.
+Everything else is a default, generated at runtime, or secret, and it stays out: SSH host keys, `master.passwd`, the DHCP lease database, the 3.5 MB blocklist the scripts build. If a script produces a file, the script goes in Git, not its output.
 
 ## Why Not Stow, Chezmoi, or etckeeper
 
