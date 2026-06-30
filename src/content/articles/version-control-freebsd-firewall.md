@@ -21,7 +21,7 @@ unbound_bak.conf
 dhcpd.conf.sample.orig
 ```
 
-Each file is a moment I was about to change something load-bearing, got nervous, and copied it first. It is version control by hand, badly: no history, no diffs, and no way to tell which `pf.conf` backup actually booted.
+Each file was a moment I changed something and made a manual backup first. It is version control by hand, badly: no history, no diffs, and no way to tell which `pf.conf` backup actually booted.
 
 A firewall is the worst place to do this. A bad edit doesn't throw an error, it just stops passing traffic, and you find out when the whole house loses the internet. So I put the entire config of my [FreeBSD pf router](freebsd-pf-router) into Git. The interesting part was deciding *how*.
 
