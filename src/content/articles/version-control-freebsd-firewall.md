@@ -140,14 +140,12 @@ Between the two, the firewall is fully recoverable: the repo restores the config
 
 ## The Payoff
 
-Every change is now a reviewed diff with a message. Rolling back is `git revert` and `make install`. Rebuilding on fresh hardware is a clone, a `make install`, and a reboot.
+The firewall is now reproducible. Every change is a reviewed diff, rolling back is `git revert` and `make install`, and rebuilding on fresh hardware is a clone, a `make install`, and a reboot.
 
-None of this needed a fancy tool. It needed *rejecting* the fancy tools, because a firewall's one constraint, that the running config cannot depend on the repo, rules them out. A directory of real files, a Makefile, and a permissions manifest is less clever than Stow and exactly right for the job.
+Want a closer look at any piece, the Makefile, the pf ruleset, the boot environments? Say so in the comments and I will write it up.
 
 ## Next Steps
 
 -   [Building a FreeBSD pf Router behind XGS-PON](freebsd-pf-router): the box this config runs on
 -   [pf.conf: Writing Rules That Survive a Power Outage](pf-firewall-rules): the ruleset that lives in this repo
 -   [ZFS send/recv Replication](zfs-send-recv-replication): the other half of "I can rebuild this"
-
-Managing a router's config some other way? [Tell me how you draw the line](../contact). The copy-versus-symlink question has more than one defensible answer, and I like hearing the other ones.
