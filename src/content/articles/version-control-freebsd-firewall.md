@@ -49,7 +49,7 @@ I originally wanted to use [GNU Stow](https://www.gnu.org/software/stow/), since
 
 **etckeeper** is the closest fit, since it versions `/etc` in place and auto-commits on every `pkg` operation. I would have used it. It is not packaged for FreeBSD anymore; the port was retired. That settled it.
 
-The requirement underneath all three rejections is the same: **the running config must not depend on the repo existing.** Take that seriously and the design falls out on its own.
+Each one misses in its own way: Stow leans on symlinks, chezmoi wants to render the files rather than store them, and etckeeper is not available on FreeBSD at all. None was worth bending to fit, so I built my own.
 
 ## The Approach
 
