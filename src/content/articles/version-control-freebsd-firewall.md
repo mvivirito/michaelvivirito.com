@@ -94,7 +94,7 @@ The deploy step applies the manifest after copying. It is the piece Stow and etc
 
 ## The Makefile Is the Interface
 
-I never run `cp` by hand. A Makefile wraps every operation so the verbs stay consistent:
+I never run `cp` by hand. A Makefile wraps every operation:
 
 ```
 make status     # what's deployed vs what's in the repo, per file
@@ -104,6 +104,17 @@ make install    # copy repo -> system, then apply manifest perms
 make reload     # reload the services that changed
 make capture    # pull live files back INTO the repo (for ad-hoc edits)
 ```
+
+If you have only ever *run* a Makefile, the format is simpler than it looks: each entry is a **target**, an optional list of prerequisites that run first, and a tab-indented recipe of shell commands. For example, my `reload` target depends on `check`, so it validates before it touches a running service:
+
+```
+# target: prerequisite
+reload: check
+	pfctl -f /etc/pf.conf
+	service unbound reload
+```
+
+If `check` fails, `reload` never runs. Plain targets like these behave the same under FreeBSD's BSD `make` and GNU `make`; if you want to learn the syntax, [makefiletutorial.com](https://makefiletutorial.com/) is a friendly primer.
 
 `make diff` answers "did I change something on the box and forget to commit it," which is always eventually yes. `make capture` is the escape hatch: when I edit `/etc/pf.conf` in place at 1am like a normal person, it pulls the live file back into the repo so the next commit matches reality instead of fighting it.
 
