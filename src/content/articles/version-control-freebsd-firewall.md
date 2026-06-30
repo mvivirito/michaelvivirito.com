@@ -124,24 +124,25 @@ So Gitea is primary and push-mirrors to a private GitHub repo. The firewall only
 homefw  ──push──►  Gitea (LAN, private)  ──mirror──►  GitHub (off-site, private)
 ```
 
-## Updating the Box: PkgBase, Not freebsd-update
+## Updating with PkgBase
 
-One detail changes how you update. I built this router on **PkgBase**: the base system delivered as packages (`FreeBSD-kernel-generic`, `FreeBSD-runtime`, and friends) rather than the monolithic base `freebsd-update` manages. The two are mutually exclusive, so on a PkgBase box `freebsd-update` is not just unnecessary, it is wrong and will fight the package database. The upside is one tool for everything:
+FreeBSD now ships **PkgBase**: the base system, kernel and userland, delivered as regular packages instead of one monolithic blob. I built this router on it, and it is worth knowing about if you run FreeBSD.
+
+Traditionally the base system and your installed packages were two separate worlds, with `freebsd-update` handling the base and `pkg` handling everything on top. PkgBase folds the base into `pkg`, so a single command updates the whole system:
 
 ```
 pkg update
-pkg upgrade        # base system AND ports, one transaction
+pkg upgrade        # kernel, userland, and ports in one transaction
 ```
 
-A new kernel needs a reboot to activate, which is where ZFS boot environments earn their keep:
+A new kernel needs a reboot to activate, so I snapshot a ZFS boot environment first and can roll back to it at the loader if anything misbehaves:
 
 ```
-bectl create pre-upgrade-2026-06-28    # snapshot the whole BE first
+bectl create pre-upgrade-2026-06-28
 pkg upgrade
-# if the new kernel misbehaves, pick the old BE at the loader
 ```
 
-I take one before every upgrade. The repo and the boot environment cover different failure modes: the repo versions my *deliberate* changes, the boot environment reverts the *whole system* across an update I didn't write.
+See the [FreeBSD PkgBase wiki](https://wiki.freebsd.org/PkgBase) for the full picture.
 
 ## What Version Control Surfaced
 
