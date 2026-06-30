@@ -41,7 +41,7 @@ Everything else is a default, generated at runtime, or secret, and it stays out:
 
 ## Why Not Stow, Chezmoi, or etckeeper
 
-I originally wanted to use GNU Stow, since I already used it for my [dotfiles](https://github.com/mvivirito/dotfiles) in the past, but I did not like the idea of symlinking a firewall's config into place. So I looked at a few other options before settling on the custom Makefile this post describes. Here is what I weighed, and why none of the usual tools fit.
+I originally wanted to use [GNU Stow](https://www.gnu.org/software/stow/), since I already used it for my [dotfiles](https://github.com/mvivirito/dotfiles) in the past, but I did not like the idea of symlinking a firewall's config into place. So I looked at a few other options before settling on the custom Makefile this post describes. Stow, [chezmoi](https://www.chezmoi.io/), and [etckeeper](https://etckeeper.branchable.com/) are all excellent tools in their own right; none of them is quite the right fit for a firewall, and here is why.
 
 **GNU Stow** symlinks files out of a repo into place. The moment `/etc/pf.conf` is a symlink into `/root/firewall-repo/...`, the repo checkout is load-bearing: blow it away, restore onto a fresh disk in the wrong order, or mount it late, and your firewall's core config is a dangling link. A router's config files should be *real files* that exist whether or not a repo does.
 
