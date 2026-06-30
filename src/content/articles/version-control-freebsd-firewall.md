@@ -37,13 +37,13 @@ The router runs FreeBSD 15 on an N100 with a ZFS root. The set of config files y
 -   `/usr/local/etc/doas.conf` : the privilege policy
 -   `/usr/local/sbin/update-*-blocklists.sh` : the scripts that refresh the blocklists
 
-Everything else is a default, generated at runtime, or secret, and it stays out: SSH host keys, `master.passwd`, the DHCP lease database, the 3.5 MB blocklist the scripts build. If a script produces a file, the script goes in Git, not its output.
+Everything else is a default, generated at runtime, or secret, and it stays out: SSH host keys, the DHCP lease database, the 3.5 MB blocklist the scripts build. If a script produces a file, the script goes in Git, not its output.
 
 ## Why Not Stow, Chezmoi, or etckeeper
 
-This is the part I actually thought about, because the internet has three confident answers and I rejected all of them.
+I originally wanted to use GNU Stow, since I already use it for my dotfiles, but I did not like the idea of symlinking a firewall's config into place. So I looked at a few other options before settling on the custom Makefile this post describes. Here is what I weighed, and why none of the usual tools fit.
 
-**GNU Stow** symlinks files out of a repo into place. Elegant for a home directory, a quiet hazard for a router. The moment `/etc/pf.conf` is a symlink into `/root/firewall-repo/...`, the repo checkout is load-bearing: blow it away, restore onto a fresh disk in the wrong order, or mount it late, and your firewall's core config is a dangling link. A router's config files should be *real files* that exist whether or not a repo does.
+**GNU Stow** symlinks files out of a repo into place. The moment `/etc/pf.conf` is a symlink into `/root/firewall-repo/...`, the repo checkout is load-bearing: blow it away, restore onto a fresh disk in the wrong order, or mount it late, and your firewall's core config is a dangling link. A router's config files should be *real files* that exist whether or not a repo does.
 
 **Chezmoi** is a good dotfile manager, and it can run as root, but its model is "the repo is the source of truth and I render it into place." Pointing that at `/etc` on a daemon's behalf is off-label: you are asking a tool built for `~/.config` to own the files that decide whether the box routes packets.
 
