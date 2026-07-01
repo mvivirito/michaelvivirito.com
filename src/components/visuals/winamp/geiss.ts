@@ -54,7 +54,7 @@ void main(){
 const BLOB_VS = `#version 300 es
 in float a_idx;                 // 0..1 along the waveform
 uniform sampler2D u_wave;       // waveform in a 1-D texture (R = sample)
-uniform float u_time, u_bass, u_mid, u_size, u_count;
+uniform float u_time, u_bass, u_mid, u_size, u_count, u_aspect;
 out vec3 v_col;
 // cosine palette (Inigo Quilez style)
 vec3 pal(float t){
@@ -62,14 +62,14 @@ vec3 pal(float t){
 }
 void main(){
   float s = texture(u_wave, vec2(a_idx, 0.5)).r * 2.0 - 1.0;   // -1..1
-  float ang = a_idx * 6.28318 * 3.0 + u_time * 0.6;            // wrap around a few times
-  float rad = 0.16 + 0.34 * abs(s) + 0.12 * u_bass;
-  // lissajous-ish base path, modulated by the waveform sample
-  vec2 pos = vec2(
-    cos(ang) * rad + 0.30 * s * cos(u_time * 0.7),
-    sin(ang * 1.0) * rad + 0.30 * s * sin(u_time * 0.9)
-  );
-  pos *= 1.0 + 0.15 * sin(u_time * 0.4);
+  // Spiral the waveform outward from centre to the edges so the field fills
+  // the whole screen instead of clustering in a small central ring.
+  float ang = a_idx * 6.28318 * 5.0 + u_time * 0.5;
+  float rad = 0.12 + 0.85 * a_idx + 0.28 * abs(s) + 0.10 * u_bass;
+  vec2 pos = vec2(cos(ang), sin(ang)) * rad;
+  pos += 0.22 * s * vec2(cos(u_time * 0.7), sin(u_time * 0.9));
+  pos.x *= max(1.0, u_aspect * 0.72);                          // stretch to fill widescreen
+  pos *= 1.0 + 0.06 * sin(u_time * 0.4);
   gl_Position = vec4(pos, 0.0, 1.0);
   gl_PointSize = u_size * (1.0 + 1.4 * abs(s) + 1.6 * u_bass);
   v_col = pal(a_idx + u_time * 0.05 + u_mid * 0.2) * (0.6 + 0.8 * abs(s) + 0.5 * u_bass);
@@ -253,8 +253,9 @@ export class GeissViz {
     gl.uniform1f(gl.getUniformLocation(this.blobP, 'u_time'), this.t);
     gl.uniform1f(gl.getUniformLocation(this.blobP, 'u_bass'), audio.bass);
     gl.uniform1f(gl.getUniformLocation(this.blobP, 'u_mid'), audio.mid);
-    gl.uniform1f(gl.getUniformLocation(this.blobP, 'u_size'), Math.max(6, this.H * 0.012));
+    gl.uniform1f(gl.getUniformLocation(this.blobP, 'u_size'), Math.max(5, this.H * 0.010));
     gl.uniform1f(gl.getUniformLocation(this.blobP, 'u_count'), this.count);
+    gl.uniform1f(gl.getUniformLocation(this.blobP, 'u_aspect'), aspect);
     gl.drawArrays(gl.POINTS, 0, this.count);
     gl.disable(gl.BLEND);
 
