@@ -41,11 +41,10 @@ export class MilkdropViz {
       const butterchurnPresets = bp.default || bp;
 
       const ctx = this.getAudioContext();
-      const r = this.canvas.getBoundingClientRect();
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const size = this.backingSize();
       this.visualizer = butterchurn.createVisualizer(ctx, this.canvas, {
-        width: Math.max(1, Math.floor(r.width * dpr)),
-        height: Math.max(1, Math.floor(r.height * dpr)),
+        width: size.w,
+        height: size.h,
         pixelRatio: 1,
         textureRatio: 1,
       });
@@ -104,14 +103,28 @@ export class MilkdropViz {
     }
   }
 
+  /**
+   * Backing-store size for the MilkDrop canvas. Butterchurn is GPU-heavy, so we
+   * render at a lower pixel ratio on phones (and cap the longest side) to keep
+   * it smooth, while still going crisp on desktops.
+   */
+  private backingSize(): { w: number; h: number } {
+    const r = this.canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const smallSide = Math.min(window.innerWidth, window.innerHeight);
+    const cap = smallSide <= 620 ? 1 : 2;         // treat phones (any orientation) gently
+    const pr = Math.min(cap, dpr);
+    const MAX = 1920;                              // don't build absurd canvases on 4K/5K
+    let w = Math.max(1, Math.floor((r.width || 300) * pr));
+    let h = Math.max(1, Math.floor((r.height || 150) * pr));
+    if (w > MAX) { h = Math.floor(h * (MAX / w)); w = MAX; }
+    return { w, h };
+  }
+
   resize() {
     if (!this.visualizer) return;
-    const r = this.canvas.getBoundingClientRect();
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    this.visualizer.setRendererSize(
-      Math.max(1, Math.floor(r.width * dpr)),
-      Math.max(1, Math.floor(r.height * dpr))
-    );
+    const { w, h } = this.backingSize();
+    this.visualizer.setRendererSize(w, h);
   }
 
   frame(dt: number, _audio: AudioEngine) {
