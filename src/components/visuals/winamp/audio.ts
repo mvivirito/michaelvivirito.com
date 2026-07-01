@@ -28,12 +28,26 @@ export class AudioEngine {
     this.time = new Uint8Array(this.fftSize);
   }
 
+  /**
+   * The single shared AudioContext. Everything that touches audio — the mic
+   * source, our analyser, and Butterchurn's internal analyser — must live in
+   * THIS context, or cross-context connections fail silently (which is exactly
+   * why MilkDrop looked unreactive). Created lazily on first use.
+   */
+  getContext(): AudioContext {
+    if (!this.ctx) {
+      this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+    if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
+    return this.ctx;
+  }
+
   /** Turn the mic on. Returns true on success. */
   async enable(): Promise<boolean> {
     if (this.on) return true;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const ctx = this.getContext();
       if (ctx.state === 'suspended') await ctx.resume();
       const source = ctx.createMediaStreamSource(stream);
       const analyser = ctx.createAnalyser();

@@ -21,7 +21,6 @@ export class MilkdropViz {
   private sinceSwitch = 0;
   private switchEvery = 16;         // seconds between auto preset changes
   private connectedTo: AudioNode | null = null;
-  private ownCtx: AudioContext | null = null;
   ready = false;
   failed = false;
 
@@ -40,7 +39,7 @@ export class MilkdropViz {
       const butterchurn = bc.default || bc;
       const butterchurnPresets = bp.default || bp;
 
-      const ctx = this.getAudioContext();
+      const ctx = this.audio.getContext();   // shared context so the mic can reach us
       const size = this.backingSize();
       this.visualizer = butterchurn.createVisualizer(ctx, this.canvas, {
         width: size.w,
@@ -61,14 +60,6 @@ export class MilkdropViz {
       this.failed = true;
       throw err;
     }
-  }
-
-  private getAudioContext(): AudioContext {
-    if (this.audio.ctx) return this.audio.ctx;
-    if (!this.ownCtx) {
-      this.ownCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-    return this.ownCtx;
   }
 
   private loadCurrent(blend: number) {
@@ -136,8 +127,8 @@ export class MilkdropViz {
   }
 
   dispose() {
+    // The AudioContext is owned by the shared AudioEngine, so we don't close it.
     this.connectedTo = null;
-    if (this.ownCtx) { try { this.ownCtx.close(); } catch (_) {} this.ownCtx = null; }
     this.visualizer = null;
     this.ready = false;
   }

@@ -31,7 +31,7 @@
 
   <!-- easter egg: click Mario to open the old Mandelbrot experience -->
   <a class="wa-mario" id="wa-mario" href="/visuals/mandelbrot" title="1-UP: the old visuals live here" aria-label="Secret: open the classic Mandelbrot visuals">
-    <svg id="wa-mario-svg" viewBox="0 0 12 16" width="44" height="58" shape-rendering="crispEdges" aria-hidden="true"></svg>
+    <svg id="wa-mario-svg" viewBox="0 0 12 16" width="30" height="40" shape-rendering="crispEdges" aria-hidden="true"></svg>
   </a>
 </div>
 
@@ -43,7 +43,8 @@
   .wa-msg[hidden] { display: none; }
 
   /* control window — beveled grey Winamp skin */
-  .wa-panel { position: absolute; left: calc(env(safe-area-inset-left, 0px) + .8rem); bottom: calc(env(safe-area-inset-bottom, 0px) + .8rem); z-index: 6; width: min(360px, calc(100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 1.6rem)); font-family: var(--font-mono); color: #d7f7e2; background: #1a2620; border: 1px solid #000; border-radius: 4px; box-shadow: 0 0 0 1px rgba(120,255,180,.12), 0 10px 30px rgba(0,0,0,.6); overflow: hidden; user-select: none; }
+  /* Reserve ~52px on the right so the little Mario always has a clear corner. */
+  .wa-panel { position: absolute; left: calc(env(safe-area-inset-left, 0px) + .8rem); bottom: calc(env(safe-area-inset-bottom, 0px) + .8rem); z-index: 6; width: min(360px, calc(100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px) - 1.6rem - 52px)); font-family: var(--font-mono); color: #d7f7e2; background: #1a2620; border: 1px solid #000; border-radius: 4px; box-shadow: 0 0 0 1px rgba(120,255,180,.12), 0 10px 30px rgba(0,0,0,.6); overflow: hidden; user-select: none; }
   .wa-title { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .28rem .5rem; font-size: .66rem; letter-spacing: .12em; background: linear-gradient(#2c4a3a, #17281f); border-bottom: 1px solid #000; color: #9df3bf; }
   .wa-vu { flex: 0 0 64px; height: 8px; border-radius: 2px; background: linear-gradient(90deg, #123 0%, #123 100%); box-shadow: inset 0 0 0 1px #000; }
   .wa-body { padding: .5rem; }
@@ -58,26 +59,19 @@
   .wa-btn.on { color: #a3ff12; border-color: rgba(163,255,18,.5); }
   .wa-now { flex: 1 1 100%; min-width: 0; font-size: .58rem; color: #7fbf99; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  /* Mario easter egg */
-  .wa-mario { position: absolute; right: calc(env(safe-area-inset-right, 0px) + .7rem); bottom: calc(env(safe-area-inset-bottom, 0px) + .7rem); z-index: 7; line-height: 0; filter: drop-shadow(0 3px 5px rgba(0,0,0,.6)); opacity: .82; transition: transform .15s ease, opacity .15s ease; image-rendering: pixelated; animation: wa-mario-bob 1.6s ease-in-out infinite; }
+  /* Mario easter egg — a small sprite tucked in the bottom-right corner. */
+  .wa-mario { position: absolute; right: calc(env(safe-area-inset-right, 0px) + .6rem); bottom: calc(env(safe-area-inset-bottom, 0px) + .6rem); z-index: 7; line-height: 0; filter: drop-shadow(0 3px 5px rgba(0,0,0,.6)); opacity: .82; transition: transform .15s ease, opacity .15s ease; image-rendering: pixelated; animation: wa-mario-bob 1.6s ease-in-out infinite; }
   .wa-mario:hover { opacity: 1; transform: scale(1.16) rotate(-4deg); }
-  @keyframes wa-mario-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  @keyframes wa-mario-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
   @media (prefers-reduced-motion: reduce) { .wa-mario { animation: none; } }
 
-  /* --- responsive: phones --- */
-  /* The control panel spans most of a phone's width, so lift Mario to the
-     top-right corner (just under the nav) where it can't collide with it. */
-  @media (max-width: 620px) {
-    .wa-mario { top: calc(env(safe-area-inset-top, 0px) + .55rem); bottom: auto; right: calc(env(safe-area-inset-right, 0px) + .55rem); }
-    .wa-mario svg { width: 38px; height: 50px; }
-    .wa-now { display: none; }
-  }
+  /* --- responsive --- */
+  @media (max-width: 620px) { .wa-now { display: none; } }
   /* Short viewports (landscape phones): compact the panel so it doesn't hog height. */
   @media (max-height: 440px) {
     .wa-body { padding: .4rem; }
     .wa-tabs { margin-bottom: .35rem; }
     .wa-tab, .wa-btn { padding: .28rem .35rem; }
-    .wa-mario svg { width: 34px; height: 45px; }
   }
 </style>
 
