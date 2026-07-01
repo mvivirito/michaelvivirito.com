@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MandelbrotStage from '../../components/visuals/MandelbrotStage.astro';
+---
+<BaseLayout
+  title="Visuals: the old dive - Michael Vivirito"
+  description="A full-screen, infinitely diving Mandelbrot set with psychedelic ancient monuments — the Giza pyramids, the Sphinx, and Stonehenge — drifting through it. The original /visuals experience, kept alive as an easter egg."
+  keywords="visuals, Mandelbrot, fractal, psychedelic, WebGL, Giza, pyramids, Sphinx, Stonehenge, generative art, easter egg, mvivirito"
+  ogTitle="Visuals: the old dive - Michael Vivirito"
+  ogDescription="The original psychedelic Mandelbrot dive, hidden behind a little Mario."
+  canonical="/visuals/mandelbrot"
+>
+  <MandelbrotStage />
+
+  <a class="mb-back" href="/visuals" aria-label="Back to the Winamp visualizers">◄ back to visualizers</a>
+
+  <!-- This page only: let the fractal take the full viewport, keep the nav on top. -->
+  <style is:global>
+    nav { position: relative; z-index: 20; }
+    footer { display: none; }
+  </style>
+  <style>
+    .mb-back { position: fixed; right: .8rem; bottom: .8rem; z-index: 6; font-family: var(--font-mono); font-size: .7rem; color: var(--t2); background: rgba(4,8,6,.7); border: 1px solid var(--border); border-radius: 8px; padding: .35rem .6rem; backdrop-filter: blur(6px); text-decoration: none; }
+    .mb-back:hover { color: var(--green2); border-color: var(--border-hi); }
+  </style>
+</BaseLayout>
