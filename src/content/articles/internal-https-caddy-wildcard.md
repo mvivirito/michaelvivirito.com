@@ -11,7 +11,7 @@ related: ["freebsd-pf-router", "version-control-freebsd-firewall", "beryl-7-tail
 
 ## Clean Names, Real Encryption
 
-Every internal web UI in my homelab lived at a bare IP like `https://10.0.0.150` or a fake-TLD name like `git.k8s.home`, each with a self-signed cert and the red browser warning that comes with it. Two things bugged me: I wanted clean, real names for every service, and I wanted the traffic actually encrypted with a cert browsers trust, even inside my own LAN. A [Caddy](https://caddyserver.com/) reverse proxy delivers both: one wildcard Let's Encrypt cert in front of every internal service. Here is how it fits together and how to build it.
+Every internal web UI in my homelab lived at a bare IP like `https://10.0.0.150`, each with a self-signed cert and the red browser warning that comes with it. Two things bugged me: I wanted clean, real names for every service, and I wanted the traffic actually encrypted with a cert browsers trust, even inside my own LAN. A [Caddy](https://caddyserver.com/) reverse proxy delivers both: one wildcard Let's Encrypt cert in front of every internal service. Here is how it fits together and how to build it.
 
 ## Three Independent Pieces
 
