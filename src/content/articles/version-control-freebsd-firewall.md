@@ -158,7 +158,7 @@ Between the two, the firewall is fully recoverable: the repo restores the config
 
 The firewall is now reproducible. Every change is a reviewed diff, rolling back is `git revert` and `make install`, and rebuilding on fresh hardware is a clone, a `make install`, and a reboot.
 
-Want a closer look at any piece, the Makefile, the pf ruleset, the boot environments? Say so in the comments or [drop me a line](../contact), and I will write it up.
+Want a closer look at any piece, the Makefile, the pf ruleset, the boot environments? Say so in the comments or [drop me a line](../contact).
 
 ## Next Steps
 
