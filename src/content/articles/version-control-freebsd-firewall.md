@@ -105,7 +105,7 @@ make reload     # reload the services that changed
 make capture    # pull live files back INTO the repo (for ad-hoc edits)
 ```
 
-If you have only ever *run* a Makefile, the format is simpler than it looks: each entry is a **target**, an optional list of prerequisites that run first, and a tab-indented recipe of shell commands. Here are the two that matter most, straight from my Makefile:
+If you have only ever *run* a Makefile, the format is simpler than it looks: each entry is a **target**, an optional list of prerequisites that run first, and a tab-indented recipe of shell commands. Here are the two most important from my Makefile:
 
 ```
 check:
@@ -120,26 +120,15 @@ reload: check
 	service isc-dhcpd restart && echo "  isc-dhcpd restarted"
 ```
 
-`check` runs each daemon's own validator against the repo copy: `pfctl -nf` parses the firewall rules without loading them, `unbound-checkconf` checks the resolver, `dhcpd -t` tests DHCP. Each one is its own recipe line on purpose, so Make stops at the first that fails. It only reports; nothing is touched.
+`check` runs each daemon's own validator against the repo copy.
 
-`reload` names `check` as a **prerequisite** (that is what `reload: check` means), so `make reload` runs `check` first and proceeds only if every config is valid. Then it reloads each service in turn, with isc-dhcpd getting a restart because it does not reload gracefully. One typo anywhere fails `check`, and not a single service is bounced.
+`reload` names `check` as a **prerequisite**, so `make reload` runs `check` first and proceeds only if every config is valid. Then it reloads each service in turn, with isc-dhcpd getting a restart because it does not reload gracefully. One typo anywhere fails `check`, and not a single service is bounced.
 
-Two syntax notes: a leading `@` stops Make from printing the command before it runs, and a trailing `\` continues a recipe onto the next line as one shell command (which is why `reload`'s services share a line while `check`'s validators each stand alone). New to Make? [makefiletutorial.com](https://makefiletutorial.com/) is a friendly primer.
+Two syntax notes: a leading `@` stops Make from printing the command before it runs, and a trailing `\` continues a recipe onto the next line as one shell command. Check out [makefiletutorial.com](https://makefiletutorial.com/) for a quick tutorial on makefiles.
 
-`make diff` answers "did I change something on the box and forget to commit it," which is always eventually yes. `make capture` is the escape hatch: when I edit `/etc/pf.conf` in place at 1am like a normal person, it pulls the live file back into the repo so the next commit matches reality instead of fighting it.
+`make diff` shows all changes outside of the repo that were not committed. `make capture` will pull those live changes back into the repo.
 
-## Validate Before You Reload
-
-The most valuable habit here is that reloading validates first: `make reload` runs `make check` and bails before it touches a running service if any config is invalid. FreeBSD ships the validators for free:
-
-```
-pfctl -nf /etc/pf.conf           # parse pf rules, don't load them
-unbound-checkconf                # validate the resolver config
-dhcpd -t -cf /usr/local/etc/dhcpd.conf   # test the DHCP config
-sshd -t                          # test sshd_config
-```
-
-`pfctl -n` is the hero: it parses the ruleset and reports errors without loading it, so a typo becomes a message on your terminal instead of a router you can't SSH into. Reloading a firewall you haven't dry-run is a coin flip, and the losing side is the whole house asking why the internet is down.
+Reloading a firewall you have not validated is a coin flip, and the losing side is the whole house asking why the internet is down.
 
 ## Two Remotes: Gitea First, GitHub for the 3am Scenario
 
