@@ -114,25 +114,6 @@ handle @grafana {
 
 Reload Caddy and `https://grafana.home.michaelvivirito.com` has a green lock the instant it answers, no new cert, no propagation wait. Both files live in the version-controlled repos from [the firewall post](version-control-freebsd-firewall), so adding a service is a reviewed, revertible commit.
 
-## When the Backend Fights Back
-
-Most services proxy without complaint. Two kinds don't.
-
-**Apps that police their own `Host` header.** Some self-hosted apps do DNS-rebinding protection and reject any hostname they don't recognize, returning "access denied, hostname verification failed" the first time you hit them by a new name. Add the proxy hostname to the app's allowlist, and mind the chicken-and-egg: the proxy is what's blocked, so you set the allowlist by reaching the app directly on its IP first.
-
-**SPAs that build their own URLs.** My NAS admin console (Asustor ADM) rendered blank through the proxy even though every asset returned `200`. The server side was fine (`curl` got a clean `200`, no redirect, no Host rejection); the break was client-side, ADM's JavaScript builds its API and WebSocket URLs from the browser's address bar and pins them to the port it expects. The fix, a decent template for any stubborn admin SPA: proxy to the backend's **plain-HTTP** port with its HTTPS auto-redirect off, let Caddy send `X-Forwarded-Proto: https`, and turn on the app's "trusted reverse proxy" setting pointed at the proxy so it honors that header and builds `https://` URLs.
-
-```
-@nas host nas.home.michaelvivirito.com
-handle @nas {
-	reverse_proxy http://10.0.0.108:48000 {
-		header_up X-Real-IP {remote_host}
-	}
-}
-```
-
-The lesson worth keeping: when a proxied app misbehaves but `curl` says the server is fine, stop editing the proxy and open the browser's network tab. The bug is in the front-end's head, not on the wire.
-
 ## What It Looks Like Now
 
 Every internal service now answers at `https://<name>.home.michaelvivirito.com` with a green lock, on the LAN and over Tailscale, and resolves to nothing from outside. Clean names, real certs, and the next service is two lines and a reload. None of the parts are exotic, a reverse proxy, a wildcard cert, a split-horizon resolver; the work is wiring them so nothing is exposed and the whole cert path runs on hardware I control.
