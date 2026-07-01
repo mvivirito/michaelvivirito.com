@@ -1,6 +1,6 @@
 ---
 title: "Real HTTPS for Every Homelab Service with Caddy"
-description: "Killing self-signed cert warnings for every homelab service with a Caddy reverse proxy: a wildcard Let's Encrypt cert via DNS-01, split-horizon Unbound so the names only resolve at home, and the Unbound gotcha that breaks the ACME challenge."
+description: "Give every internal homelab service a clean name and a real, browser-trusted HTTPS cert with a Caddy reverse proxy: one wildcard Let's Encrypt cert via DNS-01, split-horizon Unbound so the names resolve only at home, and the Unbound gotcha that breaks the ACME challenge."
 date: 2026-06-28
 keywords: "Caddy, reverse proxy, Let's Encrypt, DNS-01, wildcard certificate, Cloudflare, unbound, split-horizon DNS, split DNS, ACME, homelab, internal HTTPS, Tailscale, self-signed, TLS"
 ogTitle: "Real HTTPS for Every Homelab Service with Caddy"
