@@ -67,9 +67,9 @@ The trick that gets a valid cert with nothing exposed is the ACME **DNS-01** cha
 }
 ```
 
-Self-signed HTTPS backends (Proxmox and Proxmox Backup Server) get `tls_insecure_skip_verify` on that hop. It is not a hole: browser-to-Caddy is real, validated TLS, and the Caddy-to-backend hop is a meter of cable inside the same host. The browser sees one green lock.
+Some backends (Proxmox and Proxmox Backup Server) only speak HTTPS, with their own self-signed certificate. There are two encrypted hops here: your browser to Caddy, and Caddy to the backend. The browser-to-Caddy hop uses the real Let's Encrypt cert, and that is what shows the green lock. On the Caddy-to-backend hop, `tls_insecure_skip_verify` tells Caddy to accept the backend's self-signed cert instead of rejecting it. That is fine: the traffic is still encrypted, and both ends are containers on the same host, so there is no one in the middle to impersonate.
 
-The Cloudflare token is the one real secret, scoped to the floor: `dns_records:edit` on this one zone, pinned to my WAN IP so a leaked copy is useless off my network. It lives in a `0600` env file, the one file here that never touches Git, and Caddy uses it on every renewal, not just first issue.
+The Cloudflare API token is the one secret here. I scoped it narrowly, `dns_records:edit` on this one zone, pinned it to my home IP, and keep it out of Git.
 
 ## The Unbound Gotcha That Ate an Evening
 
