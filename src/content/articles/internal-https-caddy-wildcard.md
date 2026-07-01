@@ -9,9 +9,9 @@ badges: ["Caddy", "TLS", "Reverse Proxy", "DNS", "Homelab"]
 related: ["freebsd-pf-router", "version-control-freebsd-firewall", "beryl-7-tailscale-travel-router", "prometheus-grafana-monitoring"]
 ---
 
-## The Click-Through-the-Warning Tax
+## Clean Names, Real Encryption
 
-Every internal web UI in my homelab greeted me with `https://10.0.0.150` and a red cert warning I had trained myself to click through. The lucky ones had `.home` names like `git.k8s.home`: marginally better, still a fake TLD with a self-signed cert. That is the homelab default, and clicking past cert warnings trains you to ignore the one signal meant to stop a phish. I wanted the green lock to mean something again, which takes two things every service lacked: a real name and a cert browsers trust. A [Caddy](https://caddyserver.com/) reverse proxy gave me both, and getting there ran through a genuinely annoying DNS bug.
+Every internal web UI in my homelab lived at a bare IP like `https://10.0.0.150` or a fake-TLD name like `git.k8s.home`, each with a self-signed cert and the red browser warning that comes with it. Two things bugged me: I wanted clean, real names for every service, and I wanted the traffic actually encrypted with a cert browsers trust, even inside my own LAN. A [Caddy](https://caddyserver.com/) reverse proxy delivers both: one wildcard Let's Encrypt cert in front of every internal service. Here is how it fits together and how to build it, including the one DNS gotcha that will eat an evening if you hit it blind.
 
 ## Three Independent Pieces
 
@@ -93,7 +93,7 @@ That fixed issuance; then negative caching stalled it. When Caddy polls for its 
 cache-max-negative-ttl: 30
 ```
 
-The general lesson: a recursive resolver between you and an ACME challenge can lie in two directions, synthesizing records that send you to the wrong zone, and caching their absence after they exist. Both are invisible because every component is behaving exactly as documented. The payoff for fighting through it instead of punching a firewall hole: the proxy renews entirely through my own resolver, and the "all DNS through Unbound" rule stays intact.
+The takeaway: a recursive resolver between you and an ACME challenge can mislead you two ways, synthesizing records that point to the wrong zone, and caching their absence after they exist. Both are invisible because every component behaves exactly as documented. Solving it in Unbound instead of bypassing it with a firewall hole means the proxy renews through my own resolver, no exception.
 
 ## Names That Only Exist at Home
 
@@ -133,7 +133,7 @@ The lesson worth keeping: when a proxied app misbehaves but `curl` says the serv
 
 ## What It Looks Like Now
 
-Every internal service answers at `https://<name>.home.michaelvivirito.com` with a green lock, on the LAN and over Tailscale, and resolves to nothing from outside. The next one is two lines and a reload. The browser warning is gone, so when I *do* see one now, it means something again. None of the pieces are exotic, a reverse proxy, a wildcard cert, a split-horizon resolver; the value is wiring them so nothing is exposed, the secret is scoped to the floor, and the cert machinery runs entirely on hardware I control.
+Every internal service now answers at `https://<name>.home.michaelvivirito.com` with a green lock, on the LAN and over Tailscale, and resolves to nothing from outside. Clean names, real certs, and the next service is two lines and a reload. None of the parts are exotic, a reverse proxy, a wildcard cert, a split-horizon resolver; the work is wiring them so nothing is exposed and the whole cert path runs on hardware I control.
 
 Building internal HTTPS a different way, mkcert or step-ca or an internal CA? Say so in the comments or [drop me a line](../contact). Thanks for reading.
 
