@@ -1,0 +1,198 @@
+---
+// The Winamp-style visualizer hub. A full-viewport stage with three switchable
+// full-page visualizers (Geiss / MilkDrop / Classic), one shared mic analyser,
+// and a little pixel Mario in the corner that opens the old Mandelbrot page as
+// an easter egg.
+---
+<div class="wa-stage" id="wa-stage">
+  <canvas id="wa-geiss" class="wa-canvas active"></canvas>
+  <canvas id="wa-milk" class="wa-canvas"></canvas>
+  <canvas id="wa-classic" class="wa-canvas"></canvas>
+
+  <div class="wa-msg" id="wa-milk-loading" hidden>loading MilkDrop engine…</div>
+  <div class="wa-msg" id="wa-fallback" hidden>WebGL2 unavailable — this browser can't run the Geiss/MilkDrop visualizers.</div>
+
+  <!-- Winamp-ish control window -->
+  <div class="wa-panel">
+    <div class="wa-title"><span class="wa-title-txt">◄ MIKEAMP ►</span><span class="wa-vu" id="wa-vu"></span></div>
+    <div class="wa-body">
+      <div class="wa-tabs" role="tablist">
+        <button class="wa-tab active" data-viz="geiss" type="button">GEISS</button>
+        <button class="wa-tab" data-viz="milk" type="button">MILKDROP</button>
+        <button class="wa-tab" data-viz="classic" type="button">CLASSIC</button>
+      </div>
+      <div class="wa-controls">
+        <button class="wa-btn" id="wa-sound" type="button">🔊 react to sound</button>
+        <button class="wa-btn" id="wa-next" type="button" hidden>⏭ next preset</button>
+        <span class="wa-now" id="wa-now"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- easter egg: click Mario to open the old Mandelbrot experience -->
+  <a class="wa-mario" id="wa-mario" href="/visuals/mandelbrot" title="1-UP: the old visuals live here" aria-label="Secret: open the classic Mandelbrot visuals">
+    <svg id="wa-mario-svg" viewBox="0 0 12 16" width="44" height="58" shape-rendering="crispEdges" aria-hidden="true"></svg>
+  </a>
+</div>
+
+<style>
+  .wa-stage { position: fixed; left: 0; right: 0; bottom: 0; top: 104px; z-index: 1; background: #000; overflow: hidden; }
+  .wa-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity .35s ease; pointer-events: none; }
+  .wa-canvas.active { opacity: 1; pointer-events: auto; }
+  .wa-msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 1rem; color: var(--t2); font-family: var(--font-mono); font-size: .8rem; z-index: 5; }
+  .wa-msg[hidden] { display: none; }
+
+  /* control window — beveled grey Winamp skin */
+  .wa-panel { position: absolute; left: .8rem; bottom: .8rem; z-index: 6; width: min(340px, calc(100vw - 1.6rem)); font-family: var(--font-mono); color: #d7f7e2; background: #1a2620; border: 1px solid #000; border-radius: 4px; box-shadow: 0 0 0 1px rgba(120,255,180,.12), 0 10px 30px rgba(0,0,0,.6); overflow: hidden; user-select: none; }
+  .wa-title { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .28rem .5rem; font-size: .66rem; letter-spacing: .12em; background: linear-gradient(#2c4a3a, #17281f); border-bottom: 1px solid #000; color: #9df3bf; }
+  .wa-vu { flex: 0 0 64px; height: 8px; border-radius: 2px; background: linear-gradient(90deg, #123 0%, #123 100%); box-shadow: inset 0 0 0 1px #000; }
+  .wa-body { padding: .5rem; }
+  .wa-tabs { display: flex; gap: .3rem; margin-bottom: .5rem; }
+  .wa-tab { flex: 1; cursor: pointer; font-family: var(--font-mono); font-size: .64rem; letter-spacing: .06em; color: #bfeecd; background: linear-gradient(#26382e, #1a271f); border: 1px solid #000; border-top-color: #3c5a48; border-radius: 3px; padding: .38rem .2rem; }
+  .wa-tab:hover { color: #eafff2; }
+  .wa-tab.active { color: #0a140d; background: linear-gradient(#7cf0a8, #37c06d); border-top-color: #baffd4; text-shadow: 0 1px 0 rgba(255,255,255,.4); }
+  .wa-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+  .wa-btn { cursor: pointer; font-family: var(--font-mono); font-size: .66rem; color: #cfeedb; background: linear-gradient(#26382e, #1a271f); border: 1px solid #000; border-top-color: #3c5a48; border-radius: 3px; padding: .34rem .55rem; }
+  .wa-btn:hover { color: #eafff2; }
+  .wa-btn[hidden] { display: none; }
+  .wa-btn.on { color: #a3ff12; border-color: rgba(163,255,18,.5); }
+  .wa-now { flex: 1 1 100%; min-width: 0; font-size: .58rem; color: #7fbf99; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Mario easter egg */
+  .wa-mario { position: absolute; right: .7rem; bottom: .7rem; z-index: 6; line-height: 0; filter: drop-shadow(0 3px 5px rgba(0,0,0,.6)); opacity: .82; transition: transform .15s ease, opacity .15s ease; image-rendering: pixelated; animation: wa-mario-bob 1.6s ease-in-out infinite; }
+  .wa-mario:hover { opacity: 1; transform: scale(1.16) rotate(-4deg); }
+  @keyframes wa-mario-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  @media (prefers-reduced-motion: reduce) { .wa-mario { animation: none; } }
+  @media (max-width: 560px) { .wa-now { display: none; } }
+</style>
+
+<script>
+  import { AudioEngine } from './winamp/audio';
+  import { GeissViz } from './winamp/geiss';
+  import { ClassicViz } from './winamp/bars';
+  import { MilkdropViz } from './winamp/milkdrop';
+
+  const stage = document.getElementById('wa-stage');
+  // keep the stage tucked just under the nav, like the Mandelbrot page
+  function place() {
+    if (!stage) return;
+    const nav = document.querySelector('nav');
+    const b = nav ? nav.getBoundingClientRect().bottom : 88;
+    stage.style.top = Math.max(0, Math.round(b + 8)) + 'px';
+  }
+  place();
+  window.addEventListener('resize', place);
+  window.addEventListener('scroll', place, { passive: true });
+
+  // --- pixel Mario (same sprite that stars on the hidden Mandelbrot page) ---
+  (function drawMario() {
+    const MAP = ["...rrrrr....","..rrrrrrrr..","..hhhsss.s..",".hshssss.ss.",".hshhsss.ss.",".hhsssssss..","...sssss....","..rroorr....",".rrrooorrr..","rrrooooorrr.","ssrooooorss.","ssoooooooss.","..ooo..ooo..",".hhh...hhh..","hhhh...hhhh.","hhh.....hhh."];
+    const PAL: Record<string, string> = { r: '#e52521', s: '#f3b78b', h: '#5c3b1e', o: '#3d63c9' };
+    const svg = document.getElementById('wa-mario-svg');
+    if (!svg) return;
+    let rects = '';
+    for (let row = 0; row < MAP.length; row++)
+      for (let col = 0; col < MAP[row].length; col++) {
+        const ch = MAP[row][col];
+        if (PAL[ch]) rects += `<rect x="${col}" y="${row}" width="1" height="1" fill="${PAL[ch]}"/>`;
+      }
+    svg.innerHTML = rects;
+  })();
+
+  const audio = new AudioEngine();
+
+  // ---- shared render loop over the active visualizer ----
+  const canvases: Record<string, HTMLCanvasElement> = {
+    geiss: document.getElementById('wa-geiss') as HTMLCanvasElement,
+    milk: document.getElementById('wa-milk') as HTMLCanvasElement,
+    classic: document.getElementById('wa-classic') as HTMLCanvasElement,
+  };
+  const viz: Record<string, any> = { geiss: null, milk: null, classic: null };
+  let active = 'geiss';
+  let webglOK = true;
+
+  const milkLoading = document.getElementById('wa-milk-loading');
+  const fallback = document.getElementById('wa-fallback');
+  const nowEl = document.getElementById('wa-now');
+  const nextBtn = document.getElementById('wa-next');
+  const vu = document.getElementById('wa-vu');
+
+  function ensure(name: string) {
+    if (viz[name]) return viz[name];
+    try {
+      if (name === 'geiss') viz.geiss = new GeissViz(canvases.geiss);
+      else if (name === 'classic') viz.classic = new ClassicViz(canvases.classic);
+      else if (name === 'milk') {
+        const m = new MilkdropViz(canvases.milk, audio);
+        viz.milk = m;
+        if (milkLoading) milkLoading.hidden = false;
+        m.init().then(() => {
+          if (milkLoading) milkLoading.hidden = true;
+          if (nowEl) nowEl.textContent = 'MilkDrop — auto-cycling presets';
+        }).catch(() => {
+          if (milkLoading) { milkLoading.hidden = false; milkLoading.textContent = 'MilkDrop engine failed to load (needs network + WebGL2).'; }
+        });
+      }
+    } catch (err) {
+      if (name !== 'classic') { webglOK = false; if (fallback) fallback.hidden = false; }
+    }
+    return viz[name];
+  }
+
+  function setActive(name: string) {
+    active = name;
+    for (const k of Object.keys(canvases)) canvases[k].classList.toggle('active', k === name);
+    document.querySelectorAll('.wa-tab').forEach((t) => {
+      t.classList.toggle('active', (t as HTMLElement).dataset.viz === name);
+    });
+    if (nextBtn) nextBtn.hidden = name !== 'milk';
+    if (nowEl) nowEl.textContent = name === 'geiss' ? 'Geiss — feedback plasma'
+      : name === 'classic' ? 'Classic — spectrum + oscilloscope' : (viz.milk?.ready ? 'MilkDrop — auto-cycling presets' : '');
+    ensure(name);
+  }
+
+  document.querySelectorAll('.wa-tab').forEach((tab) => {
+    tab.addEventListener('click', () => setActive((tab as HTMLElement).dataset.viz!));
+  });
+  nextBtn?.addEventListener('click', () => viz.milk?.random(2.5));
+
+  // ---- mic toggle ----
+  const soundBtn = document.getElementById('wa-sound');
+  soundBtn?.addEventListener('click', async () => {
+    if (audio.on) {
+      audio.disable();
+      soundBtn.classList.remove('on');
+      soundBtn.textContent = '🔊 react to sound';
+      return;
+    }
+    soundBtn.textContent = '… allow mic';
+    const ok = await audio.enable();
+    if (ok) {
+      soundBtn.classList.add('on');
+      soundBtn.textContent = '🔊 listening';
+      viz.milk?.connectAudio();
+    } else {
+      soundBtn.textContent = '🔇 mic blocked';
+    }
+  });
+
+  ensure('geiss');
+
+  let last = 0, raf = 0, alive = true;
+  function loop(ts: number) {
+    if (!alive) return;
+    const dt = last ? Math.min(0.05, (ts - last) / 1000) : 0.016;
+    last = ts;
+    audio.update(dt);
+    if (vu) { const w = Math.round(audio.level * 100); (vu as HTMLElement).style.background = `linear-gradient(90deg,#39ff87 ${w}%, #0c1a12 ${w}%)`; }
+    try { viz[active]?.frame(dt, audio); } catch (e) {}
+    raf = requestAnimationFrame(loop);
+  }
+  raf = requestAnimationFrame(loop);
+
+  window.addEventListener('resize', () => { for (const k of Object.keys(viz)) viz[k]?.resize?.(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { alive = false; cancelAnimationFrame(raf); }
+    else if (!alive) { alive = true; last = 0; raf = requestAnimationFrame(loop); }
+  });
+</script>

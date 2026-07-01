@@ -1,18 +1,18 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import MandelbrotStage from '../components/visuals/MandelbrotStage.astro';
+import WinampStage from '../components/visuals/WinampStage.astro';
 ---
 <BaseLayout
   title="Visuals - Michael Vivirito"
-  description="A full-screen, infinitely diving Mandelbrot set with psychedelic ancient monuments — the Giza pyramids, the Sphinx, and Stonehenge — drifting through it. Drag, zoom, or let it dive."
-  keywords="visuals, Mandelbrot, fractal, psychedelic, WebGL, Giza, pyramids, Sphinx, Stonehenge, generative art, mvivirito"
+  description="Full-screen music visualizers in the spirit of the Winamp days — a hand-built Geiss feedback plasma, MilkDrop presets, and the classic spectrum-analyzer bars and oscilloscope. Turn on your mic and let it react."
+  keywords="visuals, Winamp, Geiss, MilkDrop, Butterchurn, music visualizer, spectrum analyzer, oscilloscope, WebGL, audio reactive, mvivirito"
   ogTitle="Visuals - Michael Vivirito"
-  ogDescription="A full-screen psychedelic Mandelbrot dive with ancient monuments drifting through it."
+  ogDescription="Bringing back the Winamp days: Geiss, MilkDrop, and classic spectrum visualizers, full-screen and audio-reactive."
   canonical="/visuals"
 >
-  <MandelbrotStage />
+  <WinampStage />
 
-  <!-- This page only: let the fractal take the full viewport, keep the nav on top. -->
+  <!-- This page only: let the visualizer take the full viewport, keep the nav on top. -->
   <style is:global>
     nav { position: relative; z-index: 20; }
     footer { display: none; }
