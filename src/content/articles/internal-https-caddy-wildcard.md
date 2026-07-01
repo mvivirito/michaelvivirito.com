@@ -97,9 +97,9 @@ cache-max-negative-ttl: 30
 
 Now the stale answer clears in about 30 seconds and the check passes. The takeaway: a resolver between you and an ACME challenge can trip you up two ways, by claiming to own a zone it does not, and by remembering that a record was missing after it exists. Both are easy to miss because each piece is behaving exactly as designed. Fixing it in Unbound, rather than bypassing Unbound with a firewall hole, keeps all DNS flowing through the one resolver.
 
-## Names That Only Exist at Home
+## Domain Names That Only Exist at Home
 
-Those names exist *only* in my router's Unbound; public DNS for `michaelvivirito.com` has no records for them. From outside my network they resolve to nothing; from my couch they resolve to the proxy. And "my couch" extends to "anywhere, over Tailscale": on my [Tailscale exit node](beryl-7-tailscale-travel-router), DNS tunnels home to the same Unbound, so the same names work with no per-device hosts files and no split-DNS to maintain. The exit node carries both the name resolution and the route.
+My services' domain names exist *only* in my router's Unbound; public DNS for `michaelvivirito.com` has no records for them. From outside my network they resolve to nothing; from my couch they resolve to the proxy. And "my couch" extends to "anywhere, over Tailscale": on my [Tailscale exit node](beryl-7-tailscale-travel-router), DNS tunnels home to the same Unbound, so the same domain names work with no per-device hosts files and no split-DNS to maintain. The exit node carries both the name resolution and the route.
 
 ## Adding a Service Is Two Lines
 
