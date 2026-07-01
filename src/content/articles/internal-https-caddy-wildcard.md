@@ -11,7 +11,7 @@ related: ["freebsd-pf-router", "version-control-freebsd-firewall", "beryl-7-tail
 
 ## Clean Names, Real Encryption
 
-Every internal web UI in my homelab lived at a bare IP like `https://10.0.0.150` or a fake-TLD name like `git.k8s.home`, each with a self-signed cert and the red browser warning that comes with it. Two things bugged me: I wanted clean, real names for every service, and I wanted the traffic actually encrypted with a cert browsers trust, even inside my own LAN. A [Caddy](https://caddyserver.com/) reverse proxy delivers both: one wildcard Let's Encrypt cert in front of every internal service. Here is how it fits together and how to build it, including the one DNS gotcha that will eat an evening if you hit it blind.
+Every internal web UI in my homelab lived at a bare IP like `https://10.0.0.150` or a fake-TLD name like `git.k8s.home`, each with a self-signed cert and the red browser warning that comes with it. Two things bugged me: I wanted clean, real names for every service, and I wanted the traffic actually encrypted with a cert browsers trust, even inside my own LAN. A [Caddy](https://caddyserver.com/) reverse proxy delivers both: one wildcard Let's Encrypt cert in front of every internal service. Here is how it fits together and how to build it.
 
 ## Three Independent Pieces
 
@@ -73,9 +73,11 @@ The Cloudflare token is the one real secret, scoped to the floor: `dns_records:e
 
 ## The Unbound Gotcha That Ate an Evening
 
-Here is the bug I promised. Caddy resolves through my router's Unbound (`resolvers 10.0.0.1`) because I enforce all DNS through Unbound and did not want a firewall exception. Two Unbound behaviors then fought the challenge.
+Caddy resolves DNS through my router's Unbound (`resolvers 10.0.0.1`), because I route all DNS through Unbound and did not want a firewall exception for the proxy. Two Unbound behaviors then broke the cert.
 
-My first split-horizon zone was a wildcard `redirect` local-zone. The problem: a `redirect` zone **synthesizes an SOA** for `home.michaelvivirito.com`. To issue the cert, Caddy walks up the DNS tree doing SOA lookups to find which zone to write the TXT record into. Unbound invents an SOA for `home.michaelvivirito.com`, so Caddy tries to write the proof into a zone Cloudflare has never heard of, and fails. The fix is a `transparent` zone:
+**Problem 1: the challenge went to the wrong place.** To pass the DNS-01 challenge, Caddy creates the `_acme-challenge` TXT record in the DNS zone that actually owns the domain, which for me is `michaelvivirito.com` at Cloudflare. It finds that zone by asking DNS which server is authoritative for the name (an SOA lookup) and walking up the domain until it gets an answer.
+
+My first attempt used a `redirect` local-zone in Unbound. A `redirect` zone answers *everything* under the name from local data, including that authority question, so when Caddy asked, Unbound answered as if it owned `home.michaelvivirito.com`. Caddy believed it, decided that was the zone, and tried to create the record there through Cloudflare, which has never heard of it. The fix is a `transparent` zone instead:
 
 ```
 # /usr/local/etc/unbound/unbound.conf
@@ -85,15 +87,15 @@ local-data: "pbs.home.michaelvivirito.com. A 10.0.0.5"
 # ...one A record per service, all pointing at the proxy
 ```
 
-`transparent` means "answer from local data if I have a record, otherwise recurse." So service names resolve locally to the proxy, but `_acme-challenge...` (no local data) recurses out to Cloudflare, the SOA walk finds the real zone `michaelvivirito.com`, and the TXT record lands where Let's Encrypt looks.
+`transparent` answers from local data only when it *has* a matching record, and otherwise lets the query recurse out to the real internet. So `git.home.michaelvivirito.com` still resolves locally to the proxy, but `_acme-challenge.home.michaelvivirito.com` (no local record) goes out to Cloudflare, Caddy correctly finds the `michaelvivirito.com` zone, and the TXT record lands where Let's Encrypt will look for it.
 
-That fixed issuance; then negative caching stalled it. When Caddy polls for its own TXT record, the first lookups come back empty, and Unbound caches that "no such record" answer for the zone's SOA-minimum, 1800 seconds on Cloudflare. So the record exists, Cloudflare serves it, and my resolver keeps returning the cached "nope" for half an hour until the request times out. Cap it:
+**Problem 2: a stale "does not exist" answer.** After Caddy creates the record, it double-checks that the record is visible before handing off to Let's Encrypt. But Unbound had already cached the *absence* of that record from an earlier lookup, and it keeps a "no such record" answer for as long as the domain's DNS tells it to, which is 1800 seconds (30 minutes) on Cloudflare. So the record now exists, but my own resolver keeps insisting it does not, and Caddy's check times out. The fix is to cap how long Unbound trusts a "does not exist" answer:
 
 ```
 cache-max-negative-ttl: 30
 ```
 
-The takeaway: a recursive resolver between you and an ACME challenge can mislead you two ways, synthesizing records that point to the wrong zone, and caching their absence after they exist. Both are invisible because every component behaves exactly as documented. Solving it in Unbound instead of bypassing it with a firewall hole means the proxy renews through my own resolver, no exception.
+Now the stale answer clears in about 30 seconds and the check passes. The takeaway: a resolver between you and an ACME challenge can trip you up two ways, by claiming to own a zone it does not, and by remembering that a record was missing after it exists. Both are easy to miss because each piece is behaving exactly as designed. Fixing it in Unbound, rather than bypassing Unbound with a firewall hole, keeps all DNS flowing through the one resolver.
 
 ## Names That Only Exist at Home
 
